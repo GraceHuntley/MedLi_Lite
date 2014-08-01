@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MedLi</string>
+    <string name="action_settings">Settings</string>
+    <string name="routine_label">Routine Medications</string>
+    <string name="prn_label">PRN Medications</string>
+    <string name="clear_btn_label">Clear</string>
+    <string name="submit_btn_label">Submit</string>
+
+    <string name="delete_button">Delete</string>
+    <string name="submit">Submit</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="d_c">D/C</string>
+    <string name="med_name_label">Medication Name</string>
+    <string name="dose_label">Dose</string>
+    <string name="dose_hint">Enter Dose</string>
+    <string name="freq_hours_label">Frequency hRS: </string>
+    <string name="times_perday_label">Times per day: </string>
+    <string name="times_perday_hint">Enter times per day</string>
+    <string name="medtype_label">Select Routine or PRN(As Needed)</string>
+    <string name="plus_button_label">+</string>
+    <string name="minus_button_label">-</string>
+    <string name="auto_populate_label">POPULATE</string>
+    <string name="admin_times_label">Maximum Doses per Day</string>
+    <string name="zero">0</string>
+    <string name="last_filled">Date Medication Filled last</string>
+    <string name="date_format">MM/DD/YYYY</string>
+    <string name="prn_freq_hint">Hours between doses</string>
+    <string name="prn_freq_label">Enter how often to give dose</string>
+
+
+    <string-array name="dose_measure_type">
+        <item>ml</item>
+        <item>mg</item>
+        <item>tsp</item>
+        <item>drops</item>
+    </string-array>
+
+    <string-array name="am_pm_list">
+        <item>AM</item>
+        <item>PM</item>
+    </string-array>
+    <string-array name="med_type">
+        <item>SELECT</item>
+        <item>ROUTINE</item>
+        <item>PRN</item>
+    </string-array>
+
+</resources>
