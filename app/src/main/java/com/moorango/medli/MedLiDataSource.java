@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
+import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,12 +16,15 @@ import java.util.List;
 /**
  * Created by Colin on 7/31/2014.
  * Copyright 2014
+ *
+ *
  */
 public class MedLiDataSource {
     // Database fields
     private SQLiteDatabase database;
     private final SQLiteHelper dbHelper;
     private static MedLiDataSource instance;
+    private static MakeDateTimeHelper dt = new MakeDateTimeHelper();
 
     public MedLiDataSource(Context context) {
         dbHelper = new SQLiteHelper(context);
@@ -101,8 +105,13 @@ public class MedLiDataSource {
             medication.setNextDue(new Object() {
 
                 String setTime() {
-                    String split[] = medication.getDoseTimes().split(";");
-                    return split[medication.getActualDoseCount()];
+                    if (medication.getDoseCount() > medication.getActualDoseCount()) {
+                        String split[] = medication.getDoseTimes().split(";");
+
+                        return split[medication.getActualDoseCount()];
+                    } else {
+                        return "COMPLETE";
+                    }
                 }
             }.setTime());
         }
@@ -131,5 +140,41 @@ public class MedLiDataSource {
         database.insert("medlist", "name", cv);
 
 
+    }
+
+    public void submitMedicationAdmin(Medication medication, String manualTime) {
+
+        ContentValues cv = new ContentValues();
+        cv.put("ID_UNIQUE", medication.getMedName() + new Date().getTime());
+        cv.put("name", medication.getMedName());
+        cv.put("dose", medication.getDoseMeasure() + " " + medication.getDoseMeasureType());
+
+
+        if (manualTime != null) { // dose time being entered manually.
+            cv.put("manual_entry", 1);
+            cv.put("timestamp", dt.getDate() + " " + dt.convertToTime24(manualTime));
+            cv.put("late", isDoseLate(manualTime, medication.getNextDue()));
+        } else { // no manual entry.
+            cv.put("timestamp", dt.getDate() + " " + dt.getTime24());
+            cv.put("late", isDoseLate(dt.getTime24().toString(), medication.getNextDue()));
+            cv.put("manual_entry", 0);
+        }
+
+        this.open();
+        database.insert("med_logs", "name", cv);
+    }
+
+    private int isDoseLate(String time, String due) {
+        // TODO test whether admin time is late.
+        int nextDoseHour = Integer.valueOf(dt.convertToTime24(due).split(":")[0]);
+        int loggedHour = Integer.valueOf(dt.convertToTime24(time).split(":")[0]);
+
+        int difference = loggedHour - nextDoseHour;
+
+        if (difference > 1) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }

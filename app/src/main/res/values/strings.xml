@@ -29,6 +29,7 @@
     <string name="date_format">MM/DD/YYYY</string>
     <string name="prn_freq_hint">Hours between doses</string>
     <string name="prn_freq_label">Enter how often to give dose</string>
+    <string name="med_dose_dialog_title">This is a test for now</string>
 
 
     <string-array name="dose_measure_type">

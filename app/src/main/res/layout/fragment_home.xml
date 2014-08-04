@@ -20,6 +20,8 @@
         android:id="@+id/routine_listview"
         android:layout_width="fill_parent"
         android:layout_weight="4"
+        android:overScrollFooter="@null"
+        android:background="#ffffff"
         android:layout_height="0dip"/>
 
 
@@ -32,7 +34,9 @@
     <ListView
         android:id="@+id/prn_listview"
         android:layout_width="fill_parent"
+        android:overScrollFooter="@null"
         android:layout_weight="4"
+        android:background="#ffffff"
         android:layout_height="0dip"/>
 
 
@@ -54,6 +58,7 @@
         <Button
             android:id="@+id/submit_button"
             android:layout_width="0dip"
+            android:enabled="false"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/submit_btn_label"/>

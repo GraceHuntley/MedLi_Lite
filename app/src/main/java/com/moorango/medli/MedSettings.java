@@ -82,12 +82,7 @@ public class MedSettings extends Fragment {
         return inflater.inflate(R.layout.fragment_med_settings, container, false);
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -218,10 +213,10 @@ public class MedSettings extends Fragment {
 
                 } else if (selection.equals("routine")) { // routine
                     submitRoutineToDB();
-                    mListener.onFragmentInteraction(null);
+                    mListener.onFragmentInteraction(0);
                 } else { // prn med
                     submitPrnToDB();
-                    mListener.onFragmentInteraction(null);
+                    mListener.onFragmentInteraction(0);
                 }
             }
         });
@@ -247,7 +242,7 @@ public class MedSettings extends Fragment {
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+        public void onFragmentInteraction(int tag);
     }
 
     private void setRoutineForm() {
@@ -398,6 +393,20 @@ public class MedSettings extends Fragment {
                 android.R.layout.select_dialog_item, medList);
 
         acMedName.setAdapter(adapter);
+    }
+
+
+    @Override
+    public void onPause() {
+        dbHelper.close();
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        dbHelper.close();
+        super.onDestroy();
+
     }
 
 

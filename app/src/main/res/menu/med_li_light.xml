@@ -10,7 +10,7 @@
         android:title="Edit Med"
         android:icon="@drawable/ic_action_edit"
         app:showAsAction="always"/>
-    <item android:id="@+id/add_med"
+    <item android:id="@+id/action_add_med"
         android:title="+"
         android:icon="@drawable/ic_action_new"
         app:showAsAction="always"/>

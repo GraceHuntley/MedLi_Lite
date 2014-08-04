@@ -127,8 +127,8 @@ public class Medication {
 
     @Override
     public String toString() {
-        return this.getMedName() + " " + this.getDoseMeasure() + this.getDoseMeasureType() + "\n" +
-                this.getNextDue();
+        return this.getMedName().toUpperCase() + " " + this.getDoseMeasure() + this.getDoseMeasureType() + "\n" +
+                "NEXT DUE: " + this.getNextDue();
     }
 
    /* public void printMed() {
@@ -140,22 +140,26 @@ public class Medication {
 
     public int compareNextDue(Medication med) {
 
-        SimpleDateFormat df1 = new SimpleDateFormat("hh:mm aa");
-        Date date1 = null;
-        Date date2 = null;
-        try {
-            date1 = df1.parse(this.getNextDue());
-            date2 = df1.parse(med.getNextDue());
-        } catch (ParseException e) {
-            Log.d("Medication", e.toString());
-        }
-        Log.d("Medication", date1.toString());
-        if (date1.getTime() < date2.getTime()) {
-            return -1;
-        } else if (date1.getTime() > date2.getTime()) {
+        if (this.getNextDue().equals("COMPLETE") || med.getNextDue().equals("COMPLETE")) {
             return 1;
         } else {
-            return 0;
+            SimpleDateFormat df1 = new SimpleDateFormat("hh:mm aa");
+            Date date1 = null;
+            Date date2 = null;
+            try {
+                date1 = df1.parse(this.getNextDue());
+                date2 = df1.parse(med.getNextDue());
+            } catch (ParseException e) {
+                Log.d("Medication", e.toString());
+            }
+            Log.d("Medication", date1.toString());
+            if (date1.getTime() < date2.getTime()) {
+                return -1;
+            } else if (date1.getTime() > date2.getTime()) {
+                return 1;
+            } else {
+                return 0;
+            }
         }
     }
 
