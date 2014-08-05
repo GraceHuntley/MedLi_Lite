@@ -42,23 +42,14 @@ public class MedSettings extends Fragment {
     private final ArrayList<EditText> etList = new ArrayList<EditText>();
     private EditText med_dose, adminTimes, lastFilled;
     private MakeDateTimeHelper dt;
-    private ArrayAdapter<CharSequence> measure;
     private LinearLayout adminTimesList;
     private AlertDialog.Builder ad;
-    private String name, dose, type;
     private Spinner med_measure_spinner, med_type;
     private AutoCompleteTextView acMedName;
-    private Button delete_med;
-    private Button dc_med;
-    private Button submitMed;
     private TextWatcher textWatcher;
     private LinearLayout prnFreqBox;
-    private LinearLayout ll;
-    private TimePickerDialog backupTPD = null;
     private EditText doseFrequency;
     private int index = 0;
-    private boolean wasDialogShowing = false;
-
     private boolean isRoutine = false;
 
     private MedLiDataSource dbHelper;
@@ -67,12 +58,6 @@ public class MedSettings extends Fragment {
 
     public MedSettings() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -91,14 +76,14 @@ public class MedSettings extends Fragment {
         ad = new AlertDialog.Builder(getActivity());
         dbHelper = MedLiDataSource.getHelper(getActivity());
 
-        ll = (LinearLayout) getActivity().findViewById(R.id.med_edit_layout);
-        delete_med = (Button) getActivity().findViewById(R.id.del_med);
+        LinearLayout ll = (LinearLayout) getActivity().findViewById(R.id.med_edit_layout);
+        Button delete_med = (Button) getActivity().findViewById(R.id.del_med);
         Button plusButton = (Button) getActivity().findViewById(R.id.plus_button);
         adminTimes = (EditText) getActivity().findViewById(R.id.admin_count_edittext);
         Button minusButton = (Button) getActivity().findViewById(R.id.minus_button);
         doseFrequency = (EditText) getActivity().findViewById(R.id.prn_frequency_input);
-        dc_med = (Button) getActivity().findViewById(R.id.dc_med);
-        submitMed = (Button) getActivity().findViewById(R.id.btn_add_med);
+        Button dc_med = (Button) getActivity().findViewById(R.id.dc_med);
+        Button submitMed = (Button) getActivity().findViewById(R.id.btn_add_med);
         med_type = (Spinner) getActivity().findViewById(R.id.med_type_spinner);
         med_dose = (EditText) getActivity().findViewById(R.id.med_dose_input);
         lastFilled = (EditText) getActivity().findViewById(R.id.last_filled_date);
@@ -119,7 +104,7 @@ public class MedSettings extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 if (!adapterView.getSelectedItem().toString().toLowerCase().equals("select")) {
-                    isRoutine = (adapterView.getSelectedItem().toString().toLowerCase().equals("routine")) ? true : false;
+                    isRoutine = (adapterView.getSelectedItem().toString().toLowerCase().equals("routine"));
                     if (isRoutine) { // setup form for routine medication.
                         adminTimes.setText("0");
                         setTextChangeListener();
@@ -240,11 +225,6 @@ public class MedSettings extends Fragment {
         mListener = null;
     }
 
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(int tag);
-    }
-
     private void setRoutineForm() {
         // make any changes for a routine med form here. TODO
         prnFreqBox.setVisibility(View.GONE);
@@ -295,7 +275,7 @@ public class MedSettings extends Fragment {
                             public boolean onTouch(View view, MotionEvent motionEvent) {
 
                                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                                    final int nextIndex = index;
+
                                     final View v = view;
                                     TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
                                         @Override
@@ -304,8 +284,6 @@ public class MedSettings extends Fragment {
                                             //etList2.get(nextIndex - 1).setText(dt.convertToTime12("" + hourOfDay + ":" + String.format("%02d", minute)));
                                             EditText et = (EditText) getActivity().findViewById(v.getId());
                                             et.setText(dt.convertToTime12("" + hourOfDay + ":" + String.format("%02d", minute)));
-                                            // TODO need to test to make sure correct times are being grabbed from edittexts.
-                                            wasDialogShowing = false;
 
                                         }
                                     };
@@ -313,8 +291,7 @@ public class MedSettings extends Fragment {
                                     String timeSplit[] = dt.convertToTime24(etList.get(index - 1).getText().toString()).split(":");
 
                                     TimePickerDialog tpd = new TimePickerDialog(getActivity(), t, Integer.valueOf(timeSplit[0]), Integer.valueOf(timeSplit[1]), false);
-                                    backupTPD = tpd; // store dialog for reinstatement TODO test only.
-                                    wasDialogShowing = true;
+
                                     tpd.show();
                                 }
                                 return false;
@@ -358,7 +335,8 @@ public class MedSettings extends Fragment {
 
         if (type.equals("routine")) {
             medication.setDoseTimes(new Object() {
-                @Override public String toString() {
+                @Override
+                public String toString() {
                     String compiled = "";
                     for (index = etList.size() - 1; index > -1; index--) {
                         compiled += etList.get(index).getText().toString() + ";";
@@ -395,7 +373,6 @@ public class MedSettings extends Fragment {
         acMedName.setAdapter(adapter);
     }
 
-
     @Override
     public void onPause() {
         dbHelper.close();
@@ -407,6 +384,11 @@ public class MedSettings extends Fragment {
         dbHelper.close();
         super.onDestroy();
 
+    }
+
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        public void onFragmentInteraction(int tag);
     }
 
 

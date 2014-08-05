@@ -16,13 +16,9 @@
     <string name="med_name_label">Medication Name</string>
     <string name="dose_label">Dose</string>
     <string name="dose_hint">Enter Dose</string>
-    <string name="freq_hours_label">Frequency hRS: </string>
-    <string name="times_perday_label">Times per day: </string>
-    <string name="times_perday_hint">Enter times per day</string>
     <string name="medtype_label">Select Routine or PRN(As Needed)</string>
     <string name="plus_button_label">+</string>
     <string name="minus_button_label">-</string>
-    <string name="auto_populate_label">POPULATE</string>
     <string name="admin_times_label">Maximum Doses per Day</string>
     <string name="zero">0</string>
     <string name="last_filled">Date Medication Filled last</string>
@@ -30,7 +26,8 @@
     <string name="prn_freq_hint">Hours between doses</string>
     <string name="prn_freq_label">Enter how often to give dose</string>
     <string name="med_dose_dialog_title">This is a test for now</string>
-
+    <string name="edit_med_label">Edit Med</string>
+    <string name="plus_label">+</string>
 
     <string-array name="dose_measure_type">
         <item>ml</item>
@@ -39,10 +36,6 @@
         <item>drops</item>
     </string-array>
 
-    <string-array name="am_pm_list">
-        <item>AM</item>
-        <item>PM</item>
-    </string-array>
     <string-array name="med_type">
         <item>SELECT</item>
         <item>ROUTINE</item>

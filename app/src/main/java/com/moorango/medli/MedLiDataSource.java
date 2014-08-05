@@ -20,8 +20,8 @@ import java.util.List;
  */
 public class MedLiDataSource {
 
+    private static final MakeDateTimeHelper dt = new MakeDateTimeHelper();
     private static MedLiDataSource instance;
-    private static MakeDateTimeHelper dt = new MakeDateTimeHelper();
     final String TAG = "MedLiDataSource";
     private final SQLiteHelper dbHelper;
     // Database fields
@@ -38,7 +38,7 @@ public class MedLiDataSource {
         return instance;
     }
 
-    public void open() throws SQLException {
+    void open() throws SQLException {
         try {
             database = dbHelper.getWritableDatabase();
 
@@ -52,42 +52,17 @@ public class MedLiDataSource {
         dbHelper.close();
     }
 
-    public List<Medication> getAllRoutineMeds() {
-
-        this.open();
+    public List<Medication> getAllMeds(String tag) {
         List<Medication> list = new ArrayList<Medication>();
-        //Cursor cursor = database.query("medlist", null, "admin_type='routine'", null, null, null, "name");
-        Cursor cursor = database.rawQuery(Constants.GET_MEDLIST_ROUTINE, null);
+        this.open(); // open db.
 
+        Cursor cursor = database.rawQuery((tag.equals("routine")) ? Constants.GET_MEDLIST_ROUTINE : Constants.GET_MEDLIST_PRN, null);
 
         while (cursor.moveToNext()) {
             Medication medication = cursorToRoutine(cursor);
-
             list.add(medication);
-
         }
         cursor.close();
-
-
-        return list;
-    }
-
-    public List<Medication> getAllPrnMeds() {
-
-        this.open();
-        List<Medication> list = new ArrayList<Medication>();
-        Cursor cursor = database.query("medlist", null, "admin_type='prn'", null, null, null, "name");
-
-
-        while (cursor.moveToNext()) {
-            Medication medication = cursorToRoutine(cursor);
-
-            list.add(medication);
-
-        }
-        cursor.close();
-
-
         return list;
     }
 
@@ -115,9 +90,60 @@ public class MedLiDataSource {
                     }
                 }
             }.setTime());
+        } else {
+
+            medication.setDoseFrequency(Integer.valueOf(cursor.getString(7)));
+            if (getPrnDoseCount24Hours(medication.getMedName()) >= medication.getDoseCount()) { // all doses have been taken.
+                // TODO might make this show the next dose with date.
+                medication.setNextDue("MAXED DOSES!");
+            } else {
+                // TODO get last dose then see if it was recent.
+
+                medication.setNextDue(getPrnNextDose(medication.getMedName(), medication.getDoseFrequency()));
+
+            }
         }
 
         return medication;
+    }
+
+    public int getPrnDoseCount24Hours(String medName) {
+
+        this.open();
+
+        Cursor cs = database.rawQuery(Constants.GET_COUNT_LAST_24HOURS(medName), null);
+
+        return (cs.moveToFirst()) ? cs.getInt(0) : 0;
+
+    }
+
+    public String getPrnNextDose(String medName, int freq) {
+
+        String nextDose = null;
+
+        this.open();
+
+        Cursor cs = database.rawQuery(Constants.GET_LAST_PRN_DOSE(medName), null);
+        while (cs.moveToNext()) {
+            nextDose = cs.getString(0);
+        }
+
+        if (nextDose == null) {
+            nextDose = "PRN";
+        } else {
+            int lastDoseHour = Integer.valueOf(nextDose.split(" ")[1].split(":")[0]);
+            int lastDosePlusHour = lastDoseHour + 1; // just for testing purposes.
+
+            int currentHour = Integer.valueOf(dt.getTime24().split(":")[0]);
+
+            if ((lastDosePlusHour - currentHour) > 0) {
+                String nextDoseHour = "" + (lastDoseHour + freq);
+                String minutes = "" + nextDose.split(" ")[1].split(":")[1];
+                nextDose = dt.convertToTime12(nextDoseHour + ":" + minutes + ":" + "00");
+            }
+        }
+
+        return nextDose;
     }
 
     public void submitNewMedication(Medication medication) {
@@ -158,11 +184,11 @@ public class MedLiDataSource {
             cv.put("late", isDoseLate(manualTime, medication.getNextDue()));
         } else { // no manual entry.
             cv.put("timestamp", dt.getDate() + " " + dt.getTime24());
-            cv.put("late", isDoseLate(dt.getTime24().toString(), medication.getNextDue()));
+            if (medication.getAdminType().equals("routine")) {
+                cv.put("late", isDoseLate(dt.getTime24(), medication.getNextDue()));
+            }
             cv.put("manual_entry", 0);
         }
-
-        Log.d(TAG, cv.toString());
 
         this.open();
         database.insert("med_logs", "name", cv);

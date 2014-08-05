@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -56,7 +55,7 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 MedSettings medSettings = new MedSettings();
-                Log.d("TEST", "add_med was pressed");
+
                 fragmentTransaction.replace(R.id.fragment_holder, medSettings, "medSettings");
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();

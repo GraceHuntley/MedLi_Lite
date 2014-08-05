@@ -10,10 +10,8 @@ import android.net.NetworkInfo;
  */
 public class VerifyHelpers {
 
-    Context context;
-
     VerifyHelpers(Context con) {
-        context = con;
+
     }
 
     public static boolean isNetworkAvailable(Context context) {

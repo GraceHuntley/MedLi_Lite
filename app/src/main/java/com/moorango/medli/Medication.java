@@ -12,6 +12,7 @@ import java.util.Date;
  */
 public class Medication {
 
+    private final String TAG = "Medication";
     private String medName;
     private int doseMeasure; // numeric dose measure.
     private String doseMeasureType; // ex. ml tsp mg
@@ -126,14 +127,24 @@ public class Medication {
 
     @Override
     public String toString() {
+
         return this.getMedName().toUpperCase() + " " + this.getDoseMeasure() + this.getDoseMeasureType() + "\n" +
                 "NEXT DUE: " + this.getNextDue();
+
     }
 
     public int compareNextDue(Medication med) {
 
-        if (this.getNextDue().equals("COMPLETE") || med.getNextDue().equals("COMPLETE")) {
+        if (this.getNextDue().equals("COMPLETE")) {
             return 1;
+
+        } else if (med.getNextDue().equals("COMPLETE")) {
+            return -1;
+        } else if (this.getNextDue().equals("MAXED DOSES!")) {
+            return 1;
+
+        } else if (med.getNextDue().equals("MAXED DOSES!")) {
+            return -1;
         } else {
             SimpleDateFormat df1 = new SimpleDateFormat("hh:mm aa");
             Date date1 = null;
@@ -145,14 +156,19 @@ public class Medication {
                 Log.d("Medication", e.toString());
             }
 
-            if (date1.getTime() < date2.getTime()) {
-                return -1;
-            } else if (date1.getTime() > date2.getTime()) {
-                return 1;
-            } else {
-                return 0;
+            try {
+                if (date1.getTime() < date2.getTime()) {
+                    return -1;
+                } else if (date1.getTime() > date2.getTime()) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            } catch (NullPointerException e) {
+                Log.d(TAG, e.toString());
             }
         }
+        return 0;
     }
 
 }

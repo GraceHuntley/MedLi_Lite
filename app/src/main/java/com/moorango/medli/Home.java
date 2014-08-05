@@ -1,11 +1,8 @@
 package com.moorango.medli;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,10 +24,9 @@ public class Home extends Fragment {
     private ListView routineList;
     private ListView prnList;
     private MedLiDataSource dataSource;
-    private SparseBooleanArray SBA_medChoices;
     private Button submitMed;
     private ArrayAdapter<Medication> adapter;
-    private AlertDialog.Builder ad;
+    private ArrayAdapter<Medication> prnAdapter;
 
     private MedLiDataSource dbHelper;
 
@@ -65,10 +61,8 @@ public class Home extends Fragment {
         super.onActivityCreated(savedInstanceState);
         routineList = (ListView) getActivity().findViewById(R.id.routine_listview);
         prnList = (ListView) getActivity().findViewById(R.id.prn_listview);
-
+        Button clearChoices = (Button) getActivity().findViewById(R.id.clear_button);
         submitMed = (Button) getActivity().findViewById(R.id.submit_button);
-        SBA_medChoices = null;
-        ad = new AlertDialog.Builder(getActivity());
         chosenList = new ArrayList<Medication>();
 
         dbHelper = MedLiDataSource.getHelper(getActivity());
@@ -80,34 +74,33 @@ public class Home extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                chosenList.clear();
-                try {
 
-                    SBA_medChoices = routineList.getCheckedItemPositions();
-
-                    for (int index = 0; index < SBA_medChoices.size(); index++) {
-                        if (SBA_medChoices.valueAt(index)) {
-
-                            chosenList.add(adapter.getItem(SBA_medChoices.keyAt(index)));
-
-                        }
-                    }
-                    if (chosenList.size() > 0) {
-                        submitMed.setEnabled(true);
-                    } else {
-                        submitMed.setEnabled(false);
-                    }
-
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    Toast.makeText(getActivity(), "error" + e,
-                            Toast.LENGTH_LONG).show();
-                }
+                grabChoices();
             }
         });
 
-        /***
-         * start dialog test here.
-         */
+        prnList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                grabChoices();
+            }
+        });
+
+        clearChoices.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                for (int index = 0; index < routineList.getCount(); index++) {
+                    routineList.setItemChecked(index, false);
+                }
+
+                for (int index = 0; index < prnList.getCount(); index++) {
+                    prnList.setItemChecked(index, false);
+                }
+                chosenList.clear();
+            }
+        });
 
 
 
@@ -125,8 +118,8 @@ public class Home extends Fragment {
                         String getReady() {
 
                             String ready = "";
-                            for (int index = 0; index < chosenList.size(); index++) {
-                                ready += chosenList.get(index).getMedName() + "\n";
+                            for (Medication aChosenList : chosenList) {
+                                ready += aChosenList.getMedName() + "\n";
                             }
 
                             return ready;
@@ -134,56 +127,42 @@ public class Home extends Fragment {
                     }.getReady();
 
                     showDialog("Submit:\n" + for_display + "?");
-                    String forToast = "Submit Meds?\n" + for_display;
-                    ad.setTitle("Confirm");
-                    ad.setMessage(forToast);
-                    ad.setIcon(android.R.drawable.ic_dialog_alert);
-                    ad.setPositiveButton(android.R.string.yes,
-                            new DialogInterface.OnClickListener() {
 
-                                @Override
-                                public void onClick(DialogInterface dialog,
-                                                    int whichButton) {
-
-                                    for (int index = 0; index < chosenList.size(); index++) {
-                                        dbHelper.submitMedicationAdmin(chosenList.get(index), null);
-                                    }
-                                    submitMed.setEnabled(false);
-                                    Toast.makeText(getActivity(),
-                                            "Submitted", Toast.LENGTH_LONG)
-                                            .show();
-
-                                    adapter.notifyDataSetChanged();
-
-                                }
-                            }
-                    )
-                            .setNegativeButton(android.R.string.no,
-                                    new DialogInterface.OnClickListener() {
-
-                                        @Override
-                                        public void onClick(
-                                                DialogInterface dialog,
-                                                int which) {
-
-                                            SBA_medChoices = null;
-
-                                            submitMed.setEnabled(false);
-                                        }
-                                    }
-                            );
-                    // ad.show();
-
-                    int count = routineList.getAdapter().getCount();
-                    for (int index = 0; index < count; index++) {
-                        routineList.setItemChecked(index, false);
-                        SBA_medChoices.put(index, false);
-                    }
-                    routineList.clearChoices();
-                    chosenList.clear();
                 }
             }
         });
+    }
+
+    private void grabChoices() {
+        chosenList.clear();
+        try {
+            SparseBooleanArray SBA_prn_choices = prnList.getCheckedItemPositions();
+            SparseBooleanArray SBA_routine_choices = routineList.getCheckedItemPositions();
+
+            for (int index = 0; index < SBA_routine_choices.size(); index++) {
+                if (SBA_routine_choices.valueAt(index)) {
+
+                    chosenList.add(adapter.getItem(SBA_routine_choices.keyAt(index)));
+
+                }
+            }
+
+            for (int index = 0; index < SBA_prn_choices.size(); index++) {
+                if (SBA_prn_choices.valueAt(index)) {
+                    chosenList.add(prnAdapter.getItem(SBA_prn_choices.keyAt(index)));
+                }
+            }
+            if (chosenList.size() > 0) {
+                submitMed.setEnabled(true);
+            } else {
+                submitMed.setEnabled(false);
+            }
+
+        } catch (ArrayIndexOutOfBoundsException e) {
+            Toast.makeText(getActivity(), "error" + e,
+                    Toast.LENGTH_LONG).show();
+        }
+
     }
 
 
@@ -210,8 +189,6 @@ public class Home extends Fragment {
     }
 
     public void doPositiveClick(ArrayList<Medication> choicesList) {
-        // Do stuff here.
-        Log.d("FragmentAlertDialog", "Positive click!");
 
         for (int index = 0; index < chosenList.size(); index++) {
             dbHelper.submitMedicationAdmin(choicesList.get(index), null);
@@ -224,13 +201,23 @@ public class Home extends Fragment {
 
         fillLists();
         adapter.notifyDataSetChanged();
+        routineList.clearChoices();
+        prnList.clearChoices();
+        chosenList.clear();
     }
 
     public void doNegativeClick() {
-        // Do stuff here.
-        Log.i("FragmentAlertDialog", "Negative click!");
-        SBA_medChoices = null;
 
+        routineList.clearChoices();
+        prnList.clearChoices();
+
+        for (int i = 0; i < routineList.getCount(); i++) {
+            routineList.setItemChecked(i, false);
+        }
+
+        for (int i = 0; i < prnList.getCount(); i++) {
+            prnList.setItemChecked(i, false);
+        }
         submitMed.setEnabled(false);
     }
     /***
@@ -243,12 +230,6 @@ public class Home extends Fragment {
 
 
         mListener = null;
-    }
-
-    @Override
-    public void onResume() {
-
-        super.onResume();
     }
 
     @Override
@@ -266,8 +247,8 @@ public class Home extends Fragment {
 
     private void fillLists() {
 
-        List<Medication> meds = dataSource.getAllRoutineMeds();
-        List<Medication> prnMeds = dataSource.getAllPrnMeds();
+        List<Medication> meds = dataSource.getAllMeds("routine");
+        List<Medication> prnMeds = dataSource.getAllMeds("prn");
         adapter = new ArrayAdapter<Medication>(getActivity(),
                 android.R.layout.simple_list_item_multiple_choice, meds);
 
@@ -280,7 +261,7 @@ public class Home extends Fragment {
             }
         });
 
-        ArrayAdapter<Medication> prnAdapter = new ArrayAdapter<Medication>(getActivity(),
+        prnAdapter = new ArrayAdapter<Medication>(getActivity(),
                 android.R.layout.simple_list_item_multiple_choice, prnMeds);
 
         routineList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
