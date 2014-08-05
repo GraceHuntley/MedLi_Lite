@@ -1,15 +1,12 @@
 package com.moorango.medli;
 
-import android.net.Uri;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 
 public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInteractionListener, MedSettings.OnFragmentInteractionListener {
 
@@ -55,7 +52,7 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
                 break;
 
             case R.id.action_add_med:
-                clearBackStack();
+
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 MedSettings medSettings = new MedSettings();
@@ -81,25 +78,32 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
     }
 
     public void onFragmentInteraction(int tag) {
-
+        FragmentManager fragmentManager;
         switch(tag) {
             case 0:
-                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager = getSupportFragmentManager();
                 fragmentManager.popBackStack();
                 break;
             case 1:
+                fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+                Home home = new Home();
+                clearBackStack();
+                fragmentTransaction.replace(R.id.fragment_holder, home, "home");
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+                break;
 
         }
 
     }
 
-
-
     private void clearBackStack() {
-        /*FragmentManager fm = getSupportFragmentManager();
+        FragmentManager fm = getSupportFragmentManager();
 
         for (int i = 0; i < fm.getBackStackEntryCount(); i++) {
             fm.popBackStack();
-        } */
+        }
     }
 }

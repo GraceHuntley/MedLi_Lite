@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
-import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,11 +19,13 @@ import java.util.List;
  *
  */
 public class MedLiDataSource {
-    // Database fields
-    private SQLiteDatabase database;
-    private final SQLiteHelper dbHelper;
+
     private static MedLiDataSource instance;
     private static MakeDateTimeHelper dt = new MakeDateTimeHelper();
+    final String TAG = "MedLiDataSource";
+    private final SQLiteHelper dbHelper;
+    // Database fields
+    private SQLiteDatabase database;
 
     public MedLiDataSource(Context context) {
         dbHelper = new SQLiteHelper(context);
@@ -61,7 +62,7 @@ public class MedLiDataSource {
 
         while (cursor.moveToNext()) {
             Medication medication = cursorToRoutine(cursor);
-            Log.d("MedliData", medication.toString());
+
             list.add(medication);
 
         }
@@ -80,7 +81,7 @@ public class MedLiDataSource {
 
         while (cursor.moveToNext()) {
             Medication medication = cursorToRoutine(cursor);
-            Log.d("MedliData", medication.toString());
+
             list.add(medication);
 
         }
@@ -153,12 +154,15 @@ public class MedLiDataSource {
         if (manualTime != null) { // dose time being entered manually.
             cv.put("manual_entry", 1);
             cv.put("timestamp", dt.getDate() + " " + dt.convertToTime24(manualTime));
+
             cv.put("late", isDoseLate(manualTime, medication.getNextDue()));
         } else { // no manual entry.
             cv.put("timestamp", dt.getDate() + " " + dt.getTime24());
             cv.put("late", isDoseLate(dt.getTime24().toString(), medication.getNextDue()));
             cv.put("manual_entry", 0);
         }
+
+        Log.d(TAG, cv.toString());
 
         this.open();
         database.insert("med_logs", "name", cv);

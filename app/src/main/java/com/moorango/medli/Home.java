@@ -3,9 +3,7 @@ package com.moorango.medli;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -17,8 +15,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -26,16 +22,14 @@ import java.util.List;
 
 public class Home extends Fragment {
 
+    private static ArrayList<Medication> chosenList;
     private OnFragmentInteractionListener mListener;
-
     private ListView routineList;
     private ListView prnList;
     private MedLiDataSource dataSource;
     private SparseBooleanArray SBA_medChoices;
-    private String ready_med;
     private Button submitMed;
     private ArrayAdapter<Medication> adapter;
-    private ArrayList<Medication> chosenList;
     private AlertDialog.Builder ad;
 
     private MedLiDataSource dbHelper;
@@ -79,28 +73,7 @@ public class Home extends Fragment {
 
         dbHelper = MedLiDataSource.getHelper(getActivity());
 
-        List<Medication> meds = dataSource.getAllRoutineMeds();
-        List<Medication> prnMeds = dataSource.getAllPrnMeds();
-        adapter = new ArrayAdapter<Medication>(getActivity(),
-                android.R.layout.simple_list_item_multiple_choice, meds);
-
-        adapter.sort(new Comparator<Medication>() {
-
-            @Override
-            public int compare(Medication lhs, Medication rhs) {
-                //return lhs.compareTo(rhs);   //or whatever your sorting algorithm
-
-                return lhs.compareNextDue(rhs);
-            }
-        });
-
-        ArrayAdapter<Medication> prnAdapter = new ArrayAdapter<Medication>(getActivity(),
-                android.R.layout.simple_list_item_multiple_choice, prnMeds);
-
-        routineList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        routineList.setAdapter(adapter);
-        prnList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        prnList.setAdapter(prnAdapter);
+        fillLists();
 
         routineList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -230,25 +203,26 @@ public class Home extends Fragment {
 
     void showDialog(String medList) {
         Dialog_Fragment newFragment = Dialog_Fragment.newInstance(
-                R.string.med_dose_dialog_title); // TODO look further into this was a string.
+                R.string.med_dose_dialog_title, medList); // TODO look further into this was a string.
+        newFragment.setChoiceList(chosenList);
         newFragment.show(getActivity().getSupportFragmentManager(), "dialog");
-
-
 
     }
 
-    public void doPositiveClick() {
+    public void doPositiveClick(ArrayList<Medication> choicesList) {
         // Do stuff here.
-        Log.i("FragmentAlertDialog", "Positive click!");
+        Log.d("FragmentAlertDialog", "Positive click!");
 
         for (int index = 0; index < chosenList.size(); index++) {
-            dbHelper.submitMedicationAdmin(chosenList.get(index), null);
+            dbHelper.submitMedicationAdmin(choicesList.get(index), null);
         }
+        mListener.onFragmentInteraction(1);
         submitMed.setEnabled(false);
         Toast.makeText(getActivity(),
                 "Submitted", Toast.LENGTH_LONG)
                 .show();
 
+        fillLists();
         adapter.notifyDataSetChanged();
     }
 
@@ -271,21 +245,6 @@ public class Home extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(int tag);
-    }
-
     @Override
     public void onResume() {
 
@@ -303,6 +262,46 @@ public class Home extends Fragment {
         dataSource.close();
         super.onDestroy();
 
+    }
+
+    private void fillLists() {
+
+        List<Medication> meds = dataSource.getAllRoutineMeds();
+        List<Medication> prnMeds = dataSource.getAllPrnMeds();
+        adapter = new ArrayAdapter<Medication>(getActivity(),
+                android.R.layout.simple_list_item_multiple_choice, meds);
+
+        adapter.sort(new Comparator<Medication>() {
+
+            @Override
+            public int compare(Medication lhs, Medication rhs) {
+
+                return lhs.compareNextDue(rhs);
+            }
+        });
+
+        ArrayAdapter<Medication> prnAdapter = new ArrayAdapter<Medication>(getActivity(),
+                android.R.layout.simple_list_item_multiple_choice, prnMeds);
+
+        routineList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        routineList.setAdapter(adapter);
+        prnList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        prnList.setAdapter(prnAdapter);
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        public void onFragmentInteraction(int tag);
     }
 
 }
