@@ -6,6 +6,7 @@ package com.moorango.medli;
  */
 public class Constants {
 
+    private static MakeDateTimeHelper dt = new MakeDateTimeHelper();
     public static final String CREATE_MEDLIST_DB = "CREATE TABLE medlist (" +
             "ID_UNIQUE INTEGER PRIMARY KEY AUTOINCREMENT, " +
             "name TEXT NOT NULL, " +
@@ -59,7 +60,7 @@ public class Constants {
                     + "FROM med_logs "
                     + "WHERE DATE(timestamp) = DATE('now') "
                     + "ORDER BY timestamp DESC";
-    private static MakeDateTimeHelper dt = new MakeDateTimeHelper();
+
 
     public static String GET_COUNT_LAST_24HOURS(String name) {
         return "SELECT COUNT(timestamp) FROM med_logs "
