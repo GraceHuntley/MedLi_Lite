@@ -23,11 +23,21 @@ public class Medication {
     private String fillDate; // date medication last filled.
     private String doseTimes; // times of day to give dose. only applicable to routine meds.
 
+    private boolean isForEditDisplay;
+
     private String nextDue; // next due time.
     private int actualDoseCount; // actual count of doses given today.
 
     private int doseFrequency; // prn only frequency meds can be taken in hours.
 
+
+    public boolean isForEditDisplay() {
+        return isForEditDisplay;
+    }
+
+    public void setForEditDisplay(boolean isForEditDisplay) {
+        this.isForEditDisplay = isForEditDisplay;
+    }
 
     public String getMedName() {
         return medName;
@@ -129,7 +139,7 @@ public class Medication {
     public String toString() {
 
         return this.getMedName().toUpperCase() + " " + this.getDoseMeasure() + this.getDoseMeasureType() + "\n" +
-                "NEXT DUE: " + this.getNextDue();
+                (!this.isForEditDisplay() ? "NEXT DUE: " + this.getNextDue() : "");
 
     }
 

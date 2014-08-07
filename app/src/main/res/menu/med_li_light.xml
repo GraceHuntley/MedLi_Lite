@@ -8,6 +8,16 @@
         android:title="@string/action_settings"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_home"
+        android:icon="@drawable/ic_action_previous_item"
+        android:title="back"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_med_logs"
+        android:icon="@drawable/ic_action_view_as_list"
+        android:title="logs"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/action_edit_med"
         android:icon="@drawable/ic_action_edit"
         android:title="@string/edit_med_label"

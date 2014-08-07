@@ -51,6 +51,9 @@ public class MedSettings extends Fragment {
     private EditText doseFrequency;
     private int index = 0;
     private boolean isRoutine = false;
+    private LinearLayout secondaryForm;
+    private Button delete_med;
+    private Button dc_med;
 
     private MedLiDataSource dbHelper;
 
@@ -58,6 +61,22 @@ public class MedSettings extends Fragment {
 
     public MedSettings() {
         // Required empty public constructor
+    }
+
+    public static MedSettings newInstance(String param1, boolean param2) {
+        MedSettings fragment = new MedSettings();
+        Bundle args = new Bundle();
+        args.putString("name", param1);
+        args.putBoolean("edit", param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        dbHelper = MedLiDataSource.getHelper(getActivity());
+
     }
 
     @Override
@@ -68,21 +87,21 @@ public class MedSettings extends Fragment {
     }
 
 
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         ad = new AlertDialog.Builder(getActivity());
-        dbHelper = MedLiDataSource.getHelper(getActivity());
 
+
+        secondaryForm = (LinearLayout) getActivity().findViewById(R.id.secondary_form_wrapper);
         LinearLayout ll = (LinearLayout) getActivity().findViewById(R.id.med_edit_layout);
-        Button delete_med = (Button) getActivity().findViewById(R.id.del_med);
+        delete_med = (Button) getActivity().findViewById(R.id.del_med);
         Button plusButton = (Button) getActivity().findViewById(R.id.plus_button);
         adminTimes = (EditText) getActivity().findViewById(R.id.admin_count_edittext);
         Button minusButton = (Button) getActivity().findViewById(R.id.minus_button);
         doseFrequency = (EditText) getActivity().findViewById(R.id.prn_frequency_input);
-        Button dc_med = (Button) getActivity().findViewById(R.id.dc_med);
+        dc_med = (Button) getActivity().findViewById(R.id.dc_med);
         Button submitMed = (Button) getActivity().findViewById(R.id.btn_add_med);
         med_type = (Spinner) getActivity().findViewById(R.id.med_type_spinner);
         med_dose = (EditText) getActivity().findViewById(R.id.med_dose_input);
@@ -104,19 +123,21 @@ public class MedSettings extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 if (!adapterView.getSelectedItem().toString().toLowerCase().equals("select")) {
+                    secondaryForm.setVisibility(View.VISIBLE);
                     isRoutine = (adapterView.getSelectedItem().toString().toLowerCase().equals("routine"));
                     if (isRoutine) { // setup form for routine medication.
-                        adminTimes.setText("0");
+                        // adminTimes.setText("0");
                         setTextChangeListener();
                         setRoutineForm();
                     } else { // setup form for prn med.
                         adminTimes.removeTextChangedListener(textWatcher);
-                        adminTimes.setText("0");
+                        // adminTimes.setText("0");
                         adminTimesList.removeAllViews();
                         etList.clear();
                         setPRNForm();
                     }
                 } else {
+                    secondaryForm.setVisibility(View.GONE);
                     isRoutine = false;
                 }
             }
@@ -197,16 +218,37 @@ public class MedSettings extends Fragment {
                     Toast.makeText(getActivity(), "You have not selected a medication type", Toast.LENGTH_LONG).show();
 
                 } else if (selection.equals("routine")) { // routine
-                    submitRoutineToDB();
-                    mListener.onFragmentInteraction(0);
+                    if (isFormComplete("routine")) {
+                        submitRoutineToDB();
+                        hideKeyboard();
+                        mListener.onFragmentInteraction(1);
+                    } else {
+                        Toast.makeText(getActivity(), "You forgot to enter something", Toast.LENGTH_SHORT).show();
+                    }
                 } else { // prn med
-                    submitPrnToDB();
-                    mListener.onFragmentInteraction(0);
+                    if (isFormComplete("prn")) {
+                        submitPrnToDB();
+                        hideKeyboard();
+                        mListener.onFragmentInteraction(1);
+                    } else {
+                        Toast.makeText(getActivity(), "You forgot to enter something", Toast.LENGTH_LONG).show();
+                    }
                 }
             }
         });
 
+        if (getArguments() != null && getArguments().getBoolean("edit")) {
+
+            populateForEdit(getArguments().getString("name"));
+
+        }
+
     } // end onActivityCreated()
+
+    private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Service.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(acMedName.getWindowToken(), 0);
+    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -386,10 +428,57 @@ public class MedSettings extends Fragment {
 
     }
 
+    private boolean isFormComplete(String type) {
+
+        if (type.equals("prn")) {
+            if (acMedName.getText().length() == 0 || med_dose.getText().length() == 0 || doseFrequency.getText().length() == 0 || adminTimes.getText().toString().equals("0")) {
+                return false;
+            }
+        }
+
+        if (type.equals("routine")) {
+            if (acMedName.getText().length() == 0 || med_dose.getText().length() == 0 || adminTimes.getText().length() == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void populateForEdit(String name) {
+        // TODO will populate for edits.
+
+        Medication medication = dbHelper.getSingleMedByName(name);
+
+        for (int index = 0; index < med_type.getCount(); index++) {
+            if (med_type.getItemAtPosition(index).toString().equalsIgnoreCase(medication.getAdminType())) {
+
+                med_type.setSelection(index);
+                break;
+            }
+        }
+
+        acMedName.setText(medication.getMedName());
+        med_dose.setText(String.valueOf(medication.getDoseMeasure()));
+        for (int index = 0; index < med_measure_spinner.getCount(); index++) {
+            if (med_measure_spinner.getItemAtPosition(index).toString().equalsIgnoreCase(medication.getDoseMeasureType())) {
+
+                med_measure_spinner.setSelection(index);
+                break;
+            }
+        }
+        Log.d(TAG, "" + medication.getDoseCount());
+        for (int index = 0; index < medication.getDoseCount(); index++) {
+            adminTimes.setText("" + (index + 1));
+            // adminTimes.setText("1");
+
+        }
+
+        dc_med.setVisibility(View.VISIBLE);
+        delete_med.setVisibility(View.VISIBLE);
+    }
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(int tag);
     }
-
-
 }

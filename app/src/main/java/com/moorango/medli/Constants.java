@@ -47,8 +47,19 @@ public class Constants {
                     + "medlist.dose_frequency as frequency "
                     + "from medlist "
                     + "LEFT OUTER JOIN med_logs ON medlist.name = med_logs.name WHERE medlist.admin_type = 'prn' "
-            + "GROUP BY medlist.name ORDER By medlist.name ASC";
-    private static final MakeDateTimeHelper dt = new MakeDateTimeHelper();
+                    + "GROUP BY medlist.name ORDER By medlist.name ASC";
+    public static final String GET_TODAYS_MED_ADMIN_LOGS =
+            "SELECT med_logs.ID_UNIQUE as id, "
+                    + "med_logs.name as name, "
+                    + "med_logs.dose as dose, "
+                    + "TIME(timestamp) as timestamp, "
+                    + "med_logs.late as late, "
+                    + "med_logs.missed as missed, "
+                    + "med_logs.manual_entry as manual "
+                    + "FROM med_logs "
+                    + "WHERE DATE(timestamp) = DATE('now') "
+                    + "ORDER BY timestamp DESC";
+    private static MakeDateTimeHelper dt = new MakeDateTimeHelper();
 
     public static String GET_COUNT_LAST_24HOURS(String name) {
         return "SELECT COUNT(timestamp) FROM med_logs "
@@ -64,6 +75,11 @@ public class Constants {
                 + "DATE(timestamp) > datetime('now', '-1 day')"
                 + "ORDER BY timestamp DESC "
                 + "LIMIT 1";
+    }
+
+    public static String GET_ROW_COUNT_BY_TYPE(String type) {
+        return "SELECT COUNT(name) AS count FROM medlist "
+                + "WHERE admin_type = '" + type + "'";
     }
 }
 

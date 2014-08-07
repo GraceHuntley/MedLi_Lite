@@ -1,66 +1,73 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.moorango.medli.Home">
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:weightSum="10"
-        android:layout_height="fill_parent"
-        android:orientation="vertical">
-
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"
-        android:text="@string/routine_label"/>
-
-    <ListView
-        android:id="@+id/routine_listview"
-        android:layout_width="fill_parent"
-        android:layout_weight="4"
-        android:overScrollFooter="@null"
-        android:background="#ffffff"
-        android:layout_height="0dip"/>
-
-
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_weight="1"
-        android:layout_height="0dip"
-        android:text="@string/prn_label"/>
-
-    <ListView
-        android:id="@+id/prn_listview"
-        android:layout_width="fill_parent"
-        android:overScrollFooter="@null"
-        android:layout_weight="4"
-        android:background="#ffffff"
-        android:layout_height="0dip"/>
-
-
-    </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/button_box"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="bottom">
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/clear_button"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/clear_btn_label"/>
+            android:text="@string/clear_btn_label" />
 
         <Button
             android:id="@+id/submit_button"
             android:layout_width="0dip"
-            android:enabled="false"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/submit_btn_label"/>
-        </LinearLayout>
-</FrameLayout>
+            android:enabled="false"
+            android:text="@string/submit_btn_label" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@id/button_box"
+        android:orientation="vertical"
+
+        android:weightSum="14">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:text="@string/routine_label"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <ListView
+            android:id="@+id/routine_listview"
+            android:layout_width="fill_parent"
+            android:layout_height="0dip"
+            android:layout_weight="6"
+            android:fadingEdgeLength="10dp"
+            android:overScrollFooter="@null" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:text="@string/prn_label"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <ListView
+            android:id="@+id/prn_listview"
+            android:layout_width="fill_parent"
+            android:layout_height="0dip"
+            android:layout_weight="6"
+            android:background="#ffffff"
+            android:overScrollFooter="@null"
+            android:scrollbarAlwaysDrawVerticalTrack="true" />
+
+    </LinearLayout>
+
+</RelativeLayout>

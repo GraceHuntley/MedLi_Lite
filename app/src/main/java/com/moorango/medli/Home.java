@@ -1,6 +1,7 @@
 package com.moorango.medli;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.SparseBooleanArray;
@@ -20,6 +21,7 @@ import java.util.List;
 public class Home extends Fragment {
 
     private static ArrayList<Medication> chosenList;
+    private static MyAsyncTask updateLists;
     private OnFragmentInteractionListener mListener;
     private ListView routineList;
     private ListView prnList;
@@ -27,17 +29,9 @@ public class Home extends Fragment {
     private Button submitMed;
     private ArrayAdapter<Medication> adapter;
     private ArrayAdapter<Medication> prnAdapter;
-
     private MedLiDataSource dbHelper;
 
-    /*public static Home newInstance(String param1, String param2) {
-        Home fragment = new Home();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    } */
+
     public Home() {
         // Required empty public constructor
     }
@@ -67,7 +61,19 @@ public class Home extends Fragment {
 
         dbHelper = MedLiDataSource.getHelper(getActivity());
 
-        fillLists();
+
+        //fillLists();
+        if (updateLists == null || !updateLists.getStatus().equals(AsyncTask.Status.RUNNING)) {
+            updateLists = new MyAsyncTask();
+            updateLists.execute();
+        } else {
+            updateLists.cancel(true);
+            updateLists = null;
+            updateLists = new MyAsyncTask();
+            updateLists.execute();
+        }
+
+
 
         routineList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -102,10 +108,7 @@ public class Home extends Fragment {
             }
         });
 
-
-
         submitMed.setOnClickListener(new View.OnClickListener() {
-
 
             @Override
             public void onClick(View view) {
@@ -165,12 +168,9 @@ public class Home extends Fragment {
 
     }
 
-
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
 
         try {
             mListener = (OnFragmentInteractionListener) activity;
@@ -234,12 +234,20 @@ public class Home extends Fragment {
 
     @Override
     public void onPause() {
+
+        if (updateLists != null && updateLists.getStatus().equals(AsyncTask.Status.RUNNING)) {
+            updateLists.cancel(true);
+        }
         dataSource.close();
         super.onPause();
     }
 
     @Override
     public void onDestroy() {
+
+        if (updateLists != null && updateLists.getStatus().equals(AsyncTask.Status.RUNNING)) {
+            updateLists.cancel(true);
+        }
         dataSource.close();
         super.onDestroy();
 
@@ -265,6 +273,7 @@ public class Home extends Fragment {
                 android.R.layout.simple_list_item_multiple_choice, prnMeds);
 
         routineList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
         routineList.setAdapter(adapter);
         prnList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         prnList.setAdapter(prnAdapter);
@@ -284,5 +293,43 @@ public class Home extends Fragment {
         // TODO: Update argument type and name
         public void onFragmentInteraction(int tag);
     }
+
+    public class MyAsyncTask extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            List<Medication> meds = dataSource.getAllMeds("routine");
+            List<Medication> prnMeds = dataSource.getAllMeds("prn");
+            adapter = new ArrayAdapter<Medication>(getActivity(),
+                    android.R.layout.simple_list_item_multiple_choice, meds);
+
+            adapter.sort(new Comparator<Medication>() {
+
+                @Override
+                public int compare(Medication lhs, Medication rhs) {
+
+                    return lhs.compareNextDue(rhs);
+                }
+            });
+
+            prnAdapter = new ArrayAdapter<Medication>(getActivity(),
+                    android.R.layout.simple_list_item_multiple_choice, prnMeds);
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            routineList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+            routineList.setAdapter(adapter);
+            prnList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+            prnList.setAdapter(prnAdapter);
+        }
+    }
+
+
 
 }
