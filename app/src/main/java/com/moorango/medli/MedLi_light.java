@@ -1,11 +1,13 @@
 package com.moorango.medli;
 
+import android.app.Service;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 
 public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInteractionListener, MedSettings.OnFragmentInteractionListener,
         LogFragment.OnFragmentInteractionListener, MedList.OnFragmentInteractionListener {
@@ -16,21 +18,16 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_med_li_light);
 
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         if (savedInstanceState == null) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-            Home home = new Home();
-            clearBackStack();
-            fragmentTransaction.replace(R.id.fragment_holder, home, "home");
-            fragmentTransaction.addToBackStack("home");
-            fragmentTransaction.commit();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(android.R.id.content, new Home(), "home").addToBackStack("home")
+                    .commit();
+
         }
     }
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -52,57 +49,41 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
 
             case R.id.action_edit_med:
 
-                fragmentManager = getSupportFragmentManager();
-                fragmentTransaction = fragmentManager.beginTransaction();
-                MedList medList = new MedList();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(android.R.id.content, new MedList(), "medList").addToBackStack("medList")
+                        .commit();
 
-                fragmentTransaction.replace(R.id.fragment_holder, medList, "medList");
-                fragmentTransaction.addToBackStack("medList");
-                fragmentTransaction.commit();
                 break;
 
             case R.id.action_add_med:
 
-                fragmentManager = getSupportFragmentManager();
-                fragmentTransaction = fragmentManager.beginTransaction();
-                MedSettings medSettings = new MedSettings();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(android.R.id.content, new MedSettings(), "medSettings").addToBackStack("medSettings")
+                        .commit();
 
-                fragmentTransaction.replace(R.id.fragment_holder, medSettings, "medSettings");
-                fragmentTransaction.addToBackStack("medSettings");
-                fragmentTransaction.commit();
                 break;
 
             case R.id.action_med_logs:
-                fragmentManager = getSupportFragmentManager();
-                fragmentTransaction = fragmentManager.beginTransaction();
-                LogFragment logFragment = new LogFragment();
 
-                fragmentTransaction.replace(R.id.fragment_holder, logFragment, "logFragment");
-                fragmentTransaction.addToBackStack("logFragment");
-                fragmentTransaction.commit();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(android.R.id.content, new LogFragment(), "logFragment").addToBackStack("logFragment")
+                        .commit();
+
                 break;
 
-            case R.id.action_home:
+            case android.R.id.home:
 
                 if (!getSupportFragmentManager().findFragmentByTag("home").isVisible()) {
-                    if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                        getSupportFragmentManager().popBackStack();
-                    }
+
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(android.R.id.content, new Home(), "home").addToBackStack("home")
+                            .commit();
+
                 }
 
-
-
-            default:
-               /* Home home = new Home();
-
-                fragmentTransaction.add(R.id.fragment_holder, home, "home");
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit(); */
                 return super.onOptionsItemSelected(item);
 
-
         }
-
 
         return super.onOptionsItemSelected(item);
     }
@@ -112,10 +93,13 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
         FragmentTransaction fragmentTransaction;
         switch(tag) {
             case 0:
+                hideKeyboard();
                 fragmentManager = getSupportFragmentManager();
                 fragmentManager.popBackStack();
+
                 break;
             case 1:
+                hideKeyboard();
                 fragmentManager = getSupportFragmentManager();
                 fragmentTransaction = fragmentManager.beginTransaction();
 
@@ -124,14 +108,10 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
                 } else {
                     Home home = new Home();
                     clearBackStack();
-                    fragmentTransaction.replace(R.id.fragment_holder, home, "home");
+                    fragmentTransaction.replace(android.R.id.content, home, "home");
                     fragmentTransaction.addToBackStack("home");
                     fragmentTransaction.commit();
                 }
-
-                break;
-            case 2:
-
                 break;
 
         }
@@ -156,5 +136,10 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
         for (int i = 0; i < fm.getBackStackEntryCount(); i++) {
             fm.popBackStack();
         }
+    }
+
+    private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Service.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
     }
 }

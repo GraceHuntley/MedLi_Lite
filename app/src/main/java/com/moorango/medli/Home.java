@@ -1,6 +1,7 @@
 package com.moorango.medli;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,17 +21,16 @@ import java.util.List;
 
 public class Home extends Fragment {
 
+    private final String TAG = "Home.java";
     private static ArrayList<Medication> chosenList;
     private static MyAsyncTask updateLists;
     private OnFragmentInteractionListener mListener;
-    private ListView routineList;
-    private ListView prnList;
+    private ListView routineList, prnList;
     private MedLiDataSource dataSource;
     private Button submitMed;
-    private ArrayAdapter<Medication> adapter;
-    private ArrayAdapter<Medication> prnAdapter;
-    private MedLiDataSource dbHelper;
-
+    private ArrayAdapter<Medication> adapter, prnAdapter;
+    private SparseBooleanArray routineChoicesFromInstance = null;
+    private SparseBooleanArray prnChoicesFromInstance = null;
 
     public Home() {
         // Required empty public constructor
@@ -40,8 +40,12 @@ public class Home extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        dataSource = new MedLiDataSource(getActivity());
+        if (savedInstanceState != null) {
+            routineChoicesFromInstance = (SparseBooleanArray) savedInstanceState.getParcelable("routine_array");
 
+            prnChoicesFromInstance = (SparseBooleanArray) savedInstanceState.getParcelable("prn_array");
+
+        }
     }
 
     @Override
@@ -59,10 +63,13 @@ public class Home extends Fragment {
         submitMed = (Button) getActivity().findViewById(R.id.submit_button);
         chosenList = new ArrayList<Medication>();
 
-        dbHelper = MedLiDataSource.getHelper(getActivity());
+        if (savedInstanceState != null) {
+            routineChoicesFromInstance = (SparseBooleanArray) savedInstanceState.getParcelable("routine_array");
+            prnChoicesFromInstance = (SparseBooleanArray) savedInstanceState.getParcelable("prn_array");
+        }
 
-
-        //fillLists();
+        dataSource = MedLiDataSource.getHelper(getActivity());
+        //if (savedInstanceState == null) {
         if (updateLists == null || !updateLists.getStatus().equals(AsyncTask.Status.RUNNING)) {
             updateLists = new MyAsyncTask();
             updateLists.execute();
@@ -72,8 +79,7 @@ public class Home extends Fragment {
             updateLists = new MyAsyncTask();
             updateLists.execute();
         }
-
-
+        // }
 
         routineList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -84,6 +90,7 @@ public class Home extends Fragment {
                 grabChoices();
             }
         });
+
 
         prnList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -115,8 +122,6 @@ public class Home extends Fragment {
 
                 if (chosenList.size() > 0) {
 
-
-
                     String for_display = new Object() {
                         String getReady() {
 
@@ -129,7 +134,7 @@ public class Home extends Fragment {
                         }
                     }.getReady();
 
-                    showDialog("Submit:\n" + for_display + "?");
+                    showDialog(view.getContext(), "Submit:\n" + for_display + "?");
 
                 }
             }
@@ -144,8 +149,12 @@ public class Home extends Fragment {
 
             for (int index = 0; index < SBA_routine_choices.size(); index++) {
                 if (SBA_routine_choices.valueAt(index)) {
+                    if (!adapter.getItem(SBA_routine_choices.keyAt(index)).getNextDue().equalsIgnoreCase("complete")) {
+                        chosenList.add(adapter.getItem(SBA_routine_choices.keyAt(index)));
+                    } else {
+                        routineList.setItemChecked(index, false);
 
-                    chosenList.add(adapter.getItem(SBA_routine_choices.keyAt(index)));
+                    }
 
                 }
             }
@@ -180,9 +189,9 @@ public class Home extends Fragment {
         }
     }
 
-    void showDialog(String medList) {
+    void showDialog(Context con, String medList) {
         Dialog_Fragment newFragment = Dialog_Fragment.newInstance(
-                R.string.med_dose_dialog_title, medList); // TODO look further into this was a string.
+                R.string.med_dose_dialog_title, medList);
         newFragment.setChoiceList(chosenList);
         newFragment.show(getActivity().getSupportFragmentManager(), "dialog");
 
@@ -190,8 +199,9 @@ public class Home extends Fragment {
 
     public void doPositiveClick(ArrayList<Medication> choicesList) {
 
+
         for (int index = 0; index < chosenList.size(); index++) {
-            dbHelper.submitMedicationAdmin(choicesList.get(index), null);
+            dataSource.submitMedicationAdmin(chosenList.get(index), null);
         }
         mListener.onFragmentInteraction(1);
         submitMed.setEnabled(false);
@@ -199,7 +209,7 @@ public class Home extends Fragment {
                 "Submitted", Toast.LENGTH_LONG)
                 .show();
 
-        fillLists();
+
         adapter.notifyDataSetChanged();
         routineList.clearChoices();
         prnList.clearChoices();
@@ -235,9 +245,10 @@ public class Home extends Fragment {
     @Override
     public void onPause() {
 
-        if (updateLists != null && updateLists.getStatus().equals(AsyncTask.Status.RUNNING)) {
+        /*if (updateLists != null && updateLists.getStatus().equals(AsyncTask.Status.RUNNING)) {
             updateLists.cancel(true);
-        }
+        } */
+
         dataSource.close();
         super.onPause();
     }
@@ -253,30 +264,17 @@ public class Home extends Fragment {
 
     }
 
-    private void fillLists() {
+    public void onSaveInstanceState(Bundle savedState) {
 
-        List<Medication> meds = dataSource.getAllMeds("routine");
-        List<Medication> prnMeds = dataSource.getAllMeds("prn");
-        adapter = new ArrayAdapter<Medication>(getActivity(),
-                android.R.layout.simple_list_item_multiple_choice, meds);
+        super.onSaveInstanceState(savedState);
 
-        adapter.sort(new Comparator<Medication>() {
+        // Note: getValues() is a method in your ArrayAdaptor subclass
+        SparseBooleanArray spRoutine = routineList.getCheckedItemPositions();
+        SparseBooleanArray spPRN = prnList.getCheckedItemPositions();
 
-            @Override
-            public int compare(Medication lhs, Medication rhs) {
+        savedState.putParcelable("routine_array", new SparseBooleanArrayParcelable(spRoutine));
+        savedState.putParcelable("prn_array", new SparseBooleanArrayParcelable(spPRN));
 
-                return lhs.compareNextDue(rhs);
-            }
-        });
-
-        prnAdapter = new ArrayAdapter<Medication>(getActivity(),
-                android.R.layout.simple_list_item_multiple_choice, prnMeds);
-
-        routineList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-
-        routineList.setAdapter(adapter);
-        prnList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        prnList.setAdapter(prnAdapter);
     }
 
     /**
@@ -322,14 +320,28 @@ public class Home extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
-            routineList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
             routineList.setAdapter(adapter);
-            prnList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
             prnList.setAdapter(prnAdapter);
+
+
+            if (routineChoicesFromInstance != null && prnChoicesFromInstance != null) {
+
+                int routine = routineChoicesFromInstance.size();
+                int prn = prnChoicesFromInstance.size();
+
+                for (int index = 0; index < routine; index++) {
+                    routineList.setItemChecked(index, routineChoicesFromInstance.valueAt(index));
+
+                }
+                for (int index = 0; index < prn; index++) {
+
+                    prnList.setItemChecked(index, prnChoicesFromInstance.valueAt(index));
+                }
+                grabChoices();
+            }
         }
     }
-
-
-
 }
+
+

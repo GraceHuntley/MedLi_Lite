@@ -13,7 +13,6 @@ import android.text.TextWatcher;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -54,6 +53,7 @@ public class MedSettings extends Fragment {
     private LinearLayout secondaryForm;
     private Button delete_med;
     private Button dc_med;
+    private static Bundle savedInstanceState1;
 
     private MedLiDataSource dbHelper;
 
@@ -74,7 +74,7 @@ public class MedSettings extends Fragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        savedInstanceState1 = savedInstanceState;
         dbHelper = MedLiDataSource.getHelper(getActivity());
 
     }
@@ -86,13 +86,11 @@ public class MedSettings extends Fragment {
         return inflater.inflate(R.layout.fragment_med_settings, container, false);
     }
 
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         ad = new AlertDialog.Builder(getActivity());
-
 
         secondaryForm = (LinearLayout) getActivity().findViewById(R.id.secondary_form_wrapper);
         LinearLayout ll = (LinearLayout) getActivity().findViewById(R.id.med_edit_layout);
@@ -307,36 +305,30 @@ public class MedSettings extends Fragment {
 
                         etList.add(index, new EditText(getActivity()));
                         etList.get(index).setId(Integer.valueOf(editable.toString()));
+                        etList.get(index).setFocusable(false);
                         Time now = new Time();
                         now.setToNow();
-                        etList.get(index).setText(dt.convertToTime12(now.hour + ":" + String.format("%02d", now.minute)));
-                        etList.get(index).setOnTouchListener(new View.OnTouchListener() {
+                        // etList.get(index).setText(dt.convertToTime12(now.hour + ":" + String.format("%02d", now.minute)));
+                        etList.get(index).setHint("Enter time");
 
-
+                        etList.get(index).setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public boolean onTouch(View view, MotionEvent motionEvent) {
+                            public void onClick(View view) {
+                                final View v = view;
+                                TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
+                                    @Override
+                                    public void onTimeSet(TimePicker view2, int hourOfDay, int minute) {
 
-                                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                                        EditText et = (EditText) getActivity().findViewById(v.getId());
+                                        et.setText(dt.convertToTime12("" + hourOfDay + ":" + String.format("%02d", minute)));
 
-                                    final View v = view;
-                                    TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
-                                        @Override
-                                        public void onTimeSet(TimePicker view2, int hourOfDay, int minute) {
 
-                                            //etList2.get(nextIndex - 1).setText(dt.convertToTime12("" + hourOfDay + ":" + String.format("%02d", minute)));
-                                            EditText et = (EditText) getActivity().findViewById(v.getId());
-                                            et.setText(dt.convertToTime12("" + hourOfDay + ":" + String.format("%02d", minute)));
+                                    }
+                                };
 
-                                        }
-                                    };
+                                TimePickerDialog tpd = new TimePickerDialog(getActivity(), t, 0, 0, false);
 
-                                    String timeSplit[] = dt.convertToTime24(etList.get(index - 1).getText().toString()).split(":");
-
-                                    TimePickerDialog tpd = new TimePickerDialog(getActivity(), t, Integer.valueOf(timeSplit[0]), Integer.valueOf(timeSplit[1]), false);
-
-                                    tpd.show();
-                                }
-                                return false;
+                                tpd.show();
                             }
                         });
 
@@ -415,19 +407,15 @@ public class MedSettings extends Fragment {
         acMedName.setAdapter(adapter);
     }
 
-    @Override
-    public void onPause() {
-        dbHelper.close();
-        super.onPause();
-    }
-
-    @Override
-    public void onDestroy() {
-        dbHelper.close();
-        super.onDestroy();
-
-    }
-
+    /**
+     * Validates that form was filled.
+     * <p/>
+     * TODO validate data in form modules.
+     * TODO Mark parts of form that were invalid.
+     *
+     * @param type
+     * @return
+     */
     private boolean isFormComplete(String type) {
 
         if (type.equals("prn")) {
@@ -444,6 +432,12 @@ public class MedSettings extends Fragment {
         return true;
     }
 
+    /**
+     * Called if instance created for editing a medication.
+     * populates form data from Medication Object passed.
+     *
+     * @param name
+     */
     private void populateForEdit(String name) {
         // TODO will populate for edits.
 
@@ -480,5 +474,18 @@ public class MedSettings extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(int tag);
+    }
+
+    @Override
+    public void onPause() {
+        dbHelper.close();
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        dbHelper.close();
+        super.onDestroy();
+
     }
 }

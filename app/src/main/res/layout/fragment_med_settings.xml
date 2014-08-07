@@ -4,9 +4,10 @@
   Please see included LISCENSE file for details on the distribution/modification terms
 -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     android:orientation="vertical">
 
     <LinearLayout
@@ -205,4 +206,4 @@
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</ScrollView>

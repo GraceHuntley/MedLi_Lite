@@ -138,6 +138,8 @@ public class MedLiDataSource {
                 String nextDoseHour = "" + (lastDoseHour + freq);
                 String minutes = "" + nextDose.split(" ")[1].split(":")[1];
                 nextDose = dt.convertToTime12(nextDoseHour + ":" + minutes + ":" + "00");
+            } else {
+                nextDose = "PRN";
             }
         }
 

@@ -47,6 +47,7 @@
         <ListView
             android:id="@+id/routine_listview"
             android:layout_width="fill_parent"
+            android:choiceMode="multipleChoice"
             android:layout_height="0dip"
             android:layout_weight="6"
             android:fadingEdgeLength="10dp"
@@ -63,6 +64,7 @@
             android:id="@+id/prn_listview"
             android:layout_width="fill_parent"
             android:layout_height="0dip"
+            android:choiceMode="multipleChoice"
             android:layout_weight="6"
             android:background="#ffffff"
             android:overScrollFooter="@null"

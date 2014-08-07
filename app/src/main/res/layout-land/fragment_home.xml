@@ -26,6 +26,7 @@
                 android:id="@+id/routine_listview"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
+                android:choiceMode="multipleChoice"
                 android:layout_weight="9"
                 android:background="#ffffff"
                 android:overScrollFooter="@null" />
@@ -50,6 +51,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="9"
+                android:choiceMode="multipleChoice"
                 android:background="#ffffff"
                 android:overScrollFooter="@null" />
         </LinearLayout>
