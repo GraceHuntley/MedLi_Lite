@@ -1,6 +1,7 @@
 package com.moorango.medli;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -33,7 +35,7 @@ public class LogFragment extends Fragment implements AbsListView.OnItemClickList
     /**
      * The fragment's ListView/GridView.
      */
-    private AbsListView mListView;
+    private ListView mListView;
 
     /**
      * The Adapter which will be used to populate the ListView/GridView with
@@ -62,6 +64,9 @@ public class LogFragment extends Fragment implements AbsListView.OnItemClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        getActivity().setRequestedOrientation(
+                ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -80,8 +85,8 @@ public class LogFragment extends Fragment implements AbsListView.OnItemClickList
         View view = inflater.inflate(R.layout.fragment_log, container, false);
 
         // Set the adapter
-        mListView = (AbsListView) view.findViewById(android.R.id.list);
-        ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
+        mListView = (ListView) view.findViewById(android.R.id.list);
+        mListView.setAdapter(mAdapter);
 
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);

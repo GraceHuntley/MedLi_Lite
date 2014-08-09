@@ -1,6 +1,7 @@
 package com.moorango.medli;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -61,6 +62,9 @@ public class MedList extends Fragment implements AbsListView.OnItemClickListener
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getActivity().setRequestedOrientation(
+                ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);

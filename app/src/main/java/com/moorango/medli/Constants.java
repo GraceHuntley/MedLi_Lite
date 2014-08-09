@@ -6,7 +6,6 @@ package com.moorango.medli;
  */
 public class Constants {
 
-    private static MakeDateTimeHelper dt = new MakeDateTimeHelper();
     public static final String CREATE_MEDLIST_DB = "CREATE TABLE medlist (" +
             "ID_UNIQUE INTEGER PRIMARY KEY AUTOINCREMENT, " +
             "name TEXT NOT NULL, " +
@@ -18,7 +17,10 @@ public class Constants {
             "dose_count INTEGER NOT NULL, " +
             "fillDate TEXT, " +
             "dose_times TEXT, " +
-            "dose_frequency TEXT)";
+            "dose_frequency TEXT +" +
+            "last_modified TEXT)";
+
+
     public static final String CREATE_MEDLOGS_DB = "CREATE TABLE med_logs (" +
             "ID_UNIQUE TEXT UNIQUE NOT NULL, " +
             "name TEXT NOT NULL, " +
@@ -33,7 +35,7 @@ public class Constants {
                     + "medlist.dose_measure_type as dose_type, "
                     + "medlist.dose_count as max_count, "
                     + "medlist.dose_times as dose_times, "
-                    + "COUNT(CASE WHEN DATE(med_logs.timestamp) = '" + dt.getDate() + "' THEN 'ok' END) as actual_count, "
+                    + "COUNT(CASE WHEN DATE(med_logs.timestamp) = DATE('now', 'localtime') THEN 'ok' END) as actual_count, "
                     + "admin_type as type from medlist "
                     + "LEFT OUTER JOIN med_logs ON medlist.name = med_logs.name WHERE medlist.admin_type = 'routine' "
                     + "GROUP BY medlist.name ORDER By medlist.name ASC";
@@ -43,7 +45,7 @@ public class Constants {
                     + "medlist.dose_measure_type as dose_type, "
                     + "medlist.dose_count as max_count, "
                     + "medlist.dose_times as dose_times, "
-                    + "COUNT(CASE WHEN DATE(med_logs.timestamp) = '" + dt.getDate() + "' THEN 'ok' END) as actual_count, "
+                    + "COUNT(CASE WHEN DATE(med_logs.timestamp) = DATE('now', 'localtime') THEN 'ok' END) as actual_count, "
                     + "medlist.admin_type as type, "
                     + "medlist.dose_frequency as frequency "
                     + "from medlist "
@@ -53,12 +55,12 @@ public class Constants {
             "SELECT med_logs.ID_UNIQUE as id, "
                     + "med_logs.name as name, "
                     + "med_logs.dose as dose, "
-                    + "TIME(timestamp) as timestamp, "
+                    + "timestamp as time, "
                     + "med_logs.late as late, "
                     + "med_logs.missed as missed, "
                     + "med_logs.manual_entry as manual "
                     + "FROM med_logs "
-                    + "WHERE DATE(timestamp) = DATE('now') "
+                    + "WHERE DATE(med_logs.timestamp) = DATE('now', 'localtime') "
                     + "ORDER BY timestamp DESC";
 
 
@@ -66,22 +68,40 @@ public class Constants {
         return "SELECT COUNT(timestamp) FROM med_logs "
                 + "WHERE name='" + name + "' "
                 + "AND "
-                + "DATE(timestamp) > datetime('now','-1 day')";
+                + "DATE(timestamp) > datetime('now','-1 day', 'localtime')";
     }
 
     public static String GET_LAST_PRN_DOSE(String name) {
         return "SELECT timestamp FROM med_logs "
                 + "WHERE name='" + name + "' "
                 + "AND "
-                + "DATE(timestamp) > datetime('now', '-1 day')"
+                + "DATE(timestamp) > datetime('now', '-1 day', 'localtime')"
                 + "ORDER BY timestamp DESC "
                 + "LIMIT 1";
     }
 
-    public static String GET_ROW_COUNT_BY_TYPE(String type) {
-        return "SELECT COUNT(name) AS count FROM medlist "
-                + "WHERE admin_type = '" + type + "'";
-    }
+    public static final String RX_ATTRIBUTES =
+            "consists_of+"
+                    + "constitutes+"
+                    + "contains+"
+                    + "dose_form_of+"
+                    + "has_dose_form+"
+                    + "has_form+"
+                    + "has_ingredient+"
+                    + "has_ingredients+"
+                    + "has_part+"
+                    + "has_precise_ingredient+"
+                    + "has_tradename+"
+                    + "has_doseformgroup+"
+                    + "ingredient_of+"
+                    + "ingredients_of+"
+                    + "inverse_isa+"
+                    + "isa+"
+                    + "precise_ingredient_of+"
+                    + "quantified_form_of+"
+                    + "reformulation_of+"
+                    + "doseformgroup_of";
 }
+
 
 

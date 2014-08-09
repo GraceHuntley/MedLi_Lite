@@ -91,27 +91,20 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
     public void onFragmentInteraction(int tag) {
         FragmentManager fragmentManager;
         FragmentTransaction fragmentTransaction;
-        switch(tag) {
+        switch (tag) {
             case 0:
-                hideKeyboard();
+
                 fragmentManager = getSupportFragmentManager();
                 fragmentManager.popBackStack();
 
                 break;
             case 1:
-                hideKeyboard();
-                fragmentManager = getSupportFragmentManager();
-                fragmentTransaction = fragmentManager.beginTransaction();
 
-                if (fragmentManager.getBackStackEntryCount() > 1 && fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount() - 2) == fragmentManager.findFragmentByTag("home")) {
-                    fragmentManager.popBackStack();
-                } else {
-                    Home home = new Home();
-                    clearBackStack();
-                    fragmentTransaction.replace(android.R.id.content, home, "home");
-                    fragmentTransaction.addToBackStack("home");
-                    fragmentTransaction.commit();
-                }
+
+                getSupportFragmentManager().beginTransaction().replace(android.R.id.content, new Home(), "home")
+                        .addToBackStack("home")
+                        .commit();
+
                 break;
 
         }
@@ -119,27 +112,17 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
     }
 
     public void onFragmentInteraction(int tag, String name) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        MedSettings medSettings = MedSettings.newInstance(name, true);
+        getSupportFragmentManager().beginTransaction().replace(android.R.id.content, MedSettings.newInstance(name, true), "medSettings")
+                .addToBackStack("medSettings").commit();
 
-        fragmentTransaction.replace(R.id.fragment_holder, medSettings, "medSettings");
-        fragmentTransaction.addToBackStack("medSettings");
-        fragmentTransaction.commit();
-
-    }
-
-    private void clearBackStack() {
-        FragmentManager fm = getSupportFragmentManager();
-
-        for (int i = 0; i < fm.getBackStackEntryCount(); i++) {
-            fm.popBackStack();
-        }
     }
 
     private void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Service.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        if (imm != null) {
+            //imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+
+        }
     }
 }

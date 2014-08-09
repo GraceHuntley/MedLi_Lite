@@ -130,11 +130,11 @@ public class MedLiDataSource {
             nextDose = "PRN";
         } else {
             int lastDoseHour = Integer.valueOf(nextDose.split(" ")[1].split(":")[0]);
-            int lastDosePlusHour = lastDoseHour + 1; // just for testing purposes.
+            int lastDosePlusHour = lastDoseHour + freq; // just for testing purposes.
 
             int currentHour = Integer.valueOf(dt.getTime24().split(":")[0]);
 
-            if ((lastDosePlusHour - currentHour) > 0) {
+            if ((lastDosePlusHour - currentHour) >= 0) {
                 String nextDoseHour = "" + (lastDoseHour + freq);
                 String minutes = "" + nextDose.split(" ")[1].split(":")[1];
                 nextDose = dt.convertToTime12(nextDoseHour + ":" + minutes + ":" + "00");
@@ -154,6 +154,7 @@ public class MedLiDataSource {
 
         Cursor cs = database.rawQuery(Constants.GET_TODAYS_MED_ADMIN_LOGS, null);
 
+        Log.d(TAG, "cursor size: " + cs.getCount());
         while (cs.moveToNext()) {
             loggedMeds.add(new MedLog(cs.getString(0), cs.getString(1), cs.getString(2), cs.getString(3), (cs.getInt(4) == 1), (cs.getInt(5) == 1), (cs.getInt(6) == 1)));
 
@@ -170,7 +171,7 @@ public class MedLiDataSource {
         cv.put("admin_type", medication.getAdminType());
         cv.put("status", "active");
         cv.put("dose_count", medication.getDoseCount());
-        cv.put("fillDate", medication.getFillDate());
+        //cv.put("fillDate", medication.getFillDate()); // will add this for next roll-out
         cv.put("startDate", medication.getStartDate());
 
         if (medication.getAdminType().equals("routine")) {
@@ -195,6 +196,7 @@ public class MedLiDataSource {
         if (manualTime != null) { // dose time being entered manually.
             cv.put("manual_entry", 1);
             cv.put("timestamp", dt.getDate() + " " + dt.convertToTime24(manualTime));
+
 
             cv.put("late", isDoseLate(manualTime, medication.getNextDue()));
         } else { // no manual entry.
@@ -293,5 +295,15 @@ public class MedLiDataSource {
         }
 
         return medication;
+    }
+
+    public void changeMedicationStatus(String name, String newStatus) {
+        this.open();
+
+        ContentValues cv = new ContentValues();
+        cv.put("status", newStatus);
+
+        database.update("medlist", cv, "name='" + name + "'", null);
+
     }
 }

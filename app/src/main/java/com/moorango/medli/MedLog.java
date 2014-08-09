@@ -52,7 +52,8 @@ public class MedLog {
     public String toString() {
         MakeDateTimeHelper dt = new MakeDateTimeHelper();
         String test = isLate ? "LATE" : "";
-        return dt.convertToTime12(this.getTimestamp()) + " " + this.getName() + "\n" + test;
+        return dt.convertToTime12(this.getTimestamp().split(" ")[1]) + " " + this.getName().toUpperCase() + "\n" + test;
+
     }
 
     public String getUniqueID() {

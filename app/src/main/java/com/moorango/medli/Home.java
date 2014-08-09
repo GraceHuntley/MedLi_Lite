@@ -2,6 +2,7 @@ package com.moorango.medli;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -40,10 +41,16 @@ public class Home extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        getActivity().setRequestedOrientation(
+                ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+
         if (savedInstanceState != null) {
             routineChoicesFromInstance = (SparseBooleanArray) savedInstanceState.getParcelable("routine_array");
 
             prnChoicesFromInstance = (SparseBooleanArray) savedInstanceState.getParcelable("prn_array");
+
+            MakeDateTimeHelper dt = new MakeDateTimeHelper();
+
 
         }
     }
@@ -63,10 +70,6 @@ public class Home extends Fragment {
         submitMed = (Button) getActivity().findViewById(R.id.submit_button);
         chosenList = new ArrayList<Medication>();
 
-        if (savedInstanceState != null) {
-            routineChoicesFromInstance = (SparseBooleanArray) savedInstanceState.getParcelable("routine_array");
-            prnChoicesFromInstance = (SparseBooleanArray) savedInstanceState.getParcelable("prn_array");
-        }
 
         dataSource = MedLiDataSource.getHelper(getActivity());
         //if (savedInstanceState == null) {
@@ -230,7 +233,8 @@ public class Home extends Fragment {
         }
         submitMed.setEnabled(false);
     }
-    /***
+
+    /**
      * End dialog test above.
      */
 
@@ -249,7 +253,9 @@ public class Home extends Fragment {
             updateLists.cancel(true);
         } */
 
-        dataSource.close();
+        if (dataSource != null) {
+            dataSource.close();
+        }
         super.onPause();
     }
 
@@ -259,7 +265,11 @@ public class Home extends Fragment {
         if (updateLists != null && updateLists.getStatus().equals(AsyncTask.Status.RUNNING)) {
             updateLists.cancel(true);
         }
-        dataSource.close();
+
+        if (dataSource != null) {
+
+            dataSource.close();
+        }
         super.onDestroy();
 
     }
@@ -268,13 +278,17 @@ public class Home extends Fragment {
 
         super.onSaveInstanceState(savedState);
 
-        // Note: getValues() is a method in your ArrayAdaptor subclass
-        SparseBooleanArray spRoutine = routineList.getCheckedItemPositions();
-        SparseBooleanArray spPRN = prnList.getCheckedItemPositions();
 
-        savedState.putParcelable("routine_array", new SparseBooleanArrayParcelable(spRoutine));
-        savedState.putParcelable("prn_array", new SparseBooleanArrayParcelable(spPRN));
+        if (getActivity().getSupportFragmentManager().findFragmentByTag("home").isVisible()) {
+            // Note: getValues() is a method in your ArrayAdaptor subclass
+            SparseBooleanArray spRoutine = (routineList != null) ? routineList.getCheckedItemPositions() : null;
+            SparseBooleanArray spPRN = (prnList != null) ? prnList.getCheckedItemPositions() : null;
 
+            if (spRoutine != null && spPRN != null) {
+                savedState.putParcelable("routine_array", new SparseBooleanArrayParcelable(spRoutine));
+                savedState.putParcelable("prn_array", new SparseBooleanArrayParcelable(spPRN));
+            }
+        }
     }
 
     /**

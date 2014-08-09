@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Service;
 import android.app.TimePickerDialog;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,6 +23,9 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -39,7 +43,7 @@ public class MedSettings extends Fragment {
 
     private final String TAG = "MedSettingsFragment.java";
     private final ArrayList<EditText> etList = new ArrayList<EditText>();
-    private EditText med_dose, adminTimes, lastFilled;
+    private EditText med_dose, adminTimes;
     private MakeDateTimeHelper dt;
     private LinearLayout adminTimesList;
     private AlertDialog.Builder ad;
@@ -51,11 +55,13 @@ public class MedSettings extends Fragment {
     private int index = 0;
     private boolean isRoutine = false;
     private LinearLayout secondaryForm;
-    private Button delete_med;
-    private Button dc_med;
-    private static Bundle savedInstanceState1;
+    private Button delete_med, dc_med, plusButton;
 
-    private MedLiDataSource dbHelper;
+    DrugDataHelper drugDataHelper;
+
+    private TextView medTypeLabel; // used just for clearing focus to hide soft keyboard in onPause();
+
+    private MedLiDataSource dataSource;
 
     private OnFragmentInteractionListener mListener;
 
@@ -74,8 +80,12 @@ public class MedSettings extends Fragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        savedInstanceState1 = savedInstanceState;
-        dbHelper = MedLiDataSource.getHelper(getActivity());
+
+        drugDataHelper = new DrugDataHelper();
+
+        dataSource = MedLiDataSource.getHelper(getActivity());
+        getActivity().setRequestedOrientation(
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
     }
 
@@ -93,9 +103,8 @@ public class MedSettings extends Fragment {
         ad = new AlertDialog.Builder(getActivity());
 
         secondaryForm = (LinearLayout) getActivity().findViewById(R.id.secondary_form_wrapper);
-        LinearLayout ll = (LinearLayout) getActivity().findViewById(R.id.med_edit_layout);
         delete_med = (Button) getActivity().findViewById(R.id.del_med);
-        Button plusButton = (Button) getActivity().findViewById(R.id.plus_button);
+        plusButton = (Button) getActivity().findViewById(R.id.plus_button);
         adminTimes = (EditText) getActivity().findViewById(R.id.admin_count_edittext);
         Button minusButton = (Button) getActivity().findViewById(R.id.minus_button);
         doseFrequency = (EditText) getActivity().findViewById(R.id.prn_frequency_input);
@@ -103,7 +112,9 @@ public class MedSettings extends Fragment {
         Button submitMed = (Button) getActivity().findViewById(R.id.btn_add_med);
         med_type = (Spinner) getActivity().findViewById(R.id.med_type_spinner);
         med_dose = (EditText) getActivity().findViewById(R.id.med_dose_input);
-        lastFilled = (EditText) getActivity().findViewById(R.id.last_filled_date);
+
+        medTypeLabel = (TextView) getActivity().findViewById(R.id.med_type_label);
+
         med_measure_spinner = (Spinner) getActivity().findViewById(R.id.med_measure_spinner);
         adminTimesList = (LinearLayout) getActivity().findViewById(R.id.admin_times_add_box);
         prnFreqBox = (LinearLayout) getActivity().findViewById(R.id.prn_frequency_box);
@@ -124,12 +135,12 @@ public class MedSettings extends Fragment {
                     secondaryForm.setVisibility(View.VISIBLE);
                     isRoutine = (adapterView.getSelectedItem().toString().toLowerCase().equals("routine"));
                     if (isRoutine) { // setup form for routine medication.
-                        // adminTimes.setText("0");
+
                         setTextChangeListener();
                         setRoutineForm();
                     } else { // setup form for prn med.
                         adminTimes.removeTextChangedListener(textWatcher);
-                        // adminTimes.setText("0");
+
                         adminTimesList.removeAllViews();
                         etList.clear();
                         setPRNForm();
@@ -161,7 +172,10 @@ public class MedSettings extends Fragment {
                     acMedName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            med_dose.requestFocus();
+
+                            //med_dose.requestFocus();
+
+
                         }
 
                         @Override
@@ -184,7 +198,22 @@ public class MedSettings extends Fragment {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                med_dose.requestFocus();
+
+                try {
+                    ArrayList<String> drugDosesArray = drugDataHelper.getDrugNUI(acMedName.getText().toString().toLowerCase().trim());
+                    if (drugDosesArray.size() > 0) {
+                        AlertDialog.Builder adb = new AlertDialog.Builder(getActivity());
+                        adb.setView(buildDoseChoicesForDialog(drugDosesArray));
+                        adb.show();
+                    } else {
+                        med_dose.requestFocus();
+                    }
+
+                } catch (XmlPullParserException xmp) {
+                    Log.d(TAG, xmp.toString());
+                } catch (IOException io) {
+                    Log.d(TAG, io.toString());
+                }
                 InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Service.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(acMedName.getWindowToken(), 0);
             }
@@ -284,7 +313,7 @@ public class MedSettings extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-
+                Log.d(TAG, "onTextChanged");
             }
 
             @Override
@@ -292,49 +321,14 @@ public class MedSettings extends Fragment {
 
                 // populate edittexts.
 
+                Log.d(TAG, "textChanged");
+
                 if (Integer.valueOf(editable.toString()) < (adminTimesList.getChildCount() / 2)) {
                     adminTimesList.removeViewAt(adminTimesList.getChildCount() - 1);
                     adminTimesList.removeViewAt(adminTimesList.getChildCount() - 1);
                     etList.remove(etList.size() - 1);
                 } else {
-                    int viewCount = Integer.valueOf(editable.toString()) - (adminTimesList.getChildCount() / 2);
-                    for (index = 0; index < viewCount; index++) {
-                        TextView tv = new TextView(getActivity());
-                        tv.setText("Enter " + VerifyHelpers.getCountVerbage(Integer.valueOf(editable.toString())) + " Medication");
-                        dt = new MakeDateTimeHelper();
-
-                        etList.add(index, new EditText(getActivity()));
-                        etList.get(index).setId(Integer.valueOf(editable.toString()));
-                        etList.get(index).setFocusable(false);
-                        Time now = new Time();
-                        now.setToNow();
-                        // etList.get(index).setText(dt.convertToTime12(now.hour + ":" + String.format("%02d", now.minute)));
-                        etList.get(index).setHint("Enter time");
-
-                        etList.get(index).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                final View v = view;
-                                TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
-                                    @Override
-                                    public void onTimeSet(TimePicker view2, int hourOfDay, int minute) {
-
-                                        EditText et = (EditText) getActivity().findViewById(v.getId());
-                                        et.setText(dt.convertToTime12("" + hourOfDay + ":" + String.format("%02d", minute)));
-
-
-                                    }
-                                };
-
-                                TimePickerDialog tpd = new TimePickerDialog(getActivity(), t, 0, 0, false);
-
-                                tpd.show();
-                            }
-                        });
-
-                        adminTimesList.addView(tv);
-                        adminTimesList.addView(etList.get(index));
-                    }
+                    createEditTexts(editable);
                 }
 
             }
@@ -344,12 +338,12 @@ public class MedSettings extends Fragment {
 
     private void submitRoutineToDB() {
         // TODO grab form data here.
-        dbHelper.submitNewMedication(prepareMedicationObject());
+        dataSource.submitNewMedication(prepareMedicationObject());
     }
 
     private void submitPrnToDB() {
         // TODO grab form data here.
-        dbHelper.submitNewMedication(prepareMedicationObject());
+        dataSource.submitNewMedication(prepareMedicationObject());
     }
 
     private Medication prepareMedicationObject() {
@@ -361,7 +355,7 @@ public class MedSettings extends Fragment {
         medication.setDoseMeasure(Integer.valueOf(med_dose.getText().toString().trim()));
         medication.setDoseMeasureType(med_measure_spinner.getSelectedItem().toString().toLowerCase().trim());
         medication.setDoseCount(Integer.valueOf(adminTimes.getText().toString()));
-        medication.setFillDate(lastFilled.getText().toString().toLowerCase().trim());
+        //medication.setFillDate(lastFilled.getText().toString().toLowerCase().trim()); // Will add to next roll-out.
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
         medication.setStartDate(df.format(cal.getTime()));
@@ -441,7 +435,7 @@ public class MedSettings extends Fragment {
     private void populateForEdit(String name) {
         // TODO will populate for edits.
 
-        Medication medication = dbHelper.getSingleMedByName(name);
+        Medication medication = dataSource.getSingleMedByName(name);
 
         for (int index = 0; index < med_type.getCount(); index++) {
             if (med_type.getItemAtPosition(index).toString().equalsIgnoreCase(medication.getAdminType())) {
@@ -460,15 +454,23 @@ public class MedSettings extends Fragment {
                 break;
             }
         }
-        Log.d(TAG, "" + medication.getDoseCount());
-        for (int index = 0; index < medication.getDoseCount(); index++) {
-            adminTimes.setText("" + (index + 1));
-            // adminTimes.setText("1");
 
+        adminTimes.setText(String.valueOf(medication.getDoseCount()));
+        if (medication.getAdminType().equalsIgnoreCase("routine")) {
+            createEditTexts(adminTimes.getEditableText());
+
+            String splitTimes[] = medication.getDoseTimes().split(";");
+
+            for (int index = 0; index < splitTimes.length; index++) {
+                etList.get(index).setText(splitTimes[index]);
+            }
+        } else {
+            doseFrequency.setText(String.valueOf(medication.getDoseFrequency()));
         }
 
         dc_med.setVisibility(View.VISIBLE);
         delete_med.setVisibility(View.VISIBLE);
+        setEditButtonListeners(); // turn on listeners for buttons.
     }
 
     public interface OnFragmentInteractionListener {
@@ -478,14 +480,97 @@ public class MedSettings extends Fragment {
 
     @Override
     public void onPause() {
-        dbHelper.close();
+        dataSource.close();
+
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Service.INPUT_METHOD_SERVICE);
+        if (imm.isAcceptingText()) {
+            imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+
+        }
         super.onPause();
     }
 
     @Override
     public void onDestroy() {
-        dbHelper.close();
+        dataSource.close();
+        Log.d(TAG, "onDestroy");
         super.onDestroy();
+
+    }
+
+    private void createEditTexts(Editable editable) {
+
+        int viewCount = Integer.valueOf(editable.toString()) - (adminTimesList.getChildCount() / 2);
+        for (index = 0; index < viewCount; index++) {
+            TextView tv = new TextView(getActivity());
+            tv.setText("Enter " + VerifyHelpers.getCountVerbage(index + 1) + " Medication");
+            dt = new MakeDateTimeHelper();
+
+            etList.add(index, new EditText(getActivity()));
+            etList.get(index).setId(Integer.valueOf(editable.toString()));
+            etList.get(index).setFocusable(false);
+            Time now = new Time();
+            now.setToNow();
+            // etList.get(index).setText(dt.convertToTime12(now.hour + ":" + String.format("%02d", now.minute)));
+            etList.get(index).setHint("Enter time");
+
+            etList.get(index).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final View v = view;
+                    TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
+                        @Override
+                        public void onTimeSet(TimePicker view2, int hourOfDay, int minute) {
+
+                            EditText et = (EditText) getActivity().findViewById(v.getId());
+                            et.setText(dt.convertToTime12("" + hourOfDay + ":" + String.format("%02d", minute)));
+
+                        }
+                    };
+
+                    TimePickerDialog tpd = new TimePickerDialog(getActivity(), t, 0, 0, false);
+
+                    tpd.show();
+                }
+            });
+
+            adminTimesList.addView(tv);
+            adminTimesList.addView(etList.get(index));
+        }
+    }
+
+    private void setEditButtonListeners() {
+        delete_med.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dataSource.changeMedicationStatus(acMedName.getText().toString().toLowerCase(), "del");
+                mListener.onFragmentInteraction(1);
+            }
+        });
+
+        dc_med.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dataSource.changeMedicationStatus(acMedName.getText().toString().toLowerCase(), "dc");
+                mListener.onFragmentInteraction(1);
+            }
+        });
+    }
+
+    private ScrollView buildDoseChoicesForDialog(ArrayList<String> choices) {
+        ScrollView checkBox = new ScrollView(getActivity());
+        RadioGroup radioGroup = new RadioGroup(getActivity());
+
+        for (int index = 0; index < choices.size(); index++) {
+            RadioButton radioButton = new RadioButton(getActivity());
+            radioButton.setText(choices.get(index));
+
+            radioButton.setId(index);
+            radioGroup.setBackgroundColor(getResources().getColor(android.R.color.white));
+            radioGroup.addView(radioButton);
+        }
+        checkBox.addView(radioGroup);
+        return checkBox;
 
     }
 }

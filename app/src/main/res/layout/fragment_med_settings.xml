@@ -157,7 +157,8 @@
 
             </LinearLayout>
 
-            <TextView
+            <!-- Will institute this on next roll-out -->
+            <!--<TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="10dp"
@@ -169,7 +170,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/date_format"
-                android:inputType="date" />
+                android:inputType="date" /> -->
 
 
             <LinearLayout
