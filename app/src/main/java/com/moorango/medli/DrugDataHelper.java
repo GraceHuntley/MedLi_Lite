@@ -7,6 +7,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -87,27 +88,67 @@ public class DrugDataHelper {
 
         HttpResponse response = httpClient.execute(httpGet);
         InputStream is = response.getEntity().getContent();
-        XmlPullParser parser = Xml.newPullParser();
-        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+
+        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+        factory.setNamespaceAware(true);
+
+        XmlPullParser parser = factory.newPullParser();
+
+        //XmlPullParser parser = Xml.newPullParser();
+        //parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
 
         parser.setInput(is, null);
 
+        String text = "";
+        int eventType = parser.getEventType();
+        String headerName = "";
+        String titleName = "";
+
         while (parser.next() != XmlPullParser.END_DOCUMENT) {
-            if (parser.getEventType() != XmlPullParser.START_TAG) {
-                continue;
-            }
-
-            String name = parser.getName().toString();
 
 
-            if (name.equals("tty")) {
-
-                if (parser.next() == XmlPullParser.TEXT) {
-
-                    doseList.add(parser.getText());
-
+            if (parser.getEventType() != XmlPullParser.TEXT) {
+                String tagName = parser.getName();
+                if (tagName.equals("name")) {
+                    if (parser.next() == XmlPullParser.TEXT) {
+                        doseList.add(parser.getText());
+                    }
                 }
             }
+
+           /* switch (eventType) {
+                case XmlPullParser.START_TAG:
+
+                    if (tagName.equals("tty")) {
+                        if (parser.next() == XmlPullParser.TEXT) {
+                            headerName = parser.getText();
+
+                        }
+                    }
+
+                    break;
+                case XmlPullParser.TEXT:
+                    if (headerName.equals("SCDC")) {
+                        while (parser.next() != XmlPullParser.TEXT) {
+                            if (parser.getName().equals("name")) {
+                                if (parser.next() == XmlPullParser.TEXT) {
+                                    Log.d(TAG, parser.getText());
+                                }
+                            }
+                        }
+
+
+                    }
+                    break;
+
+                case XmlPullParser.END_TAG:
+                    if (tagName.equals("conceptGroup")) {
+                        //Log.d(TAG, parser.getName() + " " + text);
+                    }
+                    break;
+
+            } */
+            // eventType = parser.next();
         }
         return doseList;
     }

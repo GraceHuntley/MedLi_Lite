@@ -82,6 +82,15 @@ public class MedSettings extends Fragment {
         super.onCreate(savedInstanceState);
 
         drugDataHelper = new DrugDataHelper();
+        /*try {
+
+            drugDataHelper.getDrugNUI("clobazam");
+
+        } catch (XmlPullParserException e) {
+
+        } catch (IOException f) {
+
+        } */
 
         dataSource = MedLiDataSource.getHelper(getActivity());
         getActivity().setRequestedOrientation(
