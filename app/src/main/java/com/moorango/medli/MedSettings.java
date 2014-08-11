@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Service;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.net.Uri;
@@ -56,6 +57,8 @@ public class MedSettings extends Fragment {
     private boolean isRoutine = false;
     private LinearLayout secondaryForm;
     private Button delete_med, dc_med, plusButton;
+    private AlertDialog.Builder adb;
+    private AlertDialog adDoseChoices;
 
     DrugDataHelper drugDataHelper;
 
@@ -82,15 +85,6 @@ public class MedSettings extends Fragment {
         super.onCreate(savedInstanceState);
 
         drugDataHelper = new DrugDataHelper();
-        /*try {
-
-            drugDataHelper.getDrugNUI("clobazam");
-
-        } catch (XmlPullParserException e) {
-
-        } catch (IOException f) {
-
-        } */
 
         dataSource = MedLiDataSource.getHelper(getActivity());
         getActivity().setRequestedOrientation(
@@ -129,8 +123,7 @@ public class MedSettings extends Fragment {
         prnFreqBox = (LinearLayout) getActivity().findViewById(R.id.prn_frequency_box);
 
         acMedName = (AutoCompleteTextView) getActivity().findViewById(R.id.ac_Med_name);
-        acMedName.setThreshold(3);
-
+        acMedName.setThreshold(2);
 
         /***
          * Spinner for setting medication type ie. routine or prn.
@@ -178,21 +171,6 @@ public class MedSettings extends Fragment {
 
                     fillList(Uri.encode(charSequence.toString()));
 
-                    acMedName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
-                            //med_dose.requestFocus();
-
-
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-
-                        }
-                    });
-
                     acMedName.setTextColor(Color.BLACK);
                 }
 
@@ -201,32 +179,40 @@ public class MedSettings extends Fragment {
 
                 }
             });
-        }
 
-        acMedName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            acMedName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                try {
-                    ArrayList<String> drugDosesArray = drugDataHelper.getDrugNUI(acMedName.getText().toString().toLowerCase().trim());
-                    if (drugDosesArray.size() > 0) {
-                        AlertDialog.Builder adb = new AlertDialog.Builder(getActivity());
-                        adb.setView(buildDoseChoicesForDialog(drugDosesArray));
-                        adb.show();
-                    } else {
-                        med_dose.requestFocus();
+                    try {
+                        ArrayList<String> drugDosesArray = drugDataHelper.getDrugNUI(acMedName.getText().toString().toLowerCase().trim());
+                        if (drugDosesArray.size() > 0) {
+                            adb = new AlertDialog.Builder(getActivity());
+                            adb.setView(buildDoseChoicesForDialog(drugDosesArray)).setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            });
+                            adDoseChoices = adb.create();
+                            adDoseChoices.show();
+
+
+                        } else {
+                            med_dose.requestFocus();
+                        }
+
+                    } catch (XmlPullParserException xmp) {
+                        Log.d(TAG, xmp.toString());
+                    } catch (IOException io) {
+                        Log.d(TAG, io.toString());
                     }
-
-                } catch (XmlPullParserException xmp) {
-                    Log.d(TAG, xmp.toString());
-                } catch (IOException io) {
-                    Log.d(TAG, io.toString());
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Service.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(acMedName.getWindowToken(), 0);
                 }
-                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Service.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(acMedName.getWindowToken(), 0);
-            }
-        });
+            });
+        }
 
         minusButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -578,6 +564,30 @@ public class MedSettings extends Fragment {
             radioGroup.setBackgroundColor(getResources().getColor(android.R.color.white));
             radioGroup.addView(radioButton);
         }
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                RadioButton checkedRadioButton = (RadioButton) radioGroup.findViewById(i);
+                String doseData[] = checkedRadioButton.getText().toString().split(" ");
+
+                med_dose.setText(doseData[1]);
+                boolean foundMatch = false;
+                for (int index = 0; index < med_measure_spinner.getCount(); index++) {
+                    if (med_measure_spinner.getItemAtPosition(index).toString().equalsIgnoreCase(doseData[2])) {
+
+                        med_measure_spinner.setSelection(index);
+                        foundMatch = true;
+                        break;
+                    }
+                }
+                if (!foundMatch) { // dose measure is not listed yet.
+                    // TODO need to make a database for storing new dose measures. and populate spinner via new databse.
+                }
+
+                adDoseChoices.dismiss();
+
+            }
+        });
         checkBox.addView(radioGroup);
         return checkBox;
 

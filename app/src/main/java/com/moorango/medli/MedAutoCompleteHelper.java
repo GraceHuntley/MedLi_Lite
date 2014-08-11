@@ -48,10 +48,23 @@ public class MedAutoCompleteHelper {
 
         int eventType = parser.getEventType();
 
-        while (eventType != XmlPullParser.END_DOCUMENT) {
-            if (eventType == XmlPullParser.TEXT) {
+        String text = "";
 
-                list.add(parser.getText());
+        while (eventType != XmlPullParser.END_DOCUMENT) {
+
+            switch (eventType) {
+                case XmlPullParser.START_TAG:
+                    // do nothing.
+                    break;
+                case XmlPullParser.TEXT:
+                    text = parser.getText();
+                    break;
+                case XmlPullParser.END_TAG:
+                    if (parser.getName().equals("suggestion")) {
+                        list.add(text);
+                    }
+                    break;
+
             }
             eventType = parser.next();
         }

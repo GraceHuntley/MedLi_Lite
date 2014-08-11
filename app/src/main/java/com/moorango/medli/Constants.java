@@ -29,6 +29,13 @@ public class Constants {
             "late BOOLEAN, " +
             "missed BOOLEAN, " +
             "manual_entry BOOLEAN)";
+
+    public static final String CREATE_DOSE_MEASURE_DB = "CREATE TABLE med_dose_measures (" +
+            "med_name TEXT, " +
+            "dose_measure_int TEXT, " +
+            "dose_measure_type TEXT NOT NULL, " +
+            "user_added boolean DEFAULT 0)";
+
     public static final String GET_MEDLIST_ROUTINE =
             "SELECT medlist.name as name, "
                     + "medlist.dose_int as dose_int, "

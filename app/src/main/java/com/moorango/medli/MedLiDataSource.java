@@ -306,4 +306,17 @@ public class MedLiDataSource {
         database.update("medlist", cv, "name='" + name + "'", null);
 
     }
+
+    public void addDoseMeasureTypeToDB(String name, String intMeasure, String measureType) {
+        this.open();
+
+        ContentValues cv = new ContentValues();
+
+        cv.put("med_name", name);
+        cv.put("dose_measure_int", intMeasure);
+        cv.put("dose_measure_type", measureType);
+        cv.put("user_added", 1);
+
+        //if (database.query("med_dose_measures", ))
+    }
 }
