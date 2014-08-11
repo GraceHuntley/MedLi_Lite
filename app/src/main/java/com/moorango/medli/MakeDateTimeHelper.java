@@ -11,6 +11,7 @@ import android.text.format.Time;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+@SuppressWarnings("WeakerAccess")
 public class MakeDateTimeHelper {
 
     private int month;

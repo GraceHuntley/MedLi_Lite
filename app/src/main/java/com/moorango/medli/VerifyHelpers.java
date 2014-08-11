@@ -8,6 +8,7 @@ import android.net.NetworkInfo;
  * Created by Colin on 7/17/2014.
  * Copyright 2014
  */
+@SuppressWarnings("WeakerAccess")
 public class VerifyHelpers {
 
     VerifyHelpers(Context con) {

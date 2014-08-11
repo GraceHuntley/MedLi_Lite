@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+@SuppressWarnings("WeakerAccess")
 public class Home extends Fragment {
 
     private final String TAG = "Home.java";
@@ -48,8 +49,6 @@ public class Home extends Fragment {
             routineChoicesFromInstance = (SparseBooleanArray) savedInstanceState.getParcelable("routine_array");
 
             prnChoicesFromInstance = (SparseBooleanArray) savedInstanceState.getParcelable("prn_array");
-
-            MakeDateTimeHelper dt = new MakeDateTimeHelper();
 
 
         }

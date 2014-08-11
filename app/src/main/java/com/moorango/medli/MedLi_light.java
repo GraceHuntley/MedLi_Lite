@@ -1,13 +1,10 @@
 package com.moorango.medli;
 
-import android.app.Service;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.inputmethod.InputMethodManager;
 
 public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInteractionListener, MedSettings.OnFragmentInteractionListener,
         LogFragment.OnFragmentInteractionListener, MedList.OnFragmentInteractionListener {
@@ -42,8 +39,6 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        FragmentManager fragmentManager;
-        FragmentTransaction fragmentTransaction;
 
         switch (item.getItemId()) {
 
@@ -90,7 +85,7 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
 
     public void onFragmentInteraction(int tag) {
         FragmentManager fragmentManager;
-        FragmentTransaction fragmentTransaction;
+
         switch (tag) {
             case 0:
 
@@ -118,11 +113,4 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
 
     }
 
-    private void hideKeyboard() {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Service.INPUT_METHOD_SERVICE);
-        if (imm != null) {
-            //imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-
-        }
-    }
 }

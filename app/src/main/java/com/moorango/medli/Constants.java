@@ -4,6 +4,7 @@ package com.moorango.medli;
  * Created by Colin on 7/31/2014.
  * Copyright 2014
  */
+@SuppressWarnings("WeakerAccess")
 public class Constants {
 
     public static final String CREATE_MEDLIST_DB = "CREATE TABLE medlist (" +

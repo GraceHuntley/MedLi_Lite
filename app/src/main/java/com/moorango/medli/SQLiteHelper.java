@@ -9,6 +9,7 @@ import android.util.Log;
  * Created by Colin on 7/31/2014.
  * Copyright 2014
  */
+@SuppressWarnings("WeakerAccess")
 public class SQLiteHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "medli.db";

@@ -31,7 +31,7 @@ public class Medication {
     private int doseFrequency; // prn only frequency meds can be taken in hours.
 
 
-    public boolean isForEditDisplay() {
+    boolean isForEditDisplay() {
         return isForEditDisplay;
     }
 

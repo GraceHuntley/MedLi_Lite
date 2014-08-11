@@ -18,23 +18,14 @@ import java.util.ArrayList;
  * Created by Colin on 8/8/2014.
  * Copyright 2014
  */
+@SuppressWarnings("WeakerAccess")
 public class DrugDataHelper {
 
     private final String TAG = "DrugDataHelper.java";
 
-    private static final String ns = null;
-
-    private MedLiDataSource dataSource;
-
-    private MedDoseObject mdo;
     private String text;
 
-
     DrugDataHelper() {
-
-    }
-
-    public void getAutoCompleteHelper() {
 
     }
 
@@ -63,11 +54,11 @@ public class DrugDataHelper {
                 continue;
             }
 
-            String name = parser.getName().toString();
+            String name = parser.getName();
             if (name.equals("rxnormId")) {
                 if (parser.next() == XmlPullParser.TEXT) {
 
-                    result = parser.getText().toString();
+                    result = parser.getText();
 
                     break;
                 }
@@ -101,7 +92,7 @@ public class DrugDataHelper {
 
         int eventType = parser.getEventType();
 
-        mdo = new MedDoseObject();
+        MedDoseObject mdo = new MedDoseObject();
         while (eventType != XmlPullParser.END_DOCUMENT) {
 
 

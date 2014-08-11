@@ -20,7 +20,7 @@ public class MedLiDataSource {
 
     private static final MakeDateTimeHelper dt = new MakeDateTimeHelper();
     private static MedLiDataSource instance;
-    final String TAG = "MedLiDataSource";
+    private final String TAG = "MedLiDataSource";
     private final SQLiteHelper dbHelper;
     // Database fields
     private SQLiteDatabase database;
@@ -105,7 +105,7 @@ public class MedLiDataSource {
         return medication;
     }
 
-    public int getPrnDoseCount24Hours(String medName) {
+    private int getPrnDoseCount24Hours(String medName) {
 
         this.open();
 
@@ -115,7 +115,7 @@ public class MedLiDataSource {
 
     }
 
-    public String getPrnNextDose(String medName, int freq) {
+    private String getPrnNextDose(String medName, int freq) {
 
         String nextDose = null;
 

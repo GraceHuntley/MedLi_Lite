@@ -6,11 +6,11 @@ package com.moorango.medli;
  */
 class MedDoseObject {
 
-    String umlscui;
-    String tty;
-    String rxcui;
-    String name;
-    String language;
+    private String umlscui;
+    private String tty;
+    private String rxcui;
+    private String name;
+    private String language;
 
     public String getTty() {
         return tty;
@@ -52,7 +52,7 @@ class MedDoseObject {
         this.suppress = suppress;
     }
 
-    String suppress;
+    private String suppress;
 
     public String getUmlscui() {
         return umlscui;

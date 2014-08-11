@@ -47,7 +47,6 @@ public class MedSettings extends Fragment {
     private EditText med_dose, adminTimes;
     private MakeDateTimeHelper dt;
     private LinearLayout adminTimesList;
-    private AlertDialog.Builder ad;
     private Spinner med_measure_spinner, med_type;
     private AutoCompleteTextView acMedName;
     private TextWatcher textWatcher;
@@ -56,13 +55,12 @@ public class MedSettings extends Fragment {
     private int index = 0;
     private boolean isRoutine = false;
     private LinearLayout secondaryForm;
-    private Button delete_med, dc_med, plusButton;
+    private Button delete_med;
+    private Button dc_med;
     private AlertDialog.Builder adb;
     private AlertDialog adDoseChoices;
 
-    DrugDataHelper drugDataHelper;
-
-    private TextView medTypeLabel; // used just for clearing focus to hide soft keyboard in onPause();
+    private DrugDataHelper drugDataHelper;
 
     private MedLiDataSource dataSource;
 
@@ -103,11 +101,9 @@ public class MedSettings extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        ad = new AlertDialog.Builder(getActivity());
-
         secondaryForm = (LinearLayout) getActivity().findViewById(R.id.secondary_form_wrapper);
         delete_med = (Button) getActivity().findViewById(R.id.del_med);
-        plusButton = (Button) getActivity().findViewById(R.id.plus_button);
+        Button plusButton = (Button) getActivity().findViewById(R.id.plus_button);
         adminTimes = (EditText) getActivity().findViewById(R.id.admin_count_edittext);
         Button minusButton = (Button) getActivity().findViewById(R.id.minus_button);
         doseFrequency = (EditText) getActivity().findViewById(R.id.prn_frequency_input);
@@ -115,8 +111,6 @@ public class MedSettings extends Fragment {
         Button submitMed = (Button) getActivity().findViewById(R.id.btn_add_med);
         med_type = (Spinner) getActivity().findViewById(R.id.med_type_spinner);
         med_dose = (EditText) getActivity().findViewById(R.id.med_dose_input);
-
-        medTypeLabel = (TextView) getActivity().findViewById(R.id.med_type_label);
 
         med_measure_spinner = (Spinner) getActivity().findViewById(R.id.med_measure_spinner);
         adminTimesList = (LinearLayout) getActivity().findViewById(R.id.admin_times_add_box);
