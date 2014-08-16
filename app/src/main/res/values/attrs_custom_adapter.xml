@@ -1,5 +1,5 @@
 <resources>
-    <declare-styleable name="CustomAdapter">
+    <declare-styleable name="CustomAdapterHistory">
         <attr name="exampleString" format="string" />
         <attr name="exampleDimension" format="dimension" />
         <attr name="exampleColor" format="color" />

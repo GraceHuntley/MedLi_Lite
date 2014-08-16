@@ -44,8 +44,11 @@ public class Constants {
                     + "medlist.dose_count as max_count, "
                     + "medlist.dose_times as dose_times, "
                     + "COUNT(CASE WHEN DATE(med_logs.timestamp) = DATE('now', 'localtime') THEN 'ok' END) as actual_count, "
-                    + "admin_type as type from medlist "
-                    + "LEFT OUTER JOIN med_logs ON medlist.name = med_logs.name WHERE medlist.admin_type = 'routine' "
+                    + "medlist.admin_type as type, "
+                    + "medlist.dose_frequency as frequency "
+                    + "from medlist "
+                    + "LEFT OUTER JOIN med_logs ON medlist.name = med_logs.name "
+                   /* + "WHERE medlist.admin_type = 'routine' " */
                     + "GROUP BY medlist.name ORDER By medlist.name ASC";
     public static final String GET_MEDLIST_PRN =
             "SELECT medlist.name as name, "
@@ -86,8 +89,8 @@ public class Constants {
         return "SELECT timestamp FROM med_logs "
                 + "WHERE name='" + name + "' "
                 + "AND "
-                + "DATE(timestamp) > datetime('now', '-1 day', 'localtime')"
-                + "timestamp DESC "
+                + "DATE(timestamp) > datetime('now', '-1 day', 'localtime') "
+                + "ORDER BY timestamp DESC "
                 + "LIMIT 1";
     }
 

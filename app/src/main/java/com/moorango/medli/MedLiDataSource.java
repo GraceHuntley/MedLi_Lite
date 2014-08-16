@@ -55,6 +55,7 @@ public class MedLiDataSource {
         this.open(); // open db.
 
         Cursor cursor = database.rawQuery((tag.equals("routine")) ? Constants.GET_MEDLIST_ROUTINE : Constants.GET_MEDLIST_PRN, null);
+        Log.d(TAG, Constants.GET_MEDLIST_ROUTINE);
 
         while (cursor.moveToNext()) {
             Medication medication = cursorToRoutine(cursor);

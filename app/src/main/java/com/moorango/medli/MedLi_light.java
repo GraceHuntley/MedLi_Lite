@@ -7,7 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInteractionListener, MedSettings.OnFragmentInteractionListener,
-        LogFragment.OnFragmentInteractionListener, MedList.OnFragmentInteractionListener {
+        LogFragment.OnFragmentInteractionListener, MedList.OnFragmentInteractionListener, MedAdminList.OnFragmentInteractionListener {
 
 
     @Override

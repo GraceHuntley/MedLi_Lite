@@ -14,12 +14,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class CustomAdapter extends BaseAdapter {
+public class CustomAdapterHistory extends BaseAdapter {
 
     Context context;
     List<MedLog> rowItem;
 
-    CustomAdapter(Context context, List<MedLog> rowItem) {
+    CustomAdapterHistory(Context context, List<MedLog> rowItem) {
         this.context = context;
         this.rowItem = rowItem;
 

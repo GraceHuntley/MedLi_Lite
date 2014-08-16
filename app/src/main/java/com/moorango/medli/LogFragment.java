@@ -89,11 +89,10 @@ public class LogFragment extends Fragment implements AbsListView.OnItemClickList
         } */
         List<MedLog> loggedMedsList = dbHelper.getMedHistory(1);
 
-        mAdapter = new CustomAdapter(getActivity(), loggedMedsList);
+        mAdapter = new CustomAdapterHistory(getActivity(), loggedMedsList);
         // TODO: Change Adapter to display your content
         /*mAdapter = new ArrayAdapter<MedLog>(getActivity(),
                 android.R.layout.simple_list_item_1, android.R.id.text1, loggedMedsList); */
-
 
 
     }
