@@ -4,7 +4,7 @@ package com.moorango.medli;
  * Created by Colin on 7/31/2014.
  * Copyright 2014
  */
-@SuppressWarnings("WeakerAccess")
+
 public class Constants {
 
     public static final String CREATE_MEDLIST_DB = "CREATE TABLE medlist (" +
@@ -18,7 +18,7 @@ public class Constants {
             "dose_count INTEGER NOT NULL, " +
             "fillDate TEXT, " +
             "dose_times TEXT, " +
-            "dose_frequency TEXT +" +
+            "dose_frequency TEXT, " +
             "last_modified TEXT)";
 
 
@@ -59,17 +59,20 @@ public class Constants {
                     + "from medlist "
                     + "LEFT OUTER JOIN med_logs ON medlist.name = med_logs.name WHERE medlist.admin_type = 'prn' "
                     + "GROUP BY medlist.name ORDER By medlist.name ASC";
+
     public static final String GET_TODAYS_MED_ADMIN_LOGS =
             "SELECT med_logs.ID_UNIQUE as id, "
                     + "med_logs.name as name, "
                     + "med_logs.dose as dose, "
-                    + "timestamp as time, "
+                    + "med_logs.timestamp as time, "
                     + "med_logs.late as late, "
                     + "med_logs.missed as missed, "
-                    + "med_logs.manual_entry as manual "
+                    + "med_logs.manual_entry as manual, "
+                    + "DATE(strftime('%s',timestamp), 'unixepoch', 'localtime') as date "
                     + "FROM med_logs "
-                    + "WHERE DATE(med_logs.timestamp) = DATE('now', 'localtime') "
-                    + "ORDER BY timestamp DESC";
+                    //+ "WHERE DATE(med_logs.timestamp) = DATE('now', '-2days', 'localtime') "
+                    + "ORDER BY DATETIME(strftime('%s',timestamp), 'unixepoch', 'localtime') DESC "
+                    /*+ "TIME(timestamp) DESC"*/;
 
 
     public static String GET_COUNT_LAST_24HOURS(String name) {
@@ -84,7 +87,7 @@ public class Constants {
                 + "WHERE name='" + name + "' "
                 + "AND "
                 + "DATE(timestamp) > datetime('now', '-1 day', 'localtime')"
-                + "ORDER BY timestamp DESC "
+                + "timestamp DESC "
                 + "LIMIT 1";
     }
 

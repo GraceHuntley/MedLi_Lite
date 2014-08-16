@@ -514,6 +514,12 @@ public class MedSettings extends Fragment {
                             EditText et = (EditText) getActivity().findViewById(v.getId());
                             et.setText(dt.convertToTime12("" + hourOfDay + ":" + String.format("%02d", minute)));
 
+                            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Service.INPUT_METHOD_SERVICE);
+                            if (imm.isAcceptingText()) {
+                                imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+
+                            }
+
                         }
                     };
 

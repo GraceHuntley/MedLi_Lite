@@ -1,6 +1,9 @@
 package com.moorango.medli;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,7 +22,15 @@ public class MedLog {
     private boolean wasMissed;
     private boolean wasManual;
 
+    private boolean isSubHeading;
+
+    private static String lastDate;
+
     private String uniqueID;
+
+    public MedLog() {
+        // empty constructor.
+    }
 
     public MedLog(String uniqueID, String name, String dose, String timestamp, boolean isLate, boolean wasMissed, boolean wasManual) {
         this.uniqueID = uniqueID;
@@ -29,6 +40,11 @@ public class MedLog {
         this.isLate = isLate;
         this.wasMissed = wasMissed;
         this.wasManual = wasManual;
+
+        if (lastDate == null) {
+            lastDate = this.getTimestamp().split(" ")[0];
+        }
+
 
         medLogList.add(this);
 
@@ -51,9 +67,28 @@ public class MedLog {
 
     public String toString() {
         MakeDateTimeHelper dt = new MakeDateTimeHelper();
-        String test = isLate ? "LATE" : "";
-        return dt.convertToTime12(this.getTimestamp().split(" ")[1]) + " " + this.getName().toUpperCase() + "\n" + test;
 
+        Date date;
+        if (this.isSubHeading()) {
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+
+            try {
+                date = sdf.parse(this.getTimestamp().split(" ")[0]);
+            } catch (ParseException p) {
+                return "ERROR";
+            }
+            String dateSplit[] = date.toString().split(" ");
+            return dateSplit[0] + " " + dateSplit[1] + " " + dateSplit[2];
+            //return this.getTimestamp().split(" ")[0];
+
+        } else {
+            String wasMedLate = isLate ? "\nLATE" : "";
+            lastDate = this.getTimestamp().split(" ")[0];
+            return dt.convertToTime12(this.getTimestamp().split(" ")[1]) + " " + this.getName().toUpperCase() + wasMedLate;
+
+        }
     }
 
     public String getUniqueID() {
@@ -102,6 +137,14 @@ public class MedLog {
 
     public void setWasMissed(boolean wasMissed) {
         this.wasMissed = wasMissed;
+    }
+
+    public boolean isSubHeading() {
+        return isSubHeading;
+    }
+
+    public void setSubHeading(boolean isSubHeading) {
+        this.isSubHeading = isSubHeading;
     }
 
 }

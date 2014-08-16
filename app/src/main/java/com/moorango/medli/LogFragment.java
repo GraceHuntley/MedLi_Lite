@@ -4,24 +4,36 @@ import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-
 
 public class LogFragment extends Fragment implements AbsListView.OnItemClickListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
+    private final String TAG = "LogFragment";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private TextView historyHeader;
+    private int selectionForView = 0;
+
+    private boolean isScrolling = false;
+    private boolean hideHeader = false;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -70,11 +82,22 @@ public class LogFragment extends Fragment implements AbsListView.OnItemClickList
         }
         MedLiDataSource dbHelper = MedLiDataSource.getHelper(getActivity());
 
-        List<MedLog> loggedMedsList = dbHelper.getDaysData(1);
+
+        /*for (int index = 0; index < 50; index++) {
+
+            dbHelper.populateMedAdminTest(null);
+        } */
+        List<MedLog> loggedMedsList = dbHelper.getMedHistory(1);
+
+        mAdapter = new CustomAdapter(getActivity(), loggedMedsList);
         // TODO: Change Adapter to display your content
-        mAdapter = new ArrayAdapter<MedLog>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, loggedMedsList);
+        /*mAdapter = new ArrayAdapter<MedLog>(getActivity(),
+                android.R.layout.simple_list_item_1, android.R.id.text1, loggedMedsList); */
+
+
+
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -82,6 +105,7 @@ public class LogFragment extends Fragment implements AbsListView.OnItemClickList
         View view = inflater.inflate(R.layout.fragment_log, container, false);
 
         // Set the adapter
+
         mListView = (ListView) view.findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
 
@@ -89,6 +113,81 @@ public class LogFragment extends Fragment implements AbsListView.OnItemClickList
         mListView.setOnItemClickListener(this);
 
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+
+        super.onActivityCreated(savedInstanceState);
+
+        Toast toast = Toast.makeText(getActivity(), "Long press Entry to Edit or Delete", Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        TextView tv = new TextView(getActivity());
+        tv.setText("Long press Entry to Edit or Delete!");
+        tv.setPadding(5, 5, 5, 5);
+        tv.setTextAppearance(getActivity(), android.R.style.TextAppearance_Large);
+        tv.setBackgroundResource(android.R.color.white);
+
+        toast.setView(tv);
+        toast.show();
+        historyHeader = (TextView) getActivity().findViewById(R.id.history_header);
+
+        mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int scrollState) {
+                if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
+                    Log.d(TAG, "stopped scrolling");
+                    if (hideHeader) {
+                        historyHeader.setVisibility(View.GONE);
+                    } else {
+                        historyHeader.setVisibility(View.VISIBLE);
+                        absListView.setSelection(selectionForView);
+                    }
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+                if (mAdapter.getCount() > 0) { // do not perform this on an empty list.
+                    MedLog mLog = (MedLog) mAdapter.getItem(firstVisibleItem);
+
+                    isScrolling = true;
+
+                    if (mLog.isSubHeading()) {
+                        hideHeader = true;
+                    } else {
+
+                        Date date = null;
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+                        try {
+                            date = sdf.parse(mLog.getTimestamp().split(" ")[0]);
+                        } catch (ParseException p) {
+
+                        }
+                        String dateSplit[] = date.toString().split(" ");
+
+                        historyHeader.setText(dateSplit[0] + " " + dateSplit[1] + " " + dateSplit[2]);
+                        hideHeader = false;
+                        selectionForView = firstVisibleItem;
+                    }
+
+                }
+            }
+        });
+
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+                if (!((MedLog) mListView.getItemAtPosition(position)).isSubHeading()) {
+                    mListener.onFragmentInteraction(1);
+                }
+                return false;
+            }
+        });
+
+
     }
 
     @Override
@@ -114,7 +213,9 @@ public class LogFragment extends Fragment implements AbsListView.OnItemClickList
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-            mListener.onFragmentInteraction(1);
+            if (!((MedLog) mListView.getItemAtPosition(position)).isSubHeading()) {
+                mListener.onFragmentInteraction(1);
+            }
         }
     }
 
@@ -135,3 +236,4 @@ public class LogFragment extends Fragment implements AbsListView.OnItemClickList
     }
 
 }
+

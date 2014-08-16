@@ -11,6 +11,8 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -31,7 +33,7 @@ public class MedList extends Fragment implements AbsListView.OnItemClickListener
     /**
      * The fragment's ListView/GridView.
      */
-    private AbsListView mListView;
+    private ListView mListView;
 
     /**
      * The Adapter which will be used to populate the ListView/GridView with
@@ -81,10 +83,16 @@ public class MedList extends Fragment implements AbsListView.OnItemClickListener
         View view = inflater.inflate(R.layout.fragment_log, container, false);
 
         // Set the adapter
-        mListView = (AbsListView) view.findViewById(android.R.id.list);
-        ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
+        mListView = (ListView) view.findViewById(android.R.id.list);
+        TextView tv = new TextView(getActivity());
+        tv.setText("Choose a Medication to Edit");
+        tv.setTextAppearance(getActivity(), android.R.style.TextAppearance_DeviceDefault_Medium);
+        mListView.addHeaderView(tv);
+        mListView.setAdapter(mAdapter);
+        //((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
 
         // Set OnItemClickListener so we can be notified on item clicks
+
         mListView.setOnItemClickListener(this);
 
         return view;

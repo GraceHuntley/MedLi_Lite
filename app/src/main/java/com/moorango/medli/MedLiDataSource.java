@@ -146,17 +146,42 @@ public class MedLiDataSource {
         return nextDose;
     }
 
-    public List<MedLog> getDaysData(int howManyDays) {
+
+    public List<MedLog> getMedHistory(int howManyDays) {
 
         // TODO for now just getting todays data.
         List<MedLog> loggedMeds = new ArrayList<MedLog>();
         this.open();
-
+        String lastDate = null;
+        boolean makeHeader = false;
+        MedLog medLog = null;
         Cursor cs = database.rawQuery(Constants.GET_TODAYS_MED_ADMIN_LOGS, null);
 
-        Log.d(TAG, "cursor size: " + cs.getCount());
+
         while (cs.moveToNext()) {
-            loggedMeds.add(new MedLog(cs.getString(0), cs.getString(1), cs.getString(2), cs.getString(3), (cs.getInt(4) == 1), (cs.getInt(5) == 1), (cs.getInt(6) == 1)));
+
+            String thisDate = cs.getString(3).split(" ")[0];
+            if (lastDate == null) {
+                lastDate = thisDate;
+            }
+
+            if (thisDate.equals(lastDate)) {
+                medLog = new MedLog(cs.getString(0), cs.getString(1), cs.getString(2), cs.getString(3), (cs.getInt(4) == 1), (cs.getInt(5) == 1), (cs.getInt(6) == 1));
+                medLog.setSubHeading(false);
+                makeHeader = false;
+                lastDate = thisDate;
+            } else if (!makeHeader) {
+                medLog = new MedLog();
+                medLog.setSubHeading(true);
+                medLog.setTimestamp(cs.getString(3));
+                makeHeader = true;
+                lastDate = thisDate;
+
+                cs.moveToPrevious();
+
+            }
+
+            loggedMeds.add(medLog);
 
         }
         return loggedMeds;
@@ -211,6 +236,33 @@ public class MedLiDataSource {
         database.insert("med_logs", "name", cv);
     }
 
+    /**
+     * this is just for filling medlogs for testing.
+     *
+     * @return
+     */
+
+    public void populateMedAdminTest(String manualTime) {
+
+        ContentValues cv = new ContentValues();
+        cv.put("ID_UNIQUE", new Date().getTime());
+        cv.put("name", "clobazam");
+        cv.put("dose", "10mg");
+
+
+        cv.put("manual_entry", 1);
+        cv.put("timestamp", "2014-08-" + String.format("%02d", (int) ((Math.random() * 30) + 1)) + " " + String.format("%02d", (int) ((Math.random() * 23) + 1)) + ":00:00");
+
+        //Log.d(TAG, "2014-08-" + ((int) ((Math.random() * 30) + 1)) + " 00:00:00");
+
+
+        cv.put("late", false);
+
+
+        this.open();
+        database.insert("med_logs", "name", cv);
+    }
+
     private int isDoseLate(String time, String due) {
         // TODO test whether admin time is late.
         int nextDoseHour = Integer.valueOf(dt.convertToTime24(due).split(":")[0]);
@@ -258,7 +310,10 @@ public class MedLiDataSource {
             medList.add(medication);
 
         }
+
+        // TODO need to give notice if no meds are added yet.
         return medList;
+
     }
 
     public Medication getSingleMedByName(String name) {
