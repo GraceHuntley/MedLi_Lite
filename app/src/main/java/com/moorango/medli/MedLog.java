@@ -147,4 +147,12 @@ public class MedLog {
         this.isSubHeading = isSubHeading;
     }
 
+    public String getDateOnly() {
+        return this.getTimestamp().split(" ")[0];
+    }
+
+    public String getTimeOnly() {
+        return this.getTimestamp().split(" ")[1];
+    }
+
 }

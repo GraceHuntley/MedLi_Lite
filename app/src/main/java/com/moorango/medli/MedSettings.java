@@ -341,7 +341,7 @@ public class MedSettings extends Fragment {
 
         medication.setMedName(acMedName.getText().toString().toLowerCase().trim());
         medication.setAdminType(type);
-        medication.setDoseMeasure(Integer.valueOf(med_dose.getText().toString().trim()));
+        medication.setDoseMeasure(Float.valueOf(med_dose.getText().toString().trim()));
         medication.setDoseMeasureType(med_measure_spinner.getSelectedItem().toString().toLowerCase().trim());
         medication.setDoseCount(Integer.valueOf(adminTimes.getText().toString()));
         //medication.setFillDate(lastFilled.getText().toString().toLowerCase().trim()); // Will add to next roll-out.

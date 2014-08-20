@@ -9,6 +9,8 @@ import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -18,12 +20,13 @@ import java.util.List;
  */
 public class MedLiDataSource {
 
-    private static final MakeDateTimeHelper dt = new MakeDateTimeHelper();
-    private static MedLiDataSource instance;
     private final String TAG = "MedLiDataSource";
-    private final SQLiteHelper dbHelper;
+    private static final MakeDateTimeHelper dt = new MakeDateTimeHelper();
+
     // Database fields
     private SQLiteDatabase database;
+    private final SQLiteHelper dbHelper;
+    private static MedLiDataSource instance;
 
     public MedLiDataSource(Context context) {
         dbHelper = new SQLiteHelper(context);
@@ -51,18 +54,49 @@ public class MedLiDataSource {
     }
 
     public List<Medication> getAllMeds(String tag) {
-        List<Medication> list = new ArrayList<Medication>();
+        List<Medication> routineList = new ArrayList<Medication>();
+        List<Medication> prnList = new ArrayList<Medication>();
         this.open(); // open db.
 
-        Cursor cursor = database.rawQuery((tag.equals("routine")) ? Constants.GET_MEDLIST_ROUTINE : Constants.GET_MEDLIST_PRN, null);
-        Log.d(TAG, Constants.GET_MEDLIST_ROUTINE);
+        //Cursor cursor = database.rawQuery((tag.equals("routine")) ? Constants.GET_MEDLIST_ROUTINE : Constants.GET_MEDLIST_PRN, null);
+        Cursor cursor = database.rawQuery(Constants.GET_MEDLIST_ROUTINE, null);
 
         while (cursor.moveToNext()) {
             Medication medication = cursorToRoutine(cursor);
-            list.add(medication);
+            if (medication.getAdminType().equalsIgnoreCase("routine")) {
+                routineList.add(medication);
+            } else {
+                prnList.add(medication);
+            }
+
+        }
+        Collections.sort(routineList, new Comparator<Medication>() {
+            @Override
+            public int compare(Medication lhs, Medication rhs) {
+                return lhs.compareNextDue(rhs);
+            }
+        });
+
+        Collections.sort(prnList, new Comparator<Medication>() {
+            @Override
+            public int compare(Medication lhs, Medication rhs) {
+                return lhs.compareNextDue(rhs);
+            }
+        });
+
+        Medication routineHeader = new Medication();
+        routineHeader.setSubHeading(true);
+        routineHeader.setMedName("Routine Medications");
+        routineList.add(0, routineHeader);
+        Medication headerMed = new Medication();
+        headerMed.setSubHeading(true);
+        headerMed.setMedName("Non-Routine Medications");
+        routineList.add(headerMed);
+        for (Medication med : prnList) {
+            routineList.add(med);
         }
         cursor.close();
-        return list;
+        return routineList;
     }
 
     private Medication cursorToRoutine(Cursor cursor) {
@@ -94,7 +128,7 @@ public class MedLiDataSource {
             medication.setDoseFrequency(Integer.valueOf(cursor.getString(7)));
             if (getPrnDoseCount24Hours(medication.getMedName()) >= medication.getDoseCount()) { // all doses have been taken.
                 // TODO might make this show the next dose with date.
-                medication.setNextDue("MAXED DOSES!");
+                medication.setNextDue("COMPLETE");
             } else {
                 // TODO get last dose then see if it was recent.
 
@@ -211,6 +245,13 @@ public class MedLiDataSource {
 
     }
 
+    public int deleteMedEntry(String uniqueId) {
+        ContentValues cv = new ContentValues();
+        cv.put("status", "del");
+        return database.update("med_logs", cv, "ID_UNIQUE='" + uniqueId + "'", null);
+
+    }
+
     public void submitMedicationAdmin(Medication medication, String manualTime) {
 
         ContentValues cv = new ContentValues();
@@ -232,6 +273,7 @@ public class MedLiDataSource {
             }
             cv.put("manual_entry", 0);
         }
+        cv.put("status", "active");
 
         this.open();
         database.insert("med_logs", "name", cv);
@@ -254,11 +296,7 @@ public class MedLiDataSource {
         cv.put("manual_entry", 1);
         cv.put("timestamp", "2014-08-" + String.format("%02d", (int) ((Math.random() * 30) + 1)) + " " + String.format("%02d", (int) ((Math.random() * 23) + 1)) + ":00:00");
 
-        //Log.d(TAG, "2014-08-" + ((int) ((Math.random() * 30) + 1)) + " 00:00:00");
-
-
         cv.put("late", false);
-
 
         this.open();
         database.insert("med_logs", "name", cv);

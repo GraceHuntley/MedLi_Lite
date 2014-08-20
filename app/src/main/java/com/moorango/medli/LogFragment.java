@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,9 +15,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 public class LogFragment extends Fragment implements AbsListView.OnItemClickListener {
@@ -38,6 +34,7 @@ public class LogFragment extends Fragment implements AbsListView.OnItemClickList
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private MedLiDataSource dbHelper;
 
     private OnFragmentInteractionListener mListener;
 
@@ -80,13 +77,8 @@ public class LogFragment extends Fragment implements AbsListView.OnItemClickList
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        MedLiDataSource dbHelper = MedLiDataSource.getHelper(getActivity());
+        dbHelper = MedLiDataSource.getHelper(getActivity());
 
-
-        /*for (int index = 0; index < 50; index++) {
-
-            dbHelper.populateMedAdminTest(null);
-        } */
         List<MedLog> loggedMedsList = dbHelper.getMedHistory(1);
 
         mAdapter = new CustomAdapterHistory(getActivity(), loggedMedsList);
@@ -96,7 +88,6 @@ public class LogFragment extends Fragment implements AbsListView.OnItemClickList
 
 
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -119,7 +110,7 @@ public class LogFragment extends Fragment implements AbsListView.OnItemClickList
 
         super.onActivityCreated(savedInstanceState);
 
-        Toast toast = Toast.makeText(getActivity(), "Long press Entry to Edit or Delete", Toast.LENGTH_LONG);
+        Toast toast = Toast.makeText(getActivity(), "Long press Entry to Edit or Delete", Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         TextView tv = new TextView(getActivity());
         tv.setText("Long press Entry to Edit or Delete!");
@@ -135,13 +126,9 @@ public class LogFragment extends Fragment implements AbsListView.OnItemClickList
             @Override
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
                 if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
-                    Log.d(TAG, "stopped scrolling");
-                    if (hideHeader) {
-                        historyHeader.setVisibility(View.GONE);
-                    } else {
-                        historyHeader.setVisibility(View.VISIBLE);
-                        absListView.setSelection(selectionForView);
-                    }
+                    //Log.d(TAG, "stopped scrolling");
+
+
                 }
             }
 
@@ -151,26 +138,12 @@ public class LogFragment extends Fragment implements AbsListView.OnItemClickList
                 if (mAdapter.getCount() > 0) { // do not perform this on an empty list.
                     MedLog mLog = (MedLog) mAdapter.getItem(firstVisibleItem);
 
-                    isScrolling = true;
+                    MakeDateTimeHelper dt = new MakeDateTimeHelper();
 
-                    if (mLog.isSubHeading()) {
-                        hideHeader = true;
-                    } else {
+                    historyHeader.setText(dt.getReadableDate(mLog.getDateOnly()));
 
-                        Date date = null;
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    selectionForView = firstVisibleItem;
 
-                        try {
-                            date = sdf.parse(mLog.getTimestamp().split(" ")[0]);
-                        } catch (ParseException p) {
-
-                        }
-                        String dateSplit[] = date.toString().split(" ");
-
-                        historyHeader.setText(dateSplit[0] + " " + dateSplit[1] + " " + dateSplit[2]);
-                        hideHeader = false;
-                        selectionForView = firstVisibleItem;
-                    }
 
                 }
             }
@@ -180,12 +153,12 @@ public class LogFragment extends Fragment implements AbsListView.OnItemClickList
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
                 if (!((MedLog) mListView.getItemAtPosition(position)).isSubHeading()) {
+                    dbHelper.deleteMedEntry(((MedLog) mListView.getItemAtPosition(position)).getUniqueID());
                     mListener.onFragmentInteraction(1);
                 }
                 return false;
             }
         });
-
 
     }
 
@@ -213,7 +186,7 @@ public class LogFragment extends Fragment implements AbsListView.OnItemClickList
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
             if (!((MedLog) mListView.getItemAtPosition(position)).isSubHeading()) {
-                mListener.onFragmentInteraction(1);
+                //mListener.onFragmentInteraction(1);
             }
         }
     }

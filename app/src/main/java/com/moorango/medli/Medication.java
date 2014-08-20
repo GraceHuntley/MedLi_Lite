@@ -14,7 +14,7 @@ public class Medication {
 
     private final String TAG = "Medication";
     private String medName;
-    private int doseMeasure; // numeric dose measure.
+    private float doseMeasure; // numeric dose measure.
     private String doseMeasureType; // ex. ml tsp mg
     private String adminType; // prn or routine
     private String status; // active, deleted, discontinued.
@@ -23,6 +23,18 @@ public class Medication {
     private String fillDate; // date medication last filled.
     private String doseTimes; // times of day to give dose. only applicable to routine meds.
 
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean isChecked) {
+        this.isChecked = isChecked;
+    }
+
+    private boolean isChecked;
+
+    private boolean isSubHeading = false;
+
     private boolean isForEditDisplay;
 
     private String nextDue; // next due time.
@@ -30,6 +42,14 @@ public class Medication {
 
     private int doseFrequency; // prn only frequency meds can be taken in hours.
 
+
+    public boolean isSubHeading() {
+        return isSubHeading;
+    }
+
+    public void setSubHeading(boolean isSubHeading) {
+        this.isSubHeading = isSubHeading;
+    }
 
     boolean isForEditDisplay() {
         return isForEditDisplay;
@@ -47,11 +67,11 @@ public class Medication {
         this.medName = medName;
     }
 
-    public int getDoseMeasure() {
+    public float getDoseMeasure() {
         return doseMeasure;
     }
 
-    public void setDoseMeasure(int doseMeasure) {
+    public void setDoseMeasure(float doseMeasure) {
         this.doseMeasure = doseMeasure;
     }
 
@@ -138,9 +158,12 @@ public class Medication {
     @Override
     public String toString() {
 
-        return this.getMedName().toUpperCase() + " " + this.getDoseMeasure() + this.getDoseMeasureType() + "\n" +
-                (!this.isForEditDisplay() ? "NEXT DUE: " + this.getNextDue() : "");
-
+        if (this.isSubHeading()) {
+            return this.getMedName();
+        } else {
+            return this.getMedName().toUpperCase() + " " + this.getDoseMeasure() + this.getDoseMeasureType() + "\n" +
+                    (!this.isForEditDisplay() ? "NEXT DUE: " + this.getNextDue() : "");
+        }
     }
 
     public int compareNextDue(Medication med) {
@@ -154,6 +177,10 @@ public class Medication {
             return 1;
 
         } else if (med.getNextDue().equals("MAXED DOSES!")) {
+            return -1;
+        } else if (this.getNextDue().equals("PRN")) {
+            return 1;
+        } else if (med.getNextDue().equals("PRN")) {
             return -1;
         } else {
             SimpleDateFormat df1 = new SimpleDateFormat("hh:mm aa");

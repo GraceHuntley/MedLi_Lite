@@ -8,6 +8,7 @@ package com.moorango.medli;
 
 import android.text.format.Time;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -46,6 +47,27 @@ public class MakeDateTimeHelper {
         sdFormat = getSDFormat("yyyy-MM-dd");
 
         return sdFormat.format(cal.getTime());
+    }
+
+    /**
+     * From date string (SQL compatable time stamp) returns date only in presentable format.
+     * ie. "Feb 3rd 2014" from "2014-02-03 01:00:23"
+     *
+     * @param date sqLite compatable timestamp structure. "2014-02-03 01:00:23" format.
+     * @return fully formated String with date only.
+     * @throws ParseException
+     */
+    public String getReadableDate(String date) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+
+            String dateSplit[] = sdf.parse(date.split(" ")[0]).toString().split(" ");
+            return dateSplit[0] + " " + dateSplit[1] + " " + dateSplit[2];
+        } catch (ParseException p) {
+            return "Parse Error";
+        }
+
     }
 
     public boolean isLate(String time) {

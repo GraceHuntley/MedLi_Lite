@@ -29,7 +29,8 @@ public class Constants {
             "timestamp TEXT NOT NULL, " +
             "late BOOLEAN, " +
             "missed BOOLEAN, " +
-            "manual_entry BOOLEAN)";
+            "manual_entry BOOLEAN, " +
+            "status TEXT)";
 
     public static final String CREATE_DOSE_MEASURE_DB = "CREATE TABLE med_dose_measures (" +
             "med_name TEXT, " +
@@ -43,7 +44,7 @@ public class Constants {
                     + "medlist.dose_measure_type as dose_type, "
                     + "medlist.dose_count as max_count, "
                     + "medlist.dose_times as dose_times, "
-                    + "COUNT(CASE WHEN DATE(med_logs.timestamp) = DATE('now', 'localtime') THEN 'ok' END) as actual_count, "
+                    + "COUNT(CASE WHEN med_logs.status = 'active' AND DATE(med_logs.timestamp) = DATE('now', 'localtime') THEN 'ok' END) as actual_count, "
                     + "medlist.admin_type as type, "
                     + "medlist.dose_frequency as frequency "
                     + "from medlist "
@@ -74,6 +75,7 @@ public class Constants {
                     + "DATE(strftime('%s',timestamp), 'unixepoch', 'localtime') as date "
                     + "FROM med_logs "
                     //+ "WHERE DATE(med_logs.timestamp) = DATE('now', '-2days', 'localtime') "
+                    + "WHERE status = 'active' "
                     + "ORDER BY DATETIME(strftime('%s',timestamp), 'unixepoch', 'localtime') DESC "
                     /*+ "TIME(timestamp) DESC"*/;
 

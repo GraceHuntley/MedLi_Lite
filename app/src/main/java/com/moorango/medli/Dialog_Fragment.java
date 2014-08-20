@@ -40,7 +40,7 @@ public class Dialog_Fragment extends DialogFragment {
                 .setPositiveButton(R.string.submit,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                ((Home) getActivity().getSupportFragmentManager().findFragmentByTag("home")).doPositiveClick(choicesList);
+                                ((Home) getActivity().getSupportFragmentManager().findFragmentByTag("home")).doPositiveClick();
                             }
                         }
                 )

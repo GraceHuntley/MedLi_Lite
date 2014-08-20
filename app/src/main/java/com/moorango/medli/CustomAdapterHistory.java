@@ -7,40 +7,38 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 public class CustomAdapterHistory extends BaseAdapter {
 
     Context context;
-    List<MedLog> rowItem;
+    List<MedLog> data;
 
     CustomAdapterHistory(Context context, List<MedLog> rowItem) {
         this.context = context;
-        this.rowItem = rowItem;
+        this.data = rowItem;
 
     }
 
     @Override
     public int getCount() {
 
-        return rowItem.size();
+        return data.size();
     }
 
     @Override
     public Object getItem(int position) {
 
-        return rowItem.get(position);
+        return data.get(position);
     }
 
     @Override
     public long getItemId(int position) {
 
-        return rowItem.indexOf(getItem(position));
+        return data.indexOf(getItem(position));
     }
 
     @Override
@@ -54,33 +52,19 @@ public class CustomAdapterHistory extends BaseAdapter {
         MakeDateTimeHelper dt = new MakeDateTimeHelper();
 
         TextView txtTitle = (TextView) convertView.findViewById(R.id.title);
+        RelativeLayout boxWrapper = (RelativeLayout) convertView.findViewById(R.id.box_wrapper);
 
-        MedLog row_pos = rowItem.get(position);
-        // setting the image resource and title
-        if (row_pos.isSubHeading()) {
+        MedLog dataItem = data.get(position);
 
-            Date date = null;
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        if (dataItem.isSubHeading()) {
 
-            try {
-                date = sdf.parse(row_pos.getTimestamp().split(" ")[0]);
-            } catch (ParseException p) {
-
-            }
-            String dateSplit[] = date.toString().split(" ");
-            txtTitle.setText(dateSplit[0] + " " + dateSplit[1] + " " + dateSplit[2]);
-            txtTitle.setBackgroundResource(android.R.color.darker_gray);
-
-            ViewGroup.LayoutParams lp = txtTitle.getLayoutParams();
-            lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
-            txtTitle.setLayoutParams(lp);
+            txtTitle.setText(dt.getReadableDate(dataItem.getDateOnly()));
+            boxWrapper.setBackgroundResource(android.R.color.background_light);
 
         } else {
-            txtTitle.setText(row_pos.getName() + " " + dt.convertToTime12(row_pos.getTimestamp().split(" ")[1]));
-            txtTitle.setBackgroundResource(android.R.color.white);
-            ViewGroup.LayoutParams lp = txtTitle.getLayoutParams();
-            lp.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-            txtTitle.setLayoutParams(lp);
+            txtTitle.setText(VerifyHelpers.capitalizeTitles(dataItem.getName()) + " " + dt.convertToTime12(dataItem.getTimeOnly()));
+            boxWrapper.setBackgroundResource(android.R.color.white);
+
         }
         return convertView;
 

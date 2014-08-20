@@ -13,11 +13,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckedTextView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
@@ -27,12 +29,12 @@ public class Home extends Fragment {
     private static ArrayList<Medication> chosenList;
     private static MyAsyncTask updateLists;
     private OnFragmentInteractionListener mListener;
-    private ListView routineList, prnList;
+    private ListView routineList;
     private MedLiDataSource dataSource;
     private Button submitMed;
-    private ArrayAdapter<Medication> adapter, prnAdapter;
+    private HomeCustomAdapter adapter;
     private SparseBooleanArray routineChoicesFromInstance = null;
-    private SparseBooleanArray prnChoicesFromInstance = null;
+
 
     public Home() {
         // Required empty public constructor
@@ -48,9 +50,6 @@ public class Home extends Fragment {
         if (savedInstanceState != null) {
             routineChoicesFromInstance = (SparseBooleanArray) savedInstanceState.getParcelable("routine_array");
 
-            prnChoicesFromInstance = (SparseBooleanArray) savedInstanceState.getParcelable("prn_array");
-
-
         }
     }
 
@@ -64,14 +63,12 @@ public class Home extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         routineList = (ListView) getActivity().findViewById(R.id.routine_listview);
-        prnList = (ListView) getActivity().findViewById(R.id.prn_listview);
         Button clearChoices = (Button) getActivity().findViewById(R.id.clear_button);
         submitMed = (Button) getActivity().findViewById(R.id.submit_button);
         chosenList = new ArrayList<Medication>();
 
-
         dataSource = MedLiDataSource.getHelper(getActivity());
-        //if (savedInstanceState == null) {
+
         if (updateLists == null || !updateLists.getStatus().equals(AsyncTask.Status.RUNNING)) {
             updateLists = new MyAsyncTask();
             updateLists.execute();
@@ -81,7 +78,6 @@ public class Home extends Fragment {
             updateLists = new MyAsyncTask();
             updateLists.execute();
         }
-        // }
 
         routineList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -89,17 +85,10 @@ public class Home extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
 
-                grabChoices();
-            }
-        });
+                if (!adapter.getItem(position).isSubHeading()) {
+                    adapter.toggleChecked(position);
+                }
 
-
-        prnList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                grabChoices();
             }
         });
 
@@ -108,11 +97,9 @@ public class Home extends Fragment {
             public void onClick(View view) {
                 for (int index = 0; index < routineList.getCount(); index++) {
                     routineList.setItemChecked(index, false);
+                    adapter.clearChoices();
                 }
 
-                for (int index = 0; index < prnList.getCount(); index++) {
-                    prnList.setItemChecked(index, false);
-                }
                 chosenList.clear();
             }
         });
@@ -121,6 +108,8 @@ public class Home extends Fragment {
 
             @Override
             public void onClick(View view) {
+
+                grabChoices();
 
                 if (chosenList.size() > 0) {
 
@@ -136,7 +125,7 @@ public class Home extends Fragment {
                         }
                     }.getReady();
 
-                    showDialog(view.getContext(), "Submit:\n" + for_display + "?");
+                    showDialog("Submit:\n" + for_display + "?");
 
                 }
             }
@@ -146,30 +135,15 @@ public class Home extends Fragment {
     private void grabChoices() {
         chosenList.clear();
         try {
-            SparseBooleanArray SBA_prn_choices = prnList.getCheckedItemPositions();
-            SparseBooleanArray SBA_routine_choices = routineList.getCheckedItemPositions();
+
+            SparseBooleanArray SBA_routine_choices = adapter.getCheckedItemPositions();
 
             for (int index = 0; index < SBA_routine_choices.size(); index++) {
                 if (SBA_routine_choices.valueAt(index)) {
-                    if (!adapter.getItem(SBA_routine_choices.keyAt(index)).getNextDue().equalsIgnoreCase("complete")) {
-                        chosenList.add(adapter.getItem(SBA_routine_choices.keyAt(index)));
-                    } else {
-                        routineList.setItemChecked(index, false);
 
-                    }
+                    chosenList.add(adapter.getItem(SBA_routine_choices.keyAt(index)));
 
                 }
-            }
-
-            for (int index = 0; index < SBA_prn_choices.size(); index++) {
-                if (SBA_prn_choices.valueAt(index)) {
-                    chosenList.add(prnAdapter.getItem(SBA_prn_choices.keyAt(index)));
-                }
-            }
-            if (chosenList.size() > 0) {
-                submitMed.setEnabled(true);
-            } else {
-                submitMed.setEnabled(false);
             }
 
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -191,7 +165,7 @@ public class Home extends Fragment {
         }
     }
 
-    void showDialog(Context con, String medList) {
+    void showDialog(String medList) {
         Dialog_Fragment newFragment = Dialog_Fragment.newInstance(
                 R.string.med_dose_dialog_title, medList);
         newFragment.setChoiceList(chosenList);
@@ -199,8 +173,7 @@ public class Home extends Fragment {
 
     }
 
-    public void doPositiveClick(ArrayList<Medication> choicesList) {
-
+    public void doPositiveClick() {
 
         for (int index = 0; index < chosenList.size(); index++) {
             dataSource.submitMedicationAdmin(chosenList.get(index), null);
@@ -211,46 +184,29 @@ public class Home extends Fragment {
                 "Submitted", Toast.LENGTH_LONG)
                 .show();
 
-
-        adapter.notifyDataSetChanged();
         routineList.clearChoices();
-        prnList.clearChoices();
         chosenList.clear();
+        adapter.clearChoices();
+        adapter.notifyDataSetChanged();
     }
 
     public void doNegativeClick() {
 
         routineList.clearChoices();
-        prnList.clearChoices();
+        chosenList.clear();
+        adapter.clearChoices();
 
-        for (int i = 0; i < routineList.getCount(); i++) {
-            routineList.setItemChecked(i, false);
-        }
-
-        for (int i = 0; i < prnList.getCount(); i++) {
-            prnList.setItemChecked(i, false);
-        }
-        submitMed.setEnabled(false);
     }
-
-    /**
-     * End dialog test above.
-     */
 
     @Override
     public void onDetach() {
         super.onDetach();
-
 
         mListener = null;
     }
 
     @Override
     public void onPause() {
-
-        /*if (updateLists != null && updateLists.getStatus().equals(AsyncTask.Status.RUNNING)) {
-            updateLists.cancel(true);
-        } */
 
         if (dataSource != null) {
             dataSource.close();
@@ -277,29 +233,18 @@ public class Home extends Fragment {
 
         super.onSaveInstanceState(savedState);
 
-
         if (getActivity().getSupportFragmentManager().findFragmentByTag("home").isVisible()) {
             // Note: getValues() is a method in your ArrayAdaptor subclass
-            SparseBooleanArray spRoutine = (routineList != null) ? routineList.getCheckedItemPositions() : null;
-            SparseBooleanArray spPRN = (prnList != null) ? prnList.getCheckedItemPositions() : null;
+            SparseBooleanArray spRoutine = (adapter != null) ? adapter.getCheckedItemPositions() : null;
 
-            if (spRoutine != null && spPRN != null) {
+            if (spRoutine != null) {
                 savedState.putParcelable("routine_array", new SparseBooleanArrayParcelable(spRoutine));
-                savedState.putParcelable("prn_array", new SparseBooleanArrayParcelable(spPRN));
+
             }
         }
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(int tag);
@@ -311,22 +256,8 @@ public class Home extends Fragment {
         protected String doInBackground(Void... voids) {
 
             List<Medication> meds = dataSource.getAllMeds("routine");
-            List<Medication> prnMeds = dataSource.getAllMeds("prn");
-            adapter = new ArrayAdapter<Medication>(getActivity(),
-                    android.R.layout.simple_list_item_multiple_choice, meds);
 
-            adapter.sort(new Comparator<Medication>() {
-
-                @Override
-                public int compare(Medication lhs, Medication rhs) {
-
-                    return lhs.compareNextDue(rhs);
-                }
-            });
-
-            prnAdapter = new ArrayAdapter<Medication>(getActivity(),
-                    android.R.layout.simple_list_item_multiple_choice, prnMeds);
-
+            adapter = new HomeCustomAdapter(getActivity(), R.layout.home_list_item, R.id.title, meds);
 
             return null;
         }
@@ -335,26 +266,141 @@ public class Home extends Fragment {
         protected void onPostExecute(String result) {
 
             routineList.setAdapter(adapter);
-            prnList.setAdapter(prnAdapter);
 
-
-            if (routineChoicesFromInstance != null && prnChoicesFromInstance != null) {
+            if (routineChoicesFromInstance != null) {
 
                 int routine = routineChoicesFromInstance.size();
-                int prn = prnChoicesFromInstance.size();
 
                 for (int index = 0; index < routine; index++) {
-                    routineList.setItemChecked(index, routineChoicesFromInstance.valueAt(index));
+                    //adapter.setItemChecked(index, routineChoicesFromInstance.valueAt(index));
+                    adapter.setItemChecked(index, routineChoicesFromInstance.valueAt(index));
 
                 }
-                for (int index = 0; index < prn; index++) {
 
-                    prnList.setItemChecked(index, prnChoicesFromInstance.valueAt(index));
-                }
                 grabChoices();
             }
         }
     }
+}
+
+class HomeCustomAdapter extends ArrayAdapter<Medication> {
+
+    Context context;
+    List<Medication> data;
+    SparseBooleanArray sparseBooleanArray;
+
+    public HomeCustomAdapter(Context context, int resource,
+                             int textViewResourceId, List<Medication> rowItem) {
+        super(context, resource, textViewResourceId, rowItem);
+        this.context = context;
+        this.data = rowItem;
+        sparseBooleanArray = new SparseBooleanArray();
+
+        for (int index = 0; index < rowItem.size(); index++) {
+            sparseBooleanArray.put(index, false);
+        }
+    }
+
+
+    public SparseBooleanArray getCheckedItemPositions() {
+
+        return sparseBooleanArray;
+    }
+
+    @Override
+    public int getCount() {
+
+        return data.size();
+    }
+
+    @Override
+    public Medication getItem(int position) {
+
+        return data.get(position);
+
+    }
+
+    public void clearChoices() {
+        for (int index = 0; index < sparseBooleanArray.size(); index++) {
+            sparseBooleanArray.put(index, false);
+            notifyDataSetChanged();
+        }
+    }
+
+    public void setItemChecked(int position, boolean value) {
+        sparseBooleanArray.put(position, value);
+    }
+
+    public void toggleChecked(int position) {
+        if (sparseBooleanArray.get(position)) {
+            sparseBooleanArray.put(position, false);
+        } else {
+            sparseBooleanArray.put(position, true);
+        }
+
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public long getItemId(int position) {
+
+        return data.indexOf(getItem(position));
+    }
+
+    @Override
+    public View getView(final int position, View convertView, ViewGroup parent) {
+
+        if (convertView == null) {
+            LayoutInflater mInflater = (LayoutInflater) context
+                    .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+            convertView = mInflater.inflate(R.layout.home_list_item, null);
+        }
+
+        final CheckedTextView txtTitle = (CheckedTextView) convertView.findViewById(R.id.title);
+        final TextView headerText = (TextView) convertView.findViewById(R.id.header_title);
+        final TextView nextDueTime = (TextView) convertView.findViewById(R.id.next_dose_time);
+        final TextView doseMeasure = (TextView) convertView.findViewById(R.id.dose_measure);
+        RelativeLayout boxWrapper = (RelativeLayout) convertView.findViewById(R.id.box_wrapper);
+
+        final Medication dataItem = data.get(position);
+
+        Boolean checked = sparseBooleanArray.get(position);
+        if (checked != null) {
+            txtTitle.setChecked(checked);
+        }
+
+        if (dataItem.isSubHeading()) {
+            headerText.setText(dataItem.getMedName());
+            txtTitle.setText(dataItem.getMedName());
+            txtTitle.setChecked(false);
+            txtTitle.setVisibility(View.INVISIBLE);
+            nextDueTime.setVisibility(View.GONE);
+            doseMeasure.setVisibility(View.GONE);
+            headerText.setVisibility(View.VISIBLE);
+            boxWrapper.setBackgroundResource(android.R.color.background_light);
+        } else {
+            txtTitle.setText(VerifyHelpers.capitalizeTitles(dataItem.getMedName()));
+            nextDueTime.setText((dataItem.getNextDue().equalsIgnoreCase("complete")) ? dataItem.getNextDue() : "Next Due: " + dataItem.getNextDue());
+            boxWrapper.setBackgroundResource(android.R.color.white);
+            if (!dataItem.getNextDue().equalsIgnoreCase("complete") &&
+                    !dataItem.getNextDue().equalsIgnoreCase("prn") &&
+                    !dataItem.getAdminType().equalsIgnoreCase("prn")) {
+                boxWrapper.setBackgroundResource((VerifyHelpers.isDoseLate(dataItem.getNextDue())) ? R.color.red : android.R.color.white);
+            }
+
+
+            doseMeasure.setText(dataItem.getDoseMeasure() + " " + dataItem.getDoseMeasureType());
+            doseMeasure.setVisibility(View.VISIBLE);
+            txtTitle.setVisibility(View.VISIBLE);
+            nextDueTime.setVisibility(View.VISIBLE);
+            headerText.setVisibility(View.GONE);
+
+        }
+
+        return convertView;
+
+    }
+
 }
 
 
