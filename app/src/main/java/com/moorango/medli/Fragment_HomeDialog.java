@@ -9,16 +9,16 @@ import android.support.v4.app.DialogFragment;
 import java.util.ArrayList;
 
 /**
- * Created by Colin on 8/4/2014.
+ * Created by Colin on 8/21/2014.
  * Copyright 2014
  */
-public class Dialog_Fragment extends DialogFragment {
+public class Fragment_HomeDialog extends DialogFragment {
 
-    private ArrayList<Medication> choicesList;
+    private ArrayList<Object_Medication> choicesList;
 
 
-    public static Dialog_Fragment newInstance(int title, String medList) {
-        Dialog_Fragment frag = new Dialog_Fragment();
+    public static Fragment_HomeDialog newInstance(int title, String medList) {
+        Fragment_HomeDialog frag = new Fragment_HomeDialog();
         Bundle args = new Bundle();
         args.putInt("title", title);
         args.putString("text", medList);
@@ -26,7 +26,7 @@ public class Dialog_Fragment extends DialogFragment {
         return frag;
     }
 
-    public void setChoiceList(ArrayList<Medication> choiceList) {
+    public void setChoiceList(ArrayList<Object_Medication> choiceList) {
         this.choicesList = choiceList;
     }
 
@@ -40,14 +40,14 @@ public class Dialog_Fragment extends DialogFragment {
                 .setPositiveButton(R.string.submit,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                ((Home) getActivity().getSupportFragmentManager().findFragmentByTag("home")).doPositiveClick();
+                                ((Fragment_Home) getActivity().getSupportFragmentManager().findFragmentByTag("home")).doPositiveClick();
                             }
                         }
                 )
                 .setNegativeButton(R.string.cancel,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                ((Home) getActivity().getSupportFragmentManager().findFragmentByTag("home")).doNegativeClick();
+                                ((Fragment_Home) getActivity().getSupportFragmentManager().findFragmentByTag("home")).doNegativeClick();
                             }
                         }
                 )

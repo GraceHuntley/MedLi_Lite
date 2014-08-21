@@ -40,12 +40,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 
-public class MedSettings extends Fragment {
+public class Fragment_MedSettings extends Fragment {
 
     private final String TAG = "MedSettingsFragment.java";
     private final ArrayList<EditText> etList = new ArrayList<EditText>();
     private EditText med_dose, adminTimes;
-    private MakeDateTimeHelper dt;
+    private Helper_DateTime dt;
     private LinearLayout adminTimesList;
     private Spinner med_measure_spinner, med_type;
     private AutoCompleteTextView acMedName;
@@ -60,18 +60,18 @@ public class MedSettings extends Fragment {
     private AlertDialog.Builder adb;
     private AlertDialog adDoseChoices;
 
-    private DrugDataHelper drugDataHelper;
+    private Helper_DrugData drugDataHelper;
 
     private MedLiDataSource dataSource;
 
     private OnFragmentInteractionListener mListener;
 
-    public MedSettings() {
+    public Fragment_MedSettings() {
         // Required empty public constructor
     }
 
-    public static MedSettings newInstance(String param1, boolean param2) {
-        MedSettings fragment = new MedSettings();
+    public static Fragment_MedSettings newInstance(String param1, boolean param2) {
+        Fragment_MedSettings fragment = new Fragment_MedSettings();
         Bundle args = new Bundle();
         args.putString("name", param1);
         args.putBoolean("edit", param2);
@@ -82,7 +82,7 @@ public class MedSettings extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        drugDataHelper = new DrugDataHelper();
+        drugDataHelper = new Helper_DrugData();
 
         dataSource = MedLiDataSource.getHelper(getActivity());
         getActivity().setRequestedOrientation(
@@ -153,7 +153,7 @@ public class MedSettings extends Fragment {
             }
         });
 
-        if (VerifyHelpers.isNetworkAvailable(getActivity())) {
+        if (Helper_DataCheck.isNetworkAvailable(getActivity())) {
             acMedName.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -335,13 +335,14 @@ public class MedSettings extends Fragment {
         dataSource.submitNewMedication(prepareMedicationObject());
     }
 
-    private Medication prepareMedicationObject() {
-        Medication medication = new Medication();
+    private Object_Medication prepareMedicationObject() {
+        Object_Medication medication = new Object_Medication();
         String type = med_type.getSelectedItem().toString().toLowerCase().trim();
 
         medication.setMedName(acMedName.getText().toString().toLowerCase().trim());
         medication.setAdminType(type);
         medication.setDoseMeasure(Float.valueOf(med_dose.getText().toString().trim()));
+        Log.d(TAG, " " + medication.getDoseMeasure());
         medication.setDoseMeasureType(med_measure_spinner.getSelectedItem().toString().toLowerCase().trim());
         medication.setDoseCount(Integer.valueOf(adminTimes.getText().toString()));
         //medication.setFillDate(lastFilled.getText().toString().toLowerCase().trim()); // Will add to next roll-out.
@@ -372,12 +373,12 @@ public class MedSettings extends Fragment {
 
     void fillList(String chars) {
 
-        MedAutoCompleteHelper medAutoCompleteHelper = new MedAutoCompleteHelper(getActivity());
+        Helper_MedAutoComplete helperMedAutoComplete = new Helper_MedAutoComplete(getActivity());
 
         ArrayList<String> medList = new ArrayList<String>();
 
         try {
-            medList = medAutoCompleteHelper.getMedList(chars);
+            medList = helperMedAutoComplete.getMedList(chars);
         } catch (IOException e) {
             Log.e(TAG, e.toString());
         } catch (XmlPullParserException x) {
@@ -424,7 +425,7 @@ public class MedSettings extends Fragment {
     private void populateForEdit(String name) {
         // TODO will populate for edits.
 
-        Medication medication = dataSource.getSingleMedByName(name);
+        Object_Medication medication = dataSource.getSingleMedByName(name);
 
         for (int index = 0; index < med_type.getCount(); index++) {
             if (med_type.getItemAtPosition(index).toString().equalsIgnoreCase(medication.getAdminType())) {
@@ -435,7 +436,8 @@ public class MedSettings extends Fragment {
         }
 
         acMedName.setText(medication.getMedName());
-        med_dose.setText(String.valueOf(medication.getDoseMeasure()));
+        //med_dose.setText(String.valueOf(medication.getDoseMeasure()));
+        med_dose.setText(Float.toString(medication.getDoseMeasure()));
         for (int index = 0; index < med_measure_spinner.getCount(); index++) {
             if (med_measure_spinner.getItemAtPosition(index).toString().equalsIgnoreCase(medication.getDoseMeasureType())) {
 
@@ -492,8 +494,8 @@ public class MedSettings extends Fragment {
         int viewCount = Integer.valueOf(editable.toString()) - (adminTimesList.getChildCount() / 2);
         for (index = 0; index < viewCount; index++) {
             TextView tv = new TextView(getActivity());
-            tv.setText("Enter " + VerifyHelpers.getCountVerbage(index + 1) + " Medication");
-            dt = new MakeDateTimeHelper();
+            tv.setText("Enter " + Helper_DataCheck.getCountVerbage(index + 1) + " Medication");
+            dt = new Helper_DateTime();
 
             etList.add(index, new EditText(getActivity()));
             etList.get(index).setId(Integer.valueOf(editable.toString()));

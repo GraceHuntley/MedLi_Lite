@@ -10,12 +10,12 @@ import android.util.Log;
  * Copyright 2014
  */
 @SuppressWarnings("WeakerAccess")
-public class SQLiteHelper extends SQLiteOpenHelper {
+public class Helper_SQLiteHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "medli.db";
     private static final int DATABASE_VERSION = 1;
 
-    public SQLiteHelper(Context context) {
+    public Helper_SQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -28,7 +28,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        Log.w(SQLiteHelper.class.getName(),
+        Log.w(Helper_SQLiteHelper.class.getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DATABASE_NAME);

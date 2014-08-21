@@ -10,7 +10,7 @@ public class Constants {
     public static final String CREATE_MEDLIST_DB = "CREATE TABLE medlist (" +
             "ID_UNIQUE INTEGER PRIMARY KEY AUTOINCREMENT, " +
             "name TEXT NOT NULL, " +
-            "dose_int INTEGER NOT NULL, " +
+            "dose_int REAL NOT NULL, " +
             "dose_measure_type TEXT NOT NULL, " +
             "admin_type TEXT NOT NULL, " +
             "status TEXT NOT NULL, " +
@@ -46,22 +46,10 @@ public class Constants {
                     + "medlist.dose_times as dose_times, "
                     + "COUNT(CASE WHEN med_logs.status = 'active' AND DATE(med_logs.timestamp) = DATE('now', 'localtime') THEN 'ok' END) as actual_count, "
                     + "medlist.admin_type as type, "
-                    + "medlist.dose_frequency as frequency "
+                    + "medlist.dose_frequency as frequency, "
+                    + "medlist.status as status "
                     + "from medlist "
                     + "LEFT OUTER JOIN med_logs ON medlist.name = med_logs.name "
-                   /* + "WHERE medlist.admin_type = 'routine' " */
-                    + "GROUP BY medlist.name ORDER By medlist.name ASC";
-    public static final String GET_MEDLIST_PRN =
-            "SELECT medlist.name as name, "
-                    + "medlist.dose_int as dose_int, "
-                    + "medlist.dose_measure_type as dose_type, "
-                    + "medlist.dose_count as max_count, "
-                    + "medlist.dose_times as dose_times, "
-                    + "COUNT(CASE WHEN DATE(med_logs.timestamp) = DATE('now', 'localtime') THEN 'ok' END) as actual_count, "
-                    + "medlist.admin_type as type, "
-                    + "medlist.dose_frequency as frequency "
-                    + "from medlist "
-                    + "LEFT OUTER JOIN med_logs ON medlist.name = med_logs.name WHERE medlist.admin_type = 'prn' "
                     + "GROUP BY medlist.name ORDER By medlist.name ASC";
 
     public static final String GET_TODAYS_MED_ADMIN_LOGS =
@@ -74,11 +62,8 @@ public class Constants {
                     + "med_logs.manual_entry as manual, "
                     + "DATE(strftime('%s',timestamp), 'unixepoch', 'localtime') as date "
                     + "FROM med_logs "
-                    //+ "WHERE DATE(med_logs.timestamp) = DATE('now', '-2days', 'localtime') "
                     + "WHERE status = 'active' "
-                    + "ORDER BY DATETIME(strftime('%s',timestamp), 'unixepoch', 'localtime') DESC "
-                    /*+ "TIME(timestamp) DESC"*/;
-
+                    + "ORDER BY DATETIME(strftime('%s',timestamp), 'unixepoch', 'localtime') DESC ";
 
     public static String GET_COUNT_LAST_24HOURS(String name) {
         return "SELECT COUNT(timestamp) FROM med_logs "

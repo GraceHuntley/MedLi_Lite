@@ -6,8 +6,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInteractionListener, MedSettings.OnFragmentInteractionListener,
-        LogFragment.OnFragmentInteractionListener, MedList.OnFragmentInteractionListener {
+public class Activity_MedLi_light extends ActionBarActivity implements Fragment_Home.OnFragmentInteractionListener, Fragment_MedSettings.OnFragmentInteractionListener,
+        Fragment_History.OnFragmentInteractionListener, Fragment_EditMed.OnFragmentInteractionListener {
 
 
     @Override
@@ -20,7 +20,7 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
         if (savedInstanceState == null) {
 
             getSupportFragmentManager().beginTransaction()
-                    .replace(android.R.id.content, new Home(), "home").addToBackStack("home")
+                    .replace(android.R.id.content, new Fragment_Home(), "home").addToBackStack("home")
                     .commit();
 
         }
@@ -45,7 +45,7 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
             case R.id.action_edit_med:
 
                 getSupportFragmentManager().beginTransaction()
-                        .replace(android.R.id.content, new MedList(), "medList").addToBackStack("medList")
+                        .replace(android.R.id.content, new Fragment_EditMed(), "medList").addToBackStack("medList")
                         .commit();
 
                 break;
@@ -53,7 +53,7 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
             case R.id.action_add_med:
 
                 getSupportFragmentManager().beginTransaction()
-                        .replace(android.R.id.content, new MedSettings(), "medSettings").addToBackStack("medSettings")
+                        .replace(android.R.id.content, new Fragment_MedSettings(), "medSettings").addToBackStack("medSettings")
                         .commit();
 
                 break;
@@ -61,7 +61,7 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
             case R.id.action_med_logs:
 
                 getSupportFragmentManager().beginTransaction()
-                        .replace(android.R.id.content, new LogFragment(), "logFragment").addToBackStack("logFragment")
+                        .replace(android.R.id.content, new Fragment_History(), "logFragment").addToBackStack("logFragment")
                         .commit();
 
                 break;
@@ -71,7 +71,7 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
                 if (!getSupportFragmentManager().findFragmentByTag("home").isVisible()) {
 
                     getSupportFragmentManager().beginTransaction()
-                            .replace(android.R.id.content, new Home(), "home").addToBackStack("home")
+                            .replace(android.R.id.content, new Fragment_Home(), "home").addToBackStack("home")
                             .commit();
 
                 }
@@ -96,7 +96,7 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
             case 1:
 
 
-                getSupportFragmentManager().beginTransaction().replace(android.R.id.content, new Home(), "home")
+                getSupportFragmentManager().beginTransaction().replace(android.R.id.content, new Fragment_Home(), "home")
                         .addToBackStack("home")
                         .commit();
 
@@ -109,7 +109,7 @@ public class MedLi_light extends ActionBarActivity implements Home.OnFragmentInt
 
     public void onFragmentInteraction(int tag, String name) {
 
-        getSupportFragmentManager().beginTransaction().replace(android.R.id.content, MedSettings.newInstance(name, true), "medSettings")
+        getSupportFragmentManager().beginTransaction().replace(android.R.id.content, Fragment_MedSettings.newInstance(name, true), "medSettings")
                 .addToBackStack("medSettings").commit();
 
     }

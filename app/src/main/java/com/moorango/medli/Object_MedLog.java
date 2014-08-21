@@ -10,9 +10,9 @@ import java.util.List;
  * Created by Colin on 8/5/2014.
  * Copyright 2014
  */
-public class MedLog {
+public class Object_MedLog {
 
-    private static List<MedLog> medLogList = new ArrayList<MedLog>();
+    private static List<Object_MedLog> medLogList = new ArrayList<Object_MedLog>();
 
     private String name;
     private String timestamp;
@@ -28,11 +28,11 @@ public class MedLog {
 
     private String uniqueID;
 
-    public MedLog() {
+    public Object_MedLog() {
         // empty constructor.
     }
 
-    public MedLog(String uniqueID, String name, String dose, String timestamp, boolean isLate, boolean wasMissed, boolean wasManual) {
+    public Object_MedLog(String uniqueID, String name, String dose, String timestamp, boolean isLate, boolean wasMissed, boolean wasManual) {
         this.uniqueID = uniqueID;
         this.name = name;
         this.timestamp = timestamp;
@@ -56,8 +56,8 @@ public class MedLog {
      * @param id
      */
     public void deleteObject(String id) {
-        List<MedLog> tempList = new ArrayList<MedLog>();
-        for (MedLog log : this.medLogList) {
+        List<Object_MedLog> tempList = new ArrayList<Object_MedLog>();
+        for (Object_MedLog log : this.medLogList) {
             if (!log.getUniqueID().equals(id)) {
                 tempList.add(log);
             }
@@ -66,7 +66,7 @@ public class MedLog {
     }
 
     public String toString() {
-        MakeDateTimeHelper dt = new MakeDateTimeHelper();
+        Helper_DateTime dt = new Helper_DateTime();
 
         Date date;
         if (this.isSubHeading()) {

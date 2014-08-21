@@ -18,13 +18,13 @@ import java.util.ArrayList;
  * Copyright 2014
  */
 @SuppressWarnings("WeakerAccess")
-public class MedAutoCompleteHelper {
+public class Helper_MedAutoComplete {
 
 
     private final String TAG = "MedAutoCompleteHelper.java";
 
 
-    public MedAutoCompleteHelper(Context con) {
+    public Helper_MedAutoComplete(Context con) {
         //TODO
     }
 

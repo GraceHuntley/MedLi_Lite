@@ -10,7 +10,7 @@ import java.util.Date;
  * Created by Colin on 7/31/2014.
  * Copyright 2014
  */
-public class Medication {
+public class Object_Medication {
 
     private final String TAG = "Medication";
     private String medName;
@@ -22,26 +22,11 @@ public class Medication {
     private int doseCount; // max doses per day of medication.
     private String fillDate; // date medication last filled.
     private String doseTimes; // times of day to give dose. only applicable to routine meds.
-
-    public boolean isChecked() {
-        return isChecked;
-    }
-
-    public void setChecked(boolean isChecked) {
-        this.isChecked = isChecked;
-    }
-
-    private boolean isChecked;
-
     private boolean isSubHeading = false;
-
     private boolean isForEditDisplay;
-
     private String nextDue; // next due time.
     private int actualDoseCount; // actual count of doses given today.
-
     private int doseFrequency; // prn only frequency meds can be taken in hours.
-
 
     public boolean isSubHeading() {
         return isSubHeading;
@@ -166,7 +151,7 @@ public class Medication {
         }
     }
 
-    public int compareNextDue(Medication med) {
+    public int compareNextDue(Object_Medication med) {
 
         if (this.getNextDue().equals("COMPLETE")) {
             return 1;

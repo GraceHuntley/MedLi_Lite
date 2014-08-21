@@ -21,15 +21,15 @@ import java.util.List;
 public class MedLiDataSource {
 
     private final String TAG = "MedLiDataSource";
-    private static final MakeDateTimeHelper dt = new MakeDateTimeHelper();
+    private static final Helper_DateTime dt = new Helper_DateTime();
 
     // Database fields
     private SQLiteDatabase database;
-    private final SQLiteHelper dbHelper;
+    private final Helper_SQLiteHelper dbHelper;
     private static MedLiDataSource instance;
 
     public MedLiDataSource(Context context) {
-        dbHelper = new SQLiteHelper(context);
+        dbHelper = new Helper_SQLiteHelper(context);
     }
 
     public static synchronized MedLiDataSource getHelper(Context context) {
@@ -53,16 +53,15 @@ public class MedLiDataSource {
         dbHelper.close();
     }
 
-    public List<Medication> getAllMeds(String tag) {
-        List<Medication> routineList = new ArrayList<Medication>();
-        List<Medication> prnList = new ArrayList<Medication>();
+    public List<Object_Medication> getAllMeds(String tag) {
+        List<Object_Medication> routineList = new ArrayList<Object_Medication>();
+        List<Object_Medication> prnList = new ArrayList<Object_Medication>();
         this.open(); // open db.
 
-        //Cursor cursor = database.rawQuery((tag.equals("routine")) ? Constants.GET_MEDLIST_ROUTINE : Constants.GET_MEDLIST_PRN, null);
         Cursor cursor = database.rawQuery(Constants.GET_MEDLIST_ROUTINE, null);
 
         while (cursor.moveToNext()) {
-            Medication medication = cursorToRoutine(cursor);
+            Object_Medication medication = cursorToRoutine(cursor);
             if (medication.getAdminType().equalsIgnoreCase("routine")) {
                 routineList.add(medication);
             } else {
@@ -70,50 +69,52 @@ public class MedLiDataSource {
             }
 
         }
-        Collections.sort(routineList, new Comparator<Medication>() {
+        Collections.sort(routineList, new Comparator<Object_Medication>() {
             @Override
-            public int compare(Medication lhs, Medication rhs) {
+            public int compare(Object_Medication lhs, Object_Medication rhs) {
                 return lhs.compareNextDue(rhs);
             }
         });
 
-        Collections.sort(prnList, new Comparator<Medication>() {
+        Collections.sort(prnList, new Comparator<Object_Medication>() {
             @Override
-            public int compare(Medication lhs, Medication rhs) {
+            public int compare(Object_Medication lhs, Object_Medication rhs) {
                 return lhs.compareNextDue(rhs);
             }
         });
 
-        Medication routineHeader = new Medication();
+        Object_Medication routineHeader = new Object_Medication();
         routineHeader.setSubHeading(true);
         routineHeader.setMedName("Routine Medications");
         routineList.add(0, routineHeader);
-        Medication headerMed = new Medication();
+        Object_Medication headerMed = new Object_Medication();
         headerMed.setSubHeading(true);
         headerMed.setMedName("Non-Routine Medications");
         routineList.add(headerMed);
-        for (Medication med : prnList) {
+        for (Object_Medication med : prnList) {
             routineList.add(med);
         }
         cursor.close();
         return routineList;
     }
 
-    private Medication cursorToRoutine(Cursor cursor) {
-        final Medication medication = new Medication();
+    private Object_Medication cursorToRoutine(Cursor cursor) {
+        final Object_Medication medication = new Object_Medication();
 
         medication.setMedName(cursor.getString(0));
-        medication.setDoseMeasure(cursor.getInt(1));
+        medication.setDoseMeasure(cursor.getFloat(1));
         medication.setDoseMeasureType(cursor.getString(2));
         medication.setDoseCount(cursor.getInt(3));
         medication.setDoseTimes(cursor.getString(4));
         medication.setActualDoseCount(cursor.getInt(5));
         medication.setAdminType(cursor.getString(6));
+        medication.setStatus(cursor.getString(8));
 
         if (medication.getAdminType().equals("routine")) {
             medication.setNextDue(new Object() {
 
                 String setTime() {
+                    Log.d(TAG, "doseCOunt: " + medication.getDoseCount() + " actual: " + medication.getActualDoseCount());
                     if (medication.getDoseCount() > medication.getActualDoseCount()) {
                         String split[] = medication.getDoseTimes().split(";");
 
@@ -182,14 +183,14 @@ public class MedLiDataSource {
     }
 
 
-    public List<MedLog> getMedHistory(int howManyDays) {
+    public List<Object_MedLog> getMedHistory(int howManyDays) {
 
         // TODO for now just getting todays data.
-        List<MedLog> loggedMeds = new ArrayList<MedLog>();
+        List<Object_MedLog> loggedMeds = new ArrayList<Object_MedLog>();
         this.open();
         String lastDate = null;
         boolean makeHeader = false;
-        MedLog medLog = null;
+        Object_MedLog medLog = null;
         Cursor cs = database.rawQuery(Constants.GET_TODAYS_MED_ADMIN_LOGS, null);
 
 
@@ -201,12 +202,12 @@ public class MedLiDataSource {
             }
 
             if (thisDate.equals(lastDate)) {
-                medLog = new MedLog(cs.getString(0), cs.getString(1), cs.getString(2), cs.getString(3), (cs.getInt(4) == 1), (cs.getInt(5) == 1), (cs.getInt(6) == 1));
+                medLog = new Object_MedLog(cs.getString(0), cs.getString(1), cs.getString(2), cs.getString(3), (cs.getInt(4) == 1), (cs.getInt(5) == 1), (cs.getInt(6) == 1));
                 medLog.setSubHeading(false);
                 makeHeader = false;
                 lastDate = thisDate;
             } else if (!makeHeader) {
-                medLog = new MedLog();
+                medLog = new Object_MedLog();
                 medLog.setSubHeading(true);
                 medLog.setTimestamp(cs.getString(3));
                 makeHeader = true;
@@ -222,14 +223,15 @@ public class MedLiDataSource {
         return loggedMeds;
     }
 
-    public void submitNewMedication(Medication medication) {
+    public void submitNewMedication(Object_Medication medication) {
 
         ContentValues cv = new ContentValues();
         cv.put("name", medication.getMedName());
         cv.put("dose_int", medication.getDoseMeasure());
         cv.put("dose_measure_type", medication.getDoseMeasureType());
         cv.put("admin_type", medication.getAdminType());
-        cv.put("status", "active");
+        //cv.put("status", "active"); // switching to new for indication whether to mark as late or not.
+        cv.put("status", medication.getAdminType().equalsIgnoreCase("routine") ? "new" : "active");
         cv.put("dose_count", medication.getDoseCount());
         //cv.put("fillDate", medication.getFillDate()); // will add this for next roll-out
         cv.put("startDate", medication.getStartDate());
@@ -252,18 +254,16 @@ public class MedLiDataSource {
 
     }
 
-    public void submitMedicationAdmin(Medication medication, String manualTime) {
+    public void submitMedicationAdmin(Object_Medication medication, String manualTime) {
 
         ContentValues cv = new ContentValues();
         cv.put("ID_UNIQUE", medication.getMedName() + new Date().getTime());
         cv.put("name", medication.getMedName());
         cv.put("dose", medication.getDoseMeasure() + " " + medication.getDoseMeasureType());
 
-
         if (manualTime != null) { // dose time being entered manually.
             cv.put("manual_entry", 1);
             cv.put("timestamp", dt.getDate() + " " + dt.convertToTime24(manualTime));
-
 
             cv.put("late", isDoseLate(manualTime, medication.getNextDue()));
         } else { // no manual entry.
@@ -277,6 +277,28 @@ public class MedLiDataSource {
 
         this.open();
         database.insert("med_logs", "name", cv);
+    }
+
+    public void submitMissedDose(Object_Medication medication, String time) {
+
+        ContentValues cv = new ContentValues();
+        cv.put("ID_UNIQUE", medication.getMedName() + new Date().getTime());
+        cv.put("name", medication.getMedName());
+        cv.put("dose", medication.getDoseMeasure() + " " + medication.getDoseMeasureType());
+        cv.put("timestamp", dt.getDate() + " " + dt.convertToTime24(time));
+        cv.put("missed", 1);
+        cv.put("status", "active");
+
+        this.open();
+        database.insert("med_logs", "name", cv);
+
+        if (medication.getStatus().equalsIgnoreCase("new")) {
+            cv.clear();
+            cv.put("status", "active");
+
+            database.update("medlist", cv, "name='" + medication.getMedName() + "'", null);
+        }
+
     }
 
     /**
@@ -316,8 +338,8 @@ public class MedLiDataSource {
         }
     }
 
-    public List<Medication> getMedListForEditing() {
-        List<Medication> medList = new ArrayList<Medication>();
+    public List<Object_Medication> getMedListForEditing() {
+        List<Object_Medication> medList = new ArrayList<Object_Medication>();
 
         String tempQuery = "SELECT "
                 + "name, "
@@ -336,10 +358,10 @@ public class MedLiDataSource {
         Cursor cs = database.rawQuery(tempQuery, null);
 
         while (cs.moveToNext()) {
-            Medication medication = new Medication();
+            Object_Medication medication = new Object_Medication();
             medication.setForEditDisplay(true);
             medication.setMedName(cs.getString(0));
-            medication.setDoseMeasure(cs.getInt(1));
+            medication.setDoseMeasure(cs.getFloat(1));
             medication.setDoseMeasureType(cs.getString(2));
             medication.setAdminType(cs.getString(3));
             medication.setDoseCount(cs.getInt(4));
@@ -355,7 +377,7 @@ public class MedLiDataSource {
 
     }
 
-    public Medication getSingleMedByName(String name) {
+    public Object_Medication getSingleMedByName(String name) {
 
         this.open();
 
@@ -372,15 +394,14 @@ public class MedLiDataSource {
                 + "AND status = 'active' "
                 + "LIMIT 1";
 
-        Medication medication = new Medication();
+        Object_Medication medication = new Object_Medication();
         Cursor cs = database.rawQuery(tempQuery, null);
 
         while (cs.moveToNext()) {
 
-
             medication.setForEditDisplay(true);
             medication.setMedName(cs.getString(0));
-            medication.setDoseMeasure(cs.getInt(1));
+            medication.setDoseMeasure(cs.getFloat(1));
             medication.setDoseMeasureType(cs.getString(2));
             medication.setAdminType(cs.getString(3));
             medication.setDoseCount(cs.getInt(4));

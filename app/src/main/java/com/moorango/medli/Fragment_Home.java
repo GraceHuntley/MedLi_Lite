@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
-public class Home extends Fragment {
+public class Fragment_Home extends Fragment {
 
     private final String TAG = "Home.java";
-    private static ArrayList<Medication> chosenList;
+    private static ArrayList<Object_Medication> chosenList;
     private static MyAsyncTask updateLists;
     private OnFragmentInteractionListener mListener;
     private ListView routineList;
@@ -36,7 +36,7 @@ public class Home extends Fragment {
     private SparseBooleanArray routineChoicesFromInstance = null;
 
 
-    public Home() {
+    public Fragment_Home() {
         // Required empty public constructor
     }
 
@@ -65,7 +65,7 @@ public class Home extends Fragment {
         routineList = (ListView) getActivity().findViewById(R.id.routine_listview);
         Button clearChoices = (Button) getActivity().findViewById(R.id.clear_button);
         submitMed = (Button) getActivity().findViewById(R.id.submit_button);
-        chosenList = new ArrayList<Medication>();
+        chosenList = new ArrayList<Object_Medication>();
 
         dataSource = MedLiDataSource.getHelper(getActivity());
 
@@ -117,7 +117,7 @@ public class Home extends Fragment {
                         String getReady() {
 
                             String ready = "";
-                            for (Medication aChosenList : chosenList) {
+                            for (Object_Medication aChosenList : chosenList) {
                                 ready += aChosenList.getMedName() + "\n";
                             }
 
@@ -166,7 +166,7 @@ public class Home extends Fragment {
     }
 
     void showDialog(String medList) {
-        Dialog_Fragment newFragment = Dialog_Fragment.newInstance(
+        Fragment_HomeDialog newFragment = Fragment_HomeDialog.newInstance(
                 R.string.med_dose_dialog_title, medList);
         newFragment.setChoiceList(chosenList);
         newFragment.show(getActivity().getSupportFragmentManager(), "dialog");
@@ -255,7 +255,7 @@ public class Home extends Fragment {
         @Override
         protected String doInBackground(Void... voids) {
 
-            List<Medication> meds = dataSource.getAllMeds("routine");
+            List<Object_Medication> meds = dataSource.getAllMeds("routine");
 
             adapter = new HomeCustomAdapter(getActivity(), R.layout.home_list_item, R.id.title, meds);
 
@@ -283,14 +283,15 @@ public class Home extends Fragment {
     }
 }
 
-class HomeCustomAdapter extends ArrayAdapter<Medication> {
+class HomeCustomAdapter extends ArrayAdapter<Object_Medication> {
 
+    private final String TAG = "Home/HomeCustomAdapter";
     Context context;
-    List<Medication> data;
+    List<Object_Medication> data;
     SparseBooleanArray sparseBooleanArray;
 
     public HomeCustomAdapter(Context context, int resource,
-                             int textViewResourceId, List<Medication> rowItem) {
+                             int textViewResourceId, List<Object_Medication> rowItem) {
         super(context, resource, textViewResourceId, rowItem);
         this.context = context;
         this.data = rowItem;
@@ -314,7 +315,7 @@ class HomeCustomAdapter extends ArrayAdapter<Medication> {
     }
 
     @Override
-    public Medication getItem(int position) {
+    public Object_Medication getItem(int position) {
 
         return data.get(position);
 
@@ -362,7 +363,7 @@ class HomeCustomAdapter extends ArrayAdapter<Medication> {
         final TextView doseMeasure = (TextView) convertView.findViewById(R.id.dose_measure);
         RelativeLayout boxWrapper = (RelativeLayout) convertView.findViewById(R.id.box_wrapper);
 
-        final Medication dataItem = data.get(position);
+        final Object_Medication dataItem = data.get(position);
 
         Boolean checked = sparseBooleanArray.get(position);
         if (checked != null) {
@@ -379,15 +380,31 @@ class HomeCustomAdapter extends ArrayAdapter<Medication> {
             headerText.setVisibility(View.VISIBLE);
             boxWrapper.setBackgroundResource(android.R.color.background_light);
         } else {
-            txtTitle.setText(VerifyHelpers.capitalizeTitles(dataItem.getMedName()));
-            nextDueTime.setText((dataItem.getNextDue().equalsIgnoreCase("complete")) ? dataItem.getNextDue() : "Next Due: " + dataItem.getNextDue());
+            txtTitle.setText(Helper_DataCheck.capitalizeTitles(dataItem.getMedName()));
+
+            /***
+             * Fill in missed doses for a new medication.
+             */
+
+            if (dataItem.getStatus().equalsIgnoreCase("new")) {
+                dataItem.setNextDue(Helper_DataCheck.findNextDoseNewMed(context, dataItem));
+
+            }
+            String doseVerbage = (dataItem.getAdminType().equalsIgnoreCase("routine")) ? "Next Due: " : "Next Earliest Dose: ";
+            nextDueTime.setText((dataItem.getNextDue().equalsIgnoreCase("complete")) ? dataItem.getNextDue() : doseVerbage + dataItem.getNextDue());
             boxWrapper.setBackgroundResource(android.R.color.white);
+
+
             if (!dataItem.getNextDue().equalsIgnoreCase("complete") &&
                     !dataItem.getNextDue().equalsIgnoreCase("prn") &&
-                    !dataItem.getAdminType().equalsIgnoreCase("prn")) {
-                boxWrapper.setBackgroundResource((VerifyHelpers.isDoseLate(dataItem.getNextDue())) ? R.color.red : android.R.color.white);
-            }
+                    !dataItem.getAdminType().equalsIgnoreCase("prn") &&
+                    dataItem.getStatus().equalsIgnoreCase("active")) {
+                //boxWrapper.setBackgroundResource((Helper_DataCheck.isDoseLate(dataItem.getNextDue()))? R.color.red : android.R.color.white);
 
+                if (Helper_DataCheck.isDoseLate(dataItem.getNextDue())) {
+                    boxWrapper.setBackgroundResource(R.drawable.late_dose_background);
+                }
+            }
 
             doseMeasure.setText(dataItem.getDoseMeasure() + " " + dataItem.getDoseMeasureType());
             doseMeasure.setVisibility(View.VISIBLE);
@@ -402,5 +419,3 @@ class HomeCustomAdapter extends ArrayAdapter<Medication> {
     }
 
 }
-
-

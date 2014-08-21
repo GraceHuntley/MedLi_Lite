@@ -29,6 +29,11 @@
     <string name="edit_med_label">Edit Med</string>
     <string name="plus_label">+</string>
 
+    <!-- Fragment_EditMed Strings -->
+    <string name="edit_med_title">Select a Medication to edit: </string>
+
+    <!-- END Fragment_EditMed Strings -->
+
     <string-array name="dose_measure_type">
         <item>ml</item>
         <item>mg</item>
