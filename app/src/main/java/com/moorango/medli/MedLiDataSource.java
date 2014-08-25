@@ -114,7 +114,7 @@ public class MedLiDataSource {
             medication.setNextDue(new Object() {
 
                 String setTime() {
-                    Log.d(TAG, "doseCOunt: " + medication.getDoseCount() + " actual: " + medication.getActualDoseCount());
+
                     if (medication.getDoseCount() > medication.getActualDoseCount()) {
                         String split[] = medication.getDoseTimes().split(";");
 
@@ -193,7 +193,6 @@ public class MedLiDataSource {
         Object_MedLog medLog = null;
         Cursor cs = database.rawQuery(Constants.GET_TODAYS_MED_ADMIN_LOGS, null);
 
-
         while (cs.moveToNext()) {
 
             String thisDate = cs.getString(3).split(" ")[0];
@@ -269,7 +268,8 @@ public class MedLiDataSource {
         } else { // no manual entry.
             cv.put("timestamp", dt.getDate() + " " + dt.getTime24());
             if (medication.getAdminType().equals("routine")) {
-                cv.put("late", isDoseLate(dt.getTime24(), medication.getNextDue()));
+                //cv.put("late", isDoseLate(dt.getTime24(), medication.getNextDue()));
+                cv.put("late", isDoseLate(dt.getTime12(), medication.getNextDue()));
             }
             cv.put("manual_entry", 0);
         }

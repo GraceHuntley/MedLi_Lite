@@ -12,6 +12,7 @@
         android:layout_width="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:visibility="gone"
+        android:layout_margin="5dip"
         android:layout_centerVertical="true"
         android:layout_height="wrap_content" />
 
@@ -19,6 +20,7 @@
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="5dip"
         android:gravity="center_vertical"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:checkMark="?android:attr/listChoiceIndicatorMultiple"
@@ -28,7 +30,7 @@
         android:id="@+id/next_dose_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
+        android:layout_margin="5dip"
         android:layout_alignParentBottom="true"
         android:layout_below="@+id/title"
         android:layout_alignParentLeft="true"
@@ -38,6 +40,7 @@
         android:id="@+id/dose_measure"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="5dip"
         android:layout_alignParentBottom="true"
         android:layout_below="@+id/title"
         android:layout_alignParentRight="true"

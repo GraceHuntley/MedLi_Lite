@@ -34,6 +34,12 @@
 
     <!-- END Fragment_EditMed Strings -->
 
+    <!-- Fragment_History Strings -->
+
+    <string name="flash_screen_title">There are currently no records Yet!</string>
+
+    <!-- END Fragment_History Strings -->
+
     <string-array name="dose_measure_type">
         <item>ml</item>
         <item>mg</item>

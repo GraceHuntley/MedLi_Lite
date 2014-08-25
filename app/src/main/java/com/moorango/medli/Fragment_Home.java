@@ -176,10 +176,12 @@ public class Fragment_Home extends Fragment {
     public void doPositiveClick() {
 
         for (int index = 0; index < chosenList.size(); index++) {
+
+
             dataSource.submitMedicationAdmin(chosenList.get(index), null);
         }
         mListener.onFragmentInteraction(1);
-        submitMed.setEnabled(false);
+        //submitMed.setEnabled(false);
         Toast.makeText(getActivity(),
                 "Submitted", Toast.LENGTH_LONG)
                 .show();
@@ -399,10 +401,11 @@ class HomeCustomAdapter extends ArrayAdapter<Object_Medication> {
                     !dataItem.getNextDue().equalsIgnoreCase("prn") &&
                     !dataItem.getAdminType().equalsIgnoreCase("prn") &&
                     dataItem.getStatus().equalsIgnoreCase("active")) {
-                //boxWrapper.setBackgroundResource((Helper_DataCheck.isDoseLate(dataItem.getNextDue()))? R.color.red : android.R.color.white);
 
                 if (Helper_DataCheck.isDoseLate(dataItem.getNextDue())) {
-                    boxWrapper.setBackgroundResource(R.drawable.late_dose_background);
+                    //boxWrapper.setBackgroundResource(R.drawable.late_dose_background);
+                    boxWrapper.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.late_dose_background));
+
                 }
             }
 

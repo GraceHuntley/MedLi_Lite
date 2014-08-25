@@ -20,7 +20,7 @@ public class Helper_DateTime {
     private int month;
     private static Calendar cal;
     private static SimpleDateFormat sdFormat;
-    private final String TAG = "MakeDateTimeHelper";
+    private static final String TAG = "MakeDateTimeHelper";
 
     int getMonth() {
         return this.month;
@@ -33,6 +33,13 @@ public class Helper_DateTime {
     public static String getTime24() {
         cal = Calendar.getInstance();
         sdFormat = getSDFormat("HH:mm:ss");
+
+        return sdFormat.format(cal.getTime());
+    }
+
+    public static String getTime12() {
+        cal = Calendar.getInstance();
+        sdFormat = getSDFormat("hh:mm a");
 
         return sdFormat.format(cal.getTime());
     }
@@ -109,18 +116,7 @@ public class Helper_DateTime {
     }
 
     public String convertToTime24(String time) {
-        /*String amPM = time.replaceAll("[^a-zA-Z]", "");
-        String cleanTime = time.replaceAll("[^0-9:]", "");
-        String readyTime;
 
-
-
-        if (amPM.equals("AM")) {
-            readyTime = cleanTime + ":00";
-        } else {
-            readyTime = "" + (Integer.valueOf(cleanTime.split(":")[0]) + 12) + ":" + cleanTime.split(":")[1] + ":" + "00";
-        }
-        */
         String formattedDate = "error";
         SimpleDateFormat input = new SimpleDateFormat("hh:mm a");
         try {

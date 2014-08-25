@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -29,17 +31,11 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private TextView historyHeader;
-    private int selectionForView = 0;
 
-    private boolean isScrolling = false;
-    private boolean hideHeader = false;
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
     private MedLiDataSource dbHelper;
-
+    private LinearLayout flashScreen;
     private OnFragmentInteractionListener mListener;
+    private boolean flashTheScreen = false;
 
     /**
      * The fragment's ListView/GridView.
@@ -59,6 +55,10 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
     public Fragment_History() {
     }
 
+    public void onEditMedListener(Object_MedLog medLog) {
+
+    }
+
     // TODO: Rename and change types of parameters
     public static Fragment_History newInstance(String param1, String param2) {
         Fragment_History fragment = new Fragment_History();
@@ -76,19 +76,16 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
         getActivity().setRequestedOrientation(
                 ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
         dbHelper = MedLiDataSource.getHelper(getActivity());
 
         List<Object_MedLog> loggedMedsList = dbHelper.getMedHistory(1);
 
-        mAdapter = new CustomAdapterHistory(getActivity(), loggedMedsList);
-        // TODO: Change Adapter to display your content
-        /*mAdapter = new ArrayAdapter<MedLog>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, loggedMedsList); */
+        if (loggedMedsList.size() == 0) {
+            flashTheScreen = true;
+        }
 
+        mAdapter = new CustomAdapterHistory(getActivity(), loggedMedsList);
 
     }
 
@@ -100,7 +97,20 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
         // Set the adapter
 
         mListView = (ListView) view.findViewById(android.R.id.list);
-        mListView.setAdapter(mAdapter);
+        flashScreen = (LinearLayout) view.findViewById(R.id.flash_screen);
+        historyHeader = (TextView) view.findViewById(R.id.history_header);
+
+
+        if (!flashTheScreen) {
+            flashScreen.setVisibility(View.GONE);
+            mListView.setVisibility(View.VISIBLE);
+            historyHeader.setVisibility(View.VISIBLE);
+            mListView.setAdapter(mAdapter);
+        } else {
+            mListView.setVisibility(View.GONE);
+            historyHeader.setVisibility(View.GONE);
+            flashScreen.setVisibility(View.VISIBLE);
+        }
 
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
@@ -112,18 +122,6 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
     public void onActivityCreated(Bundle savedInstanceState) {
 
         super.onActivityCreated(savedInstanceState);
-
-        Toast toast = Toast.makeText(getActivity(), "Long press Entry to Edit or Delete", Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        TextView tv = new TextView(getActivity());
-        tv.setText("Long press Entry to Edit or Delete!");
-        tv.setPadding(5, 5, 5, 5);
-        tv.setTextAppearance(getActivity(), android.R.style.TextAppearance_Large);
-        tv.setBackgroundResource(android.R.color.white);
-
-        toast.setView(tv);
-        toast.show();
-        historyHeader = (TextView) getActivity().findViewById(R.id.history_header);
 
         mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -145,21 +143,7 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
 
                     historyHeader.setText(dt.getReadableDate(mLog.getDateOnly()));
 
-                    selectionForView = firstVisibleItem;
-
-
                 }
-            }
-        });
-
-        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-                if (!((Object_MedLog) mListView.getItemAtPosition(position)).isSubHeading()) {
-                    dbHelper.deleteMedEntry(((Object_MedLog) mListView.getItemAtPosition(position)).getUniqueID());
-                    mListener.onFragmentInteraction(1);
-                }
-                return false;
             }
         });
 
@@ -182,7 +166,6 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
         mListener = null;
     }
 
-
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (null != mListener) {
@@ -194,21 +177,11 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
         }
     }
 
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(int id);
     }
+
 
 }
 
@@ -216,23 +189,31 @@ class CustomAdapterHistory extends BaseAdapter {
 
     Context context;
     List<Object_MedLog> data;
+    private MedLiDataSource dbHelper;
 
     CustomAdapterHistory(Context context, List<Object_MedLog> rowItem) {
         this.context = context;
         this.data = rowItem;
-
+        dbHelper = MedLiDataSource.getHelper(this.context);
     }
 
     @Override
     public int getCount() {
-
-        return data.size();
+        if (data != null) {
+            return data.size();
+        } else {
+            return 0;
+        }
     }
 
     @Override
     public Object getItem(int position) {
 
-        return data.get(position);
+        if (data.size() > 0)
+            return data.get(position);
+        else
+            return null;
+
     }
 
     @Override
@@ -241,34 +222,98 @@ class CustomAdapterHistory extends BaseAdapter {
         return data.indexOf(getItem(position));
     }
 
+
+    public void removeItem(int itemPosition) {
+
+        data.remove(itemPosition);
+        notifyDataSetChanged();
+    }
+
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
 
         if (convertView == null) {
             LayoutInflater mInflater = (LayoutInflater) context
                     .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-            convertView = mInflater.inflate(R.layout.list_item, null);
+            convertView = mInflater.inflate(R.layout.history_list_item, null);
         }
         Helper_DateTime dt = new Helper_DateTime();
 
-        TextView txtTitle = (TextView) convertView.findViewById(R.id.title);
+        TextView medName = (TextView) convertView.findViewById(R.id.name);
+        final TextView doseTime = (TextView) convertView.findViewById(R.id.dose_time);
+        final TextView dose = (TextView) convertView.findViewById(R.id.dose);
+        final TextView message = (TextView) convertView.findViewById(R.id.message);
+
         RelativeLayout boxWrapper = (RelativeLayout) convertView.findViewById(R.id.box_wrapper);
 
-        Object_MedLog dataItem = data.get(position);
+        ImageView delButton = (ImageView) convertView.findViewById(R.id.button_delete_med_admin);
+        ImageView editButton = (ImageView) convertView.findViewById(R.id.button_edit_med_admin);
+
+        final Object_MedLog dataItem = data.get(position);
+
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast toast = Toast.makeText(context, "Long press button to Edit Record", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            }
+        });
+
+        delButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast toast = Toast.makeText(context, "Long Press button to delete Record", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            }
+        });
+
+        editButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+
+
+                return false;
+            }
+        });
+
+        delButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+
+                dbHelper.deleteMedEntry(dataItem.getUniqueID());
+
+                removeItem(position);
+
+                Toast.makeText(context, "Object Deleted", Toast.LENGTH_LONG).show();
+
+                return false;
+            }
+        });
 
         if (dataItem.isSubHeading()) {
 
-            txtTitle.setText(dt.getReadableDate(dataItem.getDateOnly()));
+            medName.setText(dt.getReadableDate(dataItem.getDateOnly()));
             boxWrapper.setBackgroundResource(android.R.color.background_light);
 
         } else {
             String wasMissed = dataItem.isWasMissed() ? "Missed" : "";
-            txtTitle.setText(Helper_DataCheck.capitalizeTitles(dataItem.getName()) + " " + dt.convertToTime12(dataItem.getTimeOnly()) + " " + wasMissed);
+
+            String messageNote = dataItem.isWasMissed() ? "MISSED" : dataItem.isLate() ? "LATE" : "ON-TIME";
+            medName.setText(Helper_DataCheck.capitalizeTitles(dataItem.getName()));
+            doseTime.setText(dt.convertToTime12(dataItem.getTimeOnly()));
+            dose.setText(dataItem.getDose());
+            message.setText(messageNote);
             boxWrapper.setBackgroundResource(android.R.color.white);
 
         }
         return convertView;
 
+    }
+
+    public interface onEditMedListener {
+        public void onEditMed(Object_MedLog medLog);
     }
 
 }
