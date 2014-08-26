@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,9 +24,6 @@ import android.widget.Toast;
 import java.util.List;
 
 public class Fragment_History extends Fragment implements AbsListView.OnItemClickListener {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
     private final String TAG = "LogFragment";
     private static final String ARG_PARAM1 = "param1";
@@ -55,9 +53,6 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
     public Fragment_History() {
     }
 
-    public void onEditMedListener(Object_MedLog medLog) {
-
-    }
 
     // TODO: Rename and change types of parameters
     public static Fragment_History newInstance(String param1, String param2) {
@@ -85,8 +80,16 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
             flashTheScreen = true;
         }
 
-        mAdapter = new CustomAdapterHistory(getActivity(), loggedMedsList);
+        mAdapter = new CustomAdapterHistory(getActivity(), loggedMedsList, this);
 
+    }
+
+    public void editMedAdmin(Object_MedLog medLog) {
+
+        String medData = medLog.getName() + ";" + medLog.getTimeOnly() + ";" + medLog.getDose();
+        Fragment_HistoryDialog historyDialog = Fragment_HistoryDialog.newInstance(medData);
+        historyDialog.show(getActivity().getSupportFragmentManager(), "Edit Medication Admin");
+        Log.d(TAG, "editMedPress");
     }
 
     @Override
@@ -190,10 +193,12 @@ class CustomAdapterHistory extends BaseAdapter {
     Context context;
     List<Object_MedLog> data;
     private MedLiDataSource dbHelper;
+    Fragment_History caller;
 
-    CustomAdapterHistory(Context context, List<Object_MedLog> rowItem) {
+    CustomAdapterHistory(Context context, List<Object_MedLog> rowItem, Fragment_History caller) {
         this.context = context;
         this.data = rowItem;
+        this.caller = caller;
         dbHelper = MedLiDataSource.getHelper(this.context);
     }
 
@@ -254,9 +259,12 @@ class CustomAdapterHistory extends BaseAdapter {
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
                 Toast toast = Toast.makeText(context, "Long press button to Edit Record", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
+
             }
         });
 
@@ -273,8 +281,8 @@ class CustomAdapterHistory extends BaseAdapter {
             @Override
             public boolean onLongClick(View view) {
 
-
-                return false;
+                caller.editMedAdmin(dataItem);
+                return true;
             }
         });
 
@@ -288,7 +296,7 @@ class CustomAdapterHistory extends BaseAdapter {
 
                 Toast.makeText(context, "Object Deleted", Toast.LENGTH_LONG).show();
 
-                return false;
+                return true;
             }
         });
 

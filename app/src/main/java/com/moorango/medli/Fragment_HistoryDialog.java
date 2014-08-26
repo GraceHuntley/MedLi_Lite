@@ -2,9 +2,14 @@ package com.moorango.medli;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TimePicker;
 
 import java.util.ArrayList;
 
@@ -17,26 +22,26 @@ public class Fragment_HistoryDialog extends DialogFragment {
     private ArrayList<Object_Medication> choicesList;
 
 
-    public static Fragment_HistoryDialog newInstance(int title, String medList) {
+    public static Fragment_HistoryDialog newInstance(String medLog) {
         Fragment_HistoryDialog frag = new Fragment_HistoryDialog();
+
+        String medData[] = medLog.split(";");
         Bundle args = new Bundle();
-        args.putInt("title", title);
-        args.putString("text", medList);
+        args.putString("title", medData[0]);
+        args.putString("time", medData[1]);
+        args.putString("dose", medData[2]);
         frag.setArguments(args);
         return frag;
     }
 
-    public void setChoiceList(ArrayList<Object_Medication> choiceList) {
-        this.choicesList = choiceList;
-    }
-
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        int title = getArguments().getInt("title");
-        String message = getArguments().getString("text");
+        String title = getArguments().getString("title");
+        //String message = getArguments().getString("text");
         return new AlertDialog.Builder(getActivity())
                 .setTitle(title)
-                .setMessage(message)
+                .setMessage("Make changes Below")
+                .setView(createView())
                 .setPositiveButton(R.string.submit,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
@@ -52,5 +57,20 @@ public class Fragment_HistoryDialog extends DialogFragment {
                         }
                 )
                 .create();
+    }
+
+    private View createView() {
+
+
+        LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = layoutInflater.inflate(R.layout.history_dialog_content, null);
+        TimePicker tp = (TimePicker) getActivity().findViewById(R.id.time_picker);
+        String timeSplit[] = getArguments().getString("time").split(":");
+        Log.d("dialog", getArguments().getString("time"));
+        tp.setCurrentHour(Integer.valueOf(timeSplit[0]));
+        tp.setCurrentMinute(Integer.valueOf(timeSplit[1]));
+
+
+        return v;
     }
 }

@@ -94,7 +94,7 @@ public class Helper_DateTime {
         return new SimpleDateFormat(param);
     }
 
-    public String convertToTime12(String time) {
+    public static String convertToTime12(String time) {
         String[] splitTime = time.split(":");
         int hours = Integer.parseInt(splitTime[0]);
         String minutes = splitTime[1];
