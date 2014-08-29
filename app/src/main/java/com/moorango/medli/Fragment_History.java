@@ -13,12 +13,15 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.util.List;
@@ -32,7 +35,7 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
 
     private MedLiDataSource dbHelper;
     private LinearLayout flashScreen;
-    private OnFragmentInteractionListener mListener;
+    public OnFragmentInteractionListener mListener;
     private boolean flashTheScreen = false;
 
     /**
@@ -69,8 +72,7 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
         super.onCreate(savedInstanceState);
 
         getActivity().setRequestedOrientation(
-                ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         dbHelper = MedLiDataSource.getHelper(getActivity());
 
@@ -84,13 +86,64 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
 
     }
 
-    public void editMedAdmin(Object_MedLog medLog) {
+    public void editMedAdmin(final Object_MedLog medLog) {
 
-        String medData = medLog.getName() + ";" + medLog.getTimeOnly() + ";" + medLog.getDose();
-        Fragment_HistoryDialog historyDialog = Fragment_HistoryDialog.newInstance(medData);
-        historyDialog.show(getActivity().getSupportFragmentManager(), "Edit Medication Admin");
-        Log.d(TAG, "editMedPress");
+        final LinearLayout editMedBox = (LinearLayout) getActivity().findViewById(R.id.edit_med_admin);
+        final TextView historyHeader = (TextView) getActivity().findViewById(R.id.history_header);
+        final TimePicker timePicker = (TimePicker) getActivity().findViewById(R.id.time_picker_edit_med);
+        final EditText editDoseBox = (EditText) getActivity().findViewById(R.id.edit_dose_box);
+        Button submitChanges = (Button) getActivity().findViewById(R.id.submit_changes);
+        Button cancelChanges = (Button) getActivity().findViewById(R.id.cancel_edit);
+
+        historyHeader.setVisibility(View.GONE);
+        mListView.setVisibility(View.GONE);
+        editMedBox.setVisibility(View.VISIBLE);
+
+
+        String splitTime[] = medLog.getTimeOnly().split(":");
+        timePicker.setCurrentHour(Integer.valueOf(splitTime[0]));
+        timePicker.setCurrentMinute(Integer.valueOf(splitTime[1]));
+
+        editDoseBox.setText(medLog.getDose());
+
+        submitChanges.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Object_MedLog editLog = medLog;
+                historyHeader.setVisibility(View.VISIBLE);
+                mListView.setVisibility(View.VISIBLE);
+                editMedBox.setVisibility(View.GONE);
+
+                /*** TODO need to validate data from inputs later. ***/
+                editLog.setDose(editDoseBox.getText().toString());
+
+                String formattedHour = String.format("%02d", timePicker.getCurrentHour());
+                String formattedMinute = String.format("%02d", timePicker.getCurrentMinute());
+                editLog.setTimestamp(editLog.getDateOnly() + " " + formattedHour + ":" + formattedMinute + ":" + "00");
+                Log.d(TAG, editLog.getTimestamp());
+                /*** END ***/
+
+                if (dbHelper.updateMedicationAdmin(editLog) > -1) {
+                    mListener.onFragmentInteraction(4, null);
+                    Toast.makeText(getActivity(), "Changes submitted", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "There was an Error", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        cancelChanges.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                historyHeader.setVisibility(View.VISIBLE);
+                mListView.setVisibility(View.VISIBLE);
+                editMedBox.setVisibility(View.GONE);
+            }
+        });
+
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -182,7 +235,7 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(int id);
+        public void onFragmentInteraction(int id, String name);
     }
 
 
@@ -282,6 +335,7 @@ class CustomAdapterHistory extends BaseAdapter {
             public boolean onLongClick(View view) {
 
                 caller.editMedAdmin(dataItem);
+
                 return true;
             }
         });
@@ -304,25 +358,22 @@ class CustomAdapterHistory extends BaseAdapter {
 
             medName.setText(dt.getReadableDate(dataItem.getDateOnly()));
             boxWrapper.setBackgroundResource(android.R.color.background_light);
+            editButton.setVisibility(View.GONE);
+            delButton.setVisibility(View.GONE);
 
         } else {
-            String wasMissed = dataItem.isWasMissed() ? "Missed" : "";
 
-            String messageNote = dataItem.isWasMissed() ? "MISSED" : dataItem.isLate() ? "LATE" : "ON-TIME";
+            String messageNote = dataItem.isWasMissed() ? "MISSED" : dataItem.isWasManual() ? "MANUAL ENTRY" : dataItem.isLate() ? "LATE" : "ON-TIME";
             medName.setText(Helper_DataCheck.capitalizeTitles(dataItem.getName()));
             doseTime.setText(dt.convertToTime12(dataItem.getTimeOnly()));
             dose.setText(dataItem.getDose());
             message.setText(messageNote);
             boxWrapper.setBackgroundResource(android.R.color.white);
+            editButton.setVisibility(View.VISIBLE);
+            delButton.setVisibility(View.VISIBLE);
 
         }
         return convertView;
 
     }
-
-    public interface onEditMedListener {
-        public void onEditMed(Object_MedLog medLog);
-    }
-
 }
-

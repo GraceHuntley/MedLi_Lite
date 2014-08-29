@@ -9,6 +9,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -101,6 +102,9 @@ public class Fragment_MedSettings extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         secondaryForm = (LinearLayout) getActivity().findViewById(R.id.secondary_form_wrapper);
         delete_med = (Button) getActivity().findViewById(R.id.del_med);
         Button plusButton = (Button) getActivity().findViewById(R.id.plus_button);
@@ -162,8 +166,11 @@ public class Fragment_MedSettings extends Fragment {
 
                 @Override
                 public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                    final CharSequence charS = charSequence;
 
-                    fillList(Uri.encode(charSequence.toString()));
+
+                    fillList(Uri.encode(charS.toString()));
+
 
                     acMedName.setTextColor(Color.BLACK);
                 }
@@ -237,7 +244,7 @@ public class Fragment_MedSettings extends Fragment {
                     if (isFormComplete("routine")) {
                         submitRoutineToDB();
                         hideKeyboard();
-                        mListener.onFragmentInteraction(1);
+                        mListener.onFragmentInteraction(1, null);
                     } else {
                         Toast.makeText(getActivity(), "You forgot to enter something", Toast.LENGTH_SHORT).show();
                     }
@@ -245,7 +252,7 @@ public class Fragment_MedSettings extends Fragment {
                     if (isFormComplete("prn")) {
                         submitPrnToDB();
                         hideKeyboard();
-                        mListener.onFragmentInteraction(1);
+                        mListener.onFragmentInteraction(1, null);
                     } else {
                         Toast.makeText(getActivity(), "You forgot to enter something", Toast.LENGTH_LONG).show();
                     }
@@ -466,7 +473,7 @@ public class Fragment_MedSettings extends Fragment {
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(int tag);
+        public void onFragmentInteraction(int tag, String name);
     }
 
     @Override
@@ -541,7 +548,7 @@ public class Fragment_MedSettings extends Fragment {
             @Override
             public void onClick(View view) {
                 dataSource.changeMedicationStatus(acMedName.getText().toString().toLowerCase(), "del");
-                mListener.onFragmentInteraction(1);
+                mListener.onFragmentInteraction(1, null);
             }
         });
 
@@ -549,7 +556,7 @@ public class Fragment_MedSettings extends Fragment {
             @Override
             public void onClick(View view) {
                 dataSource.changeMedicationStatus(acMedName.getText().toString().toLowerCase(), "dc");
-                mListener.onFragmentInteraction(1);
+                mListener.onFragmentInteraction(1, null);
             }
         });
     }
@@ -594,4 +601,5 @@ public class Fragment_MedSettings extends Fragment {
         return checkBox;
 
     }
+
 }

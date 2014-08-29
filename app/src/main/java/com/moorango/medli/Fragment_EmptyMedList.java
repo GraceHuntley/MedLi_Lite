@@ -1,29 +1,32 @@
 package com.moorango.medli;
 
 import android.app.Activity;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-
-import java.util.List;
+import android.widget.Button;
 
 
-public class Fragment_EditMed extends Fragment implements AbsListView.OnItemClickListener {
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link Fragment_EmptyMedList.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link Fragment_EmptyMedList#newInstance} factory method to
+ * create an instance of this fragment.
+ */
 
+
+public class Fragment_EmptyMedList extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private final String TAG = "Fragment_EditMed";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private final int LOAD_NEW_MED_SCREEN = 2;
+
+    private Button addMed;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -32,26 +35,16 @@ public class Fragment_EditMed extends Fragment implements AbsListView.OnItemClic
     private OnFragmentInteractionListener mListener;
 
     /**
-     * The fragment's ListView/GridView.
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment Fragment_EmptyMedList.
      */
-    private ListView mListView;
-
-    /**
-     * The Adapter which will be used to populate the ListView/GridView with
-     * Views.
-     */
-    private ListAdapter mAdapter;
-
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
-    public Fragment_EditMed() {
-    }
-
-    // TODO: Rename and change types of parameters
-    public static Fragment_EditMed newInstance(String param1, String param2) {
-        Fragment_EditMed fragment = new Fragment_EditMed();
+    // TODO: Rename and change types and number of parameters
+    public static Fragment_EmptyMedList newInstance(String param1, String param2) {
+        Fragment_EmptyMedList fragment = new Fragment_EmptyMedList();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -59,38 +52,43 @@ public class Fragment_EditMed extends Fragment implements AbsListView.OnItemClic
         return fragment;
     }
 
+    public Fragment_EmptyMedList() {
+        // Required empty public constructor
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        getActivity().setRequestedOrientation(
-                ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        MedLiDataSource dbHelper = MedLiDataSource.getHelper(getActivity());
-
-        List<Object_Medication> loggedMedsList = dbHelper.getMedListForEditing();
-        // TODO: Change Adapter to display your content
-        mAdapter = new ArrayAdapter<Object_Medication>(getActivity(),
-                android.R.layout.simple_list_item_1, loggedMedsList);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_edit_med, container, false);
+        // Inflate the layout for this fragment
 
-        // Set the adapter
-        mListView = (ListView) view.findViewById(android.R.id.list);
+        View view = inflater.inflate(R.layout.fragment_empty_med_list, container, false);
+        addMed = (Button) view.findViewById(R.id.add_med_button);
 
-        mListView.setAdapter(mAdapter);
-
-        mListView.setOnItemClickListener(this);
-
+        addMed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mListener != null) {
+                    mListener.onFragmentInteraction(LOAD_NEW_MED_SCREEN, null);
+                }
+            }
+        });
         return view;
+    }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed() {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(LOAD_NEW_MED_SCREEN, null);
+        }
     }
 
     @Override
@@ -110,18 +108,6 @@ public class Fragment_EditMed extends Fragment implements AbsListView.OnItemClic
         mListener = null;
     }
 
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (null != mListener) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            Object_Medication med = (Object_Medication) mAdapter.getItem(position);
-            mListener.onFragmentInteraction(1, med.getMedName());
-            Log.d(TAG, " " + position);
-        }
-    }
-
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -134,7 +120,7 @@ public class Fragment_EditMed extends Fragment implements AbsListView.OnItemClic
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(int id, String name);
+        public void onFragmentInteraction(int choice, String name);
     }
 
 }

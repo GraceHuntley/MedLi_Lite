@@ -20,6 +20,15 @@ public class Object_MedLog {
 
     private boolean isLate;
     private boolean wasMissed;
+
+    public boolean isWasManual() {
+        return wasManual;
+    }
+
+    public void setWasManual(boolean wasManual) {
+        this.wasManual = wasManual;
+    }
+
     private boolean wasManual;
 
     private boolean isSubHeading;

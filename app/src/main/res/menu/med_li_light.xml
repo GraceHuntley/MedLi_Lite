@@ -2,6 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MedLi_light">
+
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
@@ -13,11 +14,7 @@
         android:icon="@drawable/ic_action_view_as_list"
         android:title="logs"
         app:showAsAction="always" />
-    <item
-        android:id="@+id/action_edit_med"
-        android:icon="@drawable/ic_action_edit"
-        android:title="@string/edit_med_label"
-        app:showAsAction="always" />
+
     <item
         android:id="@+id/action_add_med"
         android:icon="@drawable/ic_action_new"

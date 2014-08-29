@@ -50,6 +50,8 @@ public class Constants {
                     + "medlist.status as status "
                     + "from medlist "
                     + "LEFT OUTER JOIN med_logs ON medlist.name = med_logs.name "
+                    + "WHERE medlist.status = 'active' "
+                    + "OR medlist.status = 'new' "
                     + "GROUP BY medlist.name ORDER By medlist.name ASC";
 
     public static final String GET_TODAYS_MED_ADMIN_LOGS =
@@ -67,14 +69,18 @@ public class Constants {
 
     public static String GET_COUNT_LAST_24HOURS(String name) {
         return "SELECT COUNT(timestamp) FROM med_logs "
-                + "WHERE name='" + name + "' "
+                + "WHERE status='active' "
+                + "AND "
+                + "name='" + name + "' "
                 + "AND "
                 + "DATE(timestamp) > datetime('now','-1 day', 'localtime')";
     }
 
     public static String GET_LAST_PRN_DOSE(String name) {
         return "SELECT timestamp FROM med_logs "
-                + "WHERE name='" + name + "' "
+                + "WHERE status='active' "
+                + "AND "
+                + "name='" + name + "' "
                 + "AND "
                 + "DATE(timestamp) > datetime('now', '-1 day', 'localtime') "
                 + "ORDER BY timestamp DESC "
@@ -102,6 +108,10 @@ public class Constants {
                     + "quantified_form_of+"
                     + "reformulation_of+"
                     + "doseformgroup_of";
+
+    public static final String GET_TOTAL_MED_COUNT =
+            "SELECT COUNT(name) FROM medlist "
+                    + "WHERE status='active'";
 }
 
 

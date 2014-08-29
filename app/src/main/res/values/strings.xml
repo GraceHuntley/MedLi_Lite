@@ -7,7 +7,6 @@
     <string name="prn_label">PRN Medications</string>
     <string name="clear_btn_label">Clear</string>
     <string name="submit_btn_label">Submit</string>
-
     <string name="delete_button">Delete</string>
     <string name="submit">Submit</string>
     <string name="save">Save</string>
@@ -34,12 +33,15 @@
 
     <!-- END Fragment_EditMed Strings -->
 
+
     <!-- Fragment_History Strings -->
 
     <string name="flash_screen_title">There are currently no records Yet!</string>
     <string name="edit_med_admin_title">Edit medication Admin data</string>
     <string name="time_label">Logged Time: </string>
     <string name="edit_dose_label">Logged Dose: </string>
+    <string name="submit_changes_button">Submit Changes</string>
+    <string name="cancel_changes_button">Cancel</string>
 
     <!-- END Fragment_History Strings -->
 
@@ -49,11 +51,16 @@
         <item>tsp</item>
         <item>drops</item>
     </string-array>
-
     <string-array name="med_type">
         <item>SELECT</item>
         <item>ROUTINE</item>
         <item>PRN</item>
     </string-array>
+
+    <!-- Fragment_EmptyMedList Strings -->
+    <string name="welcome">Welcome to MedLi</string>
+    <string name="add_med_button_label">Add First Medication</string>
+
+    <!-- END Fragment_EmptyMedList -->
 
 </resources>

@@ -61,12 +61,13 @@ public class Fragment_HistoryDialog extends DialogFragment {
 
     private View createView() {
 
-
         LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = layoutInflater.inflate(R.layout.history_dialog_content, null);
         TimePicker tp = (TimePicker) getActivity().findViewById(R.id.time_picker);
         String timeSplit[] = getArguments().getString("time").split(":");
-        Log.d("dialog", getArguments().getString("time"));
+        for (String test1 : timeSplit) {
+            Log.d("dialog", test1);
+        }
         tp.setCurrentHour(Integer.valueOf(timeSplit[0]));
         tp.setCurrentMinute(Integer.valueOf(timeSplit[1]));
 

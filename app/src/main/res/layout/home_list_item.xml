@@ -36,14 +36,15 @@
         android:layout_alignParentLeft="true"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/dose_measure"
+    <ImageView
+        android:id="@+id/edit_med_button"
+        android:src="@drawable/ic_action_edit"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dip"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@+id/title"
+        android:padding="5dp"
+        android:clickable="true"
         android:layout_alignParentRight="true"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:layout_alignParentBottom="true"
+        android:layout_height="wrap_content" />
+
 
 </RelativeLayout>

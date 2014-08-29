@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckedTextView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -28,7 +29,7 @@ public class Fragment_Home extends Fragment {
     private final String TAG = "Home.java";
     private static ArrayList<Object_Medication> chosenList;
     private static MyAsyncTask updateLists;
-    private OnFragmentInteractionListener mListener;
+    public OnFragmentInteractionListener mListener;
     private ListView routineList;
     private MedLiDataSource dataSource;
     private Button submitMed;
@@ -45,7 +46,7 @@ public class Fragment_Home extends Fragment {
         super.onCreate(savedInstanceState);
 
         getActivity().setRequestedOrientation(
-                ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         if (savedInstanceState != null) {
             routineChoicesFromInstance = (SparseBooleanArray) savedInstanceState.getParcelable("routine_array");
@@ -70,12 +71,12 @@ public class Fragment_Home extends Fragment {
         dataSource = MedLiDataSource.getHelper(getActivity());
 
         if (updateLists == null || !updateLists.getStatus().equals(AsyncTask.Status.RUNNING)) {
-            updateLists = new MyAsyncTask();
+            updateLists = new MyAsyncTask(this);
             updateLists.execute();
         } else {
             updateLists.cancel(true);
             updateLists = null;
-            updateLists = new MyAsyncTask();
+            updateLists = new MyAsyncTask(this);
             updateLists.execute();
         }
 
@@ -180,7 +181,7 @@ public class Fragment_Home extends Fragment {
 
             dataSource.submitMedicationAdmin(chosenList.get(index), null);
         }
-        mListener.onFragmentInteraction(1);
+        mListener.onFragmentInteraction(1, null);
         //submitMed.setEnabled(false);
         Toast.makeText(getActivity(),
                 "Submitted", Toast.LENGTH_LONG)
@@ -249,17 +250,23 @@ public class Fragment_Home extends Fragment {
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(int tag);
+        public void onFragmentInteraction(int tag, String name);
     }
 
     public class MyAsyncTask extends AsyncTask<Void, Void, String> {
+
+        Fragment_Home fragmentHome;
+
+        public MyAsyncTask(Fragment_Home context) {
+            this.fragmentHome = context;
+        }
 
         @Override
         protected String doInBackground(Void... voids) {
 
             List<Object_Medication> meds = dataSource.getAllMeds("routine");
 
-            adapter = new HomeCustomAdapter(getActivity(), R.layout.home_list_item, R.id.title, meds);
+            adapter = new HomeCustomAdapter(getActivity(), R.layout.home_list_item, R.id.title, meds, fragmentHome);
 
             return null;
         }
@@ -288,15 +295,18 @@ public class Fragment_Home extends Fragment {
 class HomeCustomAdapter extends ArrayAdapter<Object_Medication> {
 
     private final String TAG = "Home/HomeCustomAdapter";
+    private Fragment_Home caller;
     Context context;
+
     List<Object_Medication> data;
     SparseBooleanArray sparseBooleanArray;
 
     public HomeCustomAdapter(Context context, int resource,
-                             int textViewResourceId, List<Object_Medication> rowItem) {
+                             int textViewResourceId, List<Object_Medication> rowItem, Fragment_Home caller) {
         super(context, resource, textViewResourceId, rowItem);
         this.context = context;
         this.data = rowItem;
+        this.caller = caller;
         sparseBooleanArray = new SparseBooleanArray();
 
         for (int index = 0; index < rowItem.size(); index++) {
@@ -362,7 +372,8 @@ class HomeCustomAdapter extends ArrayAdapter<Object_Medication> {
         final CheckedTextView txtTitle = (CheckedTextView) convertView.findViewById(R.id.title);
         final TextView headerText = (TextView) convertView.findViewById(R.id.header_title);
         final TextView nextDueTime = (TextView) convertView.findViewById(R.id.next_dose_time);
-        final TextView doseMeasure = (TextView) convertView.findViewById(R.id.dose_measure);
+
+        final ImageView editMed = (ImageView) convertView.findViewById(R.id.edit_med_button);
         RelativeLayout boxWrapper = (RelativeLayout) convertView.findViewById(R.id.box_wrapper);
 
         final Object_Medication dataItem = data.get(position);
@@ -378,11 +389,12 @@ class HomeCustomAdapter extends ArrayAdapter<Object_Medication> {
             txtTitle.setChecked(false);
             txtTitle.setVisibility(View.INVISIBLE);
             nextDueTime.setVisibility(View.GONE);
-            doseMeasure.setVisibility(View.GONE);
+
             headerText.setVisibility(View.VISIBLE);
+            editMed.setVisibility(View.GONE);
             boxWrapper.setBackgroundResource(android.R.color.background_light);
         } else {
-            txtTitle.setText(Helper_DataCheck.capitalizeTitles(dataItem.getMedName()));
+            txtTitle.setText(Helper_DataCheck.capitalizeTitles(dataItem.getMedName()) + " " + dataItem.getDoseMeasure() + " " + dataItem.getDoseMeasureType());
 
             /***
              * Fill in missed doses for a new medication.
@@ -393,7 +405,8 @@ class HomeCustomAdapter extends ArrayAdapter<Object_Medication> {
 
             }
             String doseVerbage = (dataItem.getAdminType().equalsIgnoreCase("routine")) ? "Next Due: " : "Next Earliest Dose: ";
-            nextDueTime.setText((dataItem.getNextDue().equalsIgnoreCase("complete")) ? dataItem.getNextDue() : doseVerbage + dataItem.getNextDue());
+            String dueWording = (dataItem.getNextDue().equalsIgnoreCase("prn") ? "Any Time" : dataItem.getNextDue());
+            nextDueTime.setText((dataItem.getNextDue().equalsIgnoreCase("complete")) ? dataItem.getNextDue() : doseVerbage + dueWording);
             boxWrapper.setBackgroundResource(android.R.color.white);
 
 
@@ -403,17 +416,30 @@ class HomeCustomAdapter extends ArrayAdapter<Object_Medication> {
                     dataItem.getStatus().equalsIgnoreCase("active")) {
 
                 if (Helper_DataCheck.isDoseLate(dataItem.getNextDue())) {
-                    //boxWrapper.setBackgroundResource(R.drawable.late_dose_background);
-                    boxWrapper.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.late_dose_background));
+
+                    nextDueTime.setTextColor(context.getResources().getColor(R.color.red));
 
                 }
             }
 
-            doseMeasure.setText(dataItem.getDoseMeasure() + " " + dataItem.getDoseMeasureType());
-            doseMeasure.setVisibility(View.VISIBLE);
             txtTitle.setVisibility(View.VISIBLE);
             nextDueTime.setVisibility(View.VISIBLE);
             headerText.setVisibility(View.GONE);
+
+            editMed.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(context, "Long press to Edit Medication", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            editMed.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    caller.mListener.onFragmentInteraction(3, dataItem.getMedName());
+                    return true;
+                }
+            });
 
         }
 

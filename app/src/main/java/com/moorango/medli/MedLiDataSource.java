@@ -53,6 +53,24 @@ public class MedLiDataSource {
         dbHelper.close();
     }
 
+    /**
+     * check if medlist has entries for main_activity.
+     *
+     * @return true if active entries exist, else false.
+     */
+    public boolean medListHasEntries() {
+
+        this.open(); // open db.
+
+        Cursor cursor = database.rawQuery(Constants.GET_TOTAL_MED_COUNT, null);
+
+        if (cursor.moveToFirst())
+            return (cursor.getInt(0) > 0) ? true : false;
+        else
+            return false;
+
+    }
+
     public List<Object_Medication> getAllMeds(String tag) {
         List<Object_Medication> routineList = new ArrayList<Object_Medication>();
         List<Object_Medication> prnList = new ArrayList<Object_Medication>();
@@ -253,6 +271,16 @@ public class MedLiDataSource {
 
     }
 
+    public int updateMedicationAdmin(Object_MedLog medLog) {
+        ContentValues cv = new ContentValues();
+        cv.put("timestamp", medLog.getTimestamp());
+        cv.put("dose", medLog.getDose());
+        cv.put("manual_entry", 1);
+        cv.put("missed", 0);
+
+        return database.update("med_logs", cv, "ID_UNIQUE='" + medLog.getUniqueID() + "'", null);
+    }
+
     public void submitMedicationAdmin(Object_Medication medication, String manualTime) {
 
         ContentValues cv = new ContentValues();
@@ -276,7 +304,9 @@ public class MedLiDataSource {
         cv.put("status", "active");
 
         this.open();
+
         database.insert("med_logs", "name", cv);
+
     }
 
     public void submitMissedDose(Object_Medication medication, String time) {

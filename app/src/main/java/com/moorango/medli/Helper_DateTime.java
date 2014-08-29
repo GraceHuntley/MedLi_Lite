@@ -130,7 +130,6 @@ public class Helper_DateTime {
 
         return formattedDate;
 
-        //return readyTime;
     }
 
     String getSyncStart() {
@@ -175,26 +174,4 @@ public class Helper_DateTime {
 
     }
 
-    /**
-     * Currently used by DBManager.java makeButtonsIfDue
-     * will work on deprecating.
-     *
-     * @param freq
-     * @param time
-     * @return
-     */
-    public String readyTime(int freq, String time) {
-
-        String[] splitTime = time.split(":");
-        int hours = Integer.parseInt(splitTime[0]) + freq;
-
-        if (hours > 24) {
-            hours = hours - 24;
-        }
-        String ready_to_convert = "" + hours + ":" + splitTime[1] + ":"
-                + splitTime[2];
-
-
-        return this.convertToTime12(ready_to_convert);
-    }
 }
