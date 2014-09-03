@@ -1,4 +1,4 @@
-package com.moorango.medli;
+package com.moorango.medli.Models;
 
 import android.util.Log;
 

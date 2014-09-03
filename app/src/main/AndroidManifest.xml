@@ -8,6 +8,9 @@
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
 
+    <permission
+        android:name="android.permission.STATUS_BAR_SERVICE"
+        android:protectionLevel="signature" />
 
     <application
         android:allowBackup="true"
@@ -24,33 +27,15 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".AuthenticatorService">
-            <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" />
-        </service>
-
-        <provider
-            android:name=".medLiContentProvider"
-            android:authorities="com.moorango.medli.provider"
-            android:enabled="true"
-            android:exported="true"></provider>
-
-        <service
-            android:name="com.moorango.medli.SyncService"
-            android:exported="true"
-            android:process=":sync">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/syncadapter" />
-        </service>
     </application>
+
+    <permission
+        android:name="com.example.gcm.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="com.example.gcm.permission.C2D_MESSAGE" />
 
 </manifest>

@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
+import com.moorango.medli.Models.Object_Medication;
+
 import java.util.ArrayList;
 
 /**

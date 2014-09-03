@@ -17,10 +17,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java', 'src/main/java/com.moorango.medli/Models', 'src/main/java/Constants']
+        }
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+
     compile 'com.android.support:appcompat-v7:19.1.0'
     compile 'com.android.support:support-v4:19.1.0'
+
+    compile project(path: ':medli', configuration: 'android-endpoints')
 }

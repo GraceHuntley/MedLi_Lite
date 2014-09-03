@@ -1,7 +1,5 @@
 package com.moorango.medli;
 
-import android.util.Xml;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -35,39 +33,46 @@ public class Helper_DrugData {
         DefaultHttpClient httpClient = new DefaultHttpClient();
         //String apiDomain = "http://rxnav.nlm.nih.gov/REST/Ndfrt/";
         //String apiCall = "search?conceptName=" + URLEncoder.encode(drugName, "utf-8") + "&kindName=DRUG_KIND";
-        String apiCall = "http://rxnav.nlm.nih.gov/REST/rxcui?name=" + URLEncoder.encode(drugName, "utf-8");
+        /**** Start test
+         *
 
-        HttpGet httpGet = new HttpGet(apiCall);
+         String apiCall = "http://rxnav.nlm.nih.gov/REST/rxcui?name=" + URLEncoder.encode(drugName, "utf-8");
+
+         HttpGet httpGet = new HttpGet(apiCall);
 
 
-        HttpResponse response = httpClient.execute(httpGet);
-        InputStream is = response.getEntity().getContent();
-        XmlPullParser parser = Xml.newPullParser();
-        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+         HttpResponse response = httpClient.execute(httpGet);
+         InputStream is = response.getEntity().getContent();
+         XmlPullParser parser = Xml.newPullParser();
+         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
 
-        parser.setInput(is, null);
+         parser.setInput(is, null);
 
-        String result = null;
+         String result = null;
 
-        while (parser.next() != XmlPullParser.END_DOCUMENT) {
-            if (parser.getEventType() != XmlPullParser.START_TAG) {
-                continue;
-            }
+         while (parser.next() != XmlPullParser.END_DOCUMENT) {
+         if (parser.getEventType() != XmlPullParser.START_TAG) {
+         continue;
+         }
 
-            String name = parser.getName();
-            if (name.equals("rxnormId")) {
-                if (parser.next() == XmlPullParser.TEXT) {
+         String name = parser.getName();
+         if (name.equals("rxnormId")) {
+         if (parser.next() == XmlPullParser.TEXT) {
 
-                    result = parser.getText();
+         result = parser.getText();
 
-                    break;
-                }
-            }
-        }
+         break;
+         }
+         }
+         }
 
-        if (result != null) {
-            doseList = getDoseListFromNui(result);
-        }
+         if (result != null) {
+         doseList = getDoseListFromNui(result);
+         }
+
+         */
+
+        doseList = getDoseListFromNui(URLEncoder.encode(drugName, "utf-8"));
         return doseList;
     }
 
@@ -76,7 +81,8 @@ public class Helper_DrugData {
 
         DefaultHttpClient httpClient = new DefaultHttpClient();
         // String apiDomain = "http://rxnav.nlm.nih.gov/REST/Ndfrt/childConcepts/nui=" + nui + "&transitive=true";
-        String apiDomain = "http://rxnav.nlm.nih.gov/REST/rxcui/" + rxcui + "/related?rela=" + Constants.RX_ATTRIBUTES;
+        //String apiDomain = "http://rxnav.nlm.nih.gov/REST/rxcui/" + rxcui + "/related?rela=" + Constants.RX_ATTRIBUTES;
+        String apiDomain = "http://rxnav.nlm.nih.gov/REST/drugs?name=" + rxcui;
 
         HttpGet httpGet = new HttpGet(apiDomain);
 

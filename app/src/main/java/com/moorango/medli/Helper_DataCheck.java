@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.moorango.medli.Models.Object_Medication;
+
 /**
  * Created by Colin on 7/17/2014.
  * Copyright 2014

@@ -8,6 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
+import com.moorango.medli.Models.Object_MedLog;
+import com.moorango.medli.Models.Object_Medication;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

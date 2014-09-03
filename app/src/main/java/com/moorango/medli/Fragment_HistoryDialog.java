@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TimePicker;
 
+import com.moorango.medli.Models.Object_Medication;
+
 import java.util.ArrayList;
 
 /**

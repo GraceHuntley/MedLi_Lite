@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +23,8 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.moorango.medli.Models.Object_MedLog;
+
 import java.util.List;
 
 public class Fragment_History extends Fragment implements AbsListView.OnItemClickListener {
@@ -37,6 +38,7 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
     private LinearLayout flashScreen;
     public OnFragmentInteractionListener mListener;
     private boolean flashTheScreen = false;
+    private boolean areMedsMissed = false;
 
     /**
      * The fragment's ListView/GridView.
@@ -77,6 +79,11 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
         dbHelper = MedLiDataSource.getHelper(getActivity());
 
         List<Object_MedLog> loggedMedsList = dbHelper.getMedHistory(1);
+
+        for (Object_MedLog log : loggedMedsList) { // mark if any meds were missed.
+            if (areMedsMissed = log.isWasMissed()) break;
+        }
+
 
         if (loggedMedsList.size() == 0) {
             flashTheScreen = true;
@@ -121,8 +128,6 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
                 String formattedHour = String.format("%02d", timePicker.getCurrentHour());
                 String formattedMinute = String.format("%02d", timePicker.getCurrentMinute());
                 editLog.setTimestamp(editLog.getDateOnly() + " " + formattedHour + ":" + formattedMinute + ":" + "00");
-                Log.d(TAG, editLog.getTimestamp());
-                /*** END ***/
 
                 if (dbHelper.updateMedicationAdmin(editLog) > -1) {
                     mListener.onFragmentInteraction(4, null);
@@ -143,7 +148,6 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
         });
 
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

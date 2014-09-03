@@ -20,6 +20,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.moorango.medli.Models.Object_Medication;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -418,6 +420,9 @@ class HomeCustomAdapter extends ArrayAdapter<Object_Medication> {
                 if (Helper_DataCheck.isDoseLate(dataItem.getNextDue())) {
 
                     nextDueTime.setTextColor(context.getResources().getColor(R.color.red));
+
+                    convertView.findViewById(R.id.late_dose_image).setVisibility(View.VISIBLE);
+                    boxWrapper.setBackgroundColor(context.getResources().getColor(android.R.color.white));
 
                 }
             }

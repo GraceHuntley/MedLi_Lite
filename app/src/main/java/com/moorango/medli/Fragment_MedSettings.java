@@ -33,6 +33,8 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.moorango.medli.Models.Object_Medication;
+
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
@@ -168,9 +170,7 @@ public class Fragment_MedSettings extends Fragment {
                 public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
                     final CharSequence charS = charSequence;
 
-
                     fillList(Uri.encode(charS.toString()));
-
 
                     acMedName.setTextColor(Color.BLACK);
                 }
@@ -314,10 +314,6 @@ public class Fragment_MedSettings extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-
-                // populate edittexts.
-
-                Log.d(TAG, "textChanged");
 
                 if (Integer.valueOf(editable.toString()) < (adminTimesList.getChildCount() / 2)) {
                     adminTimesList.removeViewAt(adminTimesList.getChildCount() - 1);
