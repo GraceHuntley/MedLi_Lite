@@ -28,6 +28,11 @@
     <string name="edit_med_label">Edit Med</string>
     <string name="plus_label">+</string>
 
+    <!-- Fragment_MedSettings -->
+    <string name="dose_form_label">Dose Form ie. 1 tab or 2 drops</string>
+
+    <!-- END Fragment_MedSettings -->
+
     <!-- Fragment_EditMed Strings -->
     <string name="edit_med_title">Select a Medication to edit: </string>
 

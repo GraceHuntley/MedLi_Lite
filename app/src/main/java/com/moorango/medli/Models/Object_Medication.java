@@ -19,6 +19,7 @@ public class Object_Medication {
     private String adminType; // prn or routine
     private String status; // active, deleted, discontinued.
     private String startDate; // date medication first started.
+    private String doseForm; // the form of the dose user entered.
     private int doseCount; // max doses per day of medication.
     private String fillDate; // date medication last filled.
     private String doseTimes; // times of day to give dose. only applicable to routine meds.
@@ -34,6 +35,14 @@ public class Object_Medication {
 
     public void setSubHeading(boolean isSubHeading) {
         this.isSubHeading = isSubHeading;
+    }
+
+    public void setDoseForm(String doseForm) {
+        this.doseForm = doseForm;
+    }
+
+    public String getDoseForm() {
+        return this.doseForm;
     }
 
     boolean isForEditDisplay() {
