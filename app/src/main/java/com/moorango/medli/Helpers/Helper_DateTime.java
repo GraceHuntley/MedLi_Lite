@@ -17,18 +17,9 @@ import java.util.Date;
 @SuppressWarnings("WeakerAccess")
 public class Helper_DateTime {
 
-    private int month;
     private static Calendar cal;
     private static SimpleDateFormat sdFormat;
     private static final String TAG = "MakeDateTimeHelper";
-
-    int getMonth() {
-        return this.month;
-    }
-
-    void setMonth(int newMonth) {
-        this.month = newMonth;
-    }
 
     public static String getTime24() {
         cal = Calendar.getInstance();

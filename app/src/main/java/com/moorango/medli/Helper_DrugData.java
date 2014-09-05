@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 @SuppressWarnings("WeakerAccess")
 public class Helper_DrugData {
 
+    @SuppressWarnings("UnusedAssignment")
     private final String TAG = "DrugDataHelper.java";
 
     private String text;

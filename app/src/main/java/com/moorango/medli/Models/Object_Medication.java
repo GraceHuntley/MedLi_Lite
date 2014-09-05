@@ -24,7 +24,6 @@ public class Object_Medication {
     private String startDate; // date medication first started.
     private String doseForm; // the form of the dose user entered.
     private int doseCount; // max doses per day of medication.
-    private String fillDate; // date medication last filled.
     private String doseTimes; // times of day to give dose. only applicable to routine meds.
     private boolean isSubHeading = false;
     private boolean isForEditDisplay;
@@ -193,7 +192,7 @@ public class Object_Medication {
             try {
                 if ((date1 != null ? date1.getTime() : 0) < (date2 != null ? date2.getTime() : 0)) {
                     return -1;
-                } else if (date1.getTime() > date2.getTime()) {
+                } else if ((date1 != null ? date1.getTime() : 0) > (date2 != null ? date2.getTime() : 0)) {
                     return 1;
                 } else {
                     return 0;

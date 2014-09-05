@@ -4,9 +4,7 @@ import com.moorango.medli.Helpers.Helper_DateTime;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by Colin on 8/5/2014.
@@ -14,30 +12,20 @@ import java.util.List;
  */
 public class Object_MedLog {
 
-    private static List<Object_MedLog> medLogList = new ArrayList<Object_MedLog>();
-
     private String name;
     private String timestamp;
     private String dose;
+    private static String lastDate;
+    private String uniqueID;
 
     private boolean isLate;
     private boolean wasMissed;
+    private boolean wasManual;
+    private boolean isSubHeading;
 
     public boolean isWasManual() {
         return wasManual;
     }
-
-    public void setWasManual(boolean wasManual) {
-        this.wasManual = wasManual;
-    }
-
-    private boolean wasManual;
-
-    private boolean isSubHeading;
-
-    private static String lastDate;
-
-    private String uniqueID;
 
     public Object_MedLog() {
         // empty constructor.
@@ -56,28 +44,9 @@ public class Object_MedLog {
             lastDate = this.getTimestamp().split(" ")[0];
         }
 
-
-        medLogList.add(this);
-
-    }
-
-    /**
-     * Delete object from List.
-     *
-     * @param id
-     */
-    public void deleteObject(String id) {
-        List<Object_MedLog> tempList = new ArrayList<Object_MedLog>();
-        for (Object_MedLog log : medLogList) {
-            if (!log.getUniqueID().equals(id)) {
-                tempList.add(log);
-            }
-        }
-        medLogList = tempList;
     }
 
     public String toString() {
-        Helper_DateTime dt = new Helper_DateTime();
 
         Date date;
         if (this.isSubHeading()) {
@@ -104,10 +73,6 @@ public class Object_MedLog {
 
     public String getUniqueID() {
         return uniqueID;
-    }
-
-    public void setUniqueID(String uniqueID) {
-        this.uniqueID = uniqueID;
     }
 
     public String getName() {
@@ -138,16 +103,8 @@ public class Object_MedLog {
         return isLate;
     }
 
-    public void setLate(boolean isLate) {
-        this.isLate = isLate;
-    }
-
     public boolean isWasMissed() {
         return wasMissed;
-    }
-
-    public void setWasMissed(boolean wasMissed) {
-        this.wasMissed = wasMissed;
     }
 
     public boolean isSubHeading() {

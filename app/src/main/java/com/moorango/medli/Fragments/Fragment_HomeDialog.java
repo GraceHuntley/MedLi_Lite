@@ -6,10 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
-import com.moorango.medli.Models.Object_Medication;
 import com.moorango.medli.R;
-
-import java.util.ArrayList;
 
 /**
  * Created by Colin on 8/21/2014.
@@ -25,10 +22,6 @@ public class Fragment_HomeDialog extends DialogFragment {
         args.putString("text", medList);
         frag.setArguments(args);
         return frag;
-    }
-
-    public void setChoiceList(ArrayList<Object_Medication> choiceList) {
-
     }
 
     @Override

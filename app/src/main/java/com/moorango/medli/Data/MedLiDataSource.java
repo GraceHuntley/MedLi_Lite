@@ -26,6 +26,7 @@ import java.util.List;
  */
 public class MedLiDataSource {
 
+    @SuppressWarnings("UnusedAssignment")
     private final String TAG = "MedLiDataSource";
     private static final Helper_DateTime dt = new Helper_DateTime();
 
@@ -280,6 +281,7 @@ public class MedLiDataSource {
 
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public int deleteMedEntry(String uniqueId) {
         ContentValues cv = new ContentValues();
         cv.put("status", "del");

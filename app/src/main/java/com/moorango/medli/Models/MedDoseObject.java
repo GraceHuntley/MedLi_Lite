@@ -8,6 +8,7 @@ public class MedDoseObject {
     private double doseDouble;
     private String doseMeasure;
     private String doseType;
+    @SuppressWarnings("UnusedAssignment")
     private final String TAG = "MedDoseObject";
     private boolean isProperty = false;
 
@@ -25,10 +26,8 @@ public class MedDoseObject {
 
         String splitEntry[] = entry.split(" ");
 
-        boolean isEmpty = !(findDoseDouble(splitEntry, splitEntry.length - 1));
-
         setDoseType(splitEntry[splitEntry.length - 1]);
-        //isEmpty = false;
+
     }
 
     public boolean findDoseDouble(String val[], int index) {

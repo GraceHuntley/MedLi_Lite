@@ -14,10 +14,6 @@ import com.moorango.medli.Models.Object_Medication;
 @SuppressWarnings("WeakerAccess")
 public class Helper_DataCheck {
 
-    Helper_DataCheck() {
-
-    }
-
     public static boolean isNetworkAvailable(Context context) {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -56,7 +52,7 @@ public class Helper_DataCheck {
     public static boolean isDoseLate(String due) {
         // TODO test whether admin time is late.
         Helper_DateTime dt = new Helper_DateTime();
-        final String TAG = "VerifyHelpers";
+        @SuppressWarnings("UnusedAssignment") final String TAG = "VerifyHelpers";
         int nextDoseHour = Integer.valueOf(dt.convertToTime24(due).split(":")[0]);
         int loggedHour = Integer.valueOf(Helper_DateTime.getTime24().split(":")[0]);
 
