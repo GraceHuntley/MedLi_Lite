@@ -6,6 +6,12 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.moorango.medli.Data.MedLiDataSource;
+import com.moorango.medli.Fragments.Fragment_EmptyMedList;
+import com.moorango.medli.Fragments.Fragment_History;
+import com.moorango.medli.Fragments.Fragment_Home;
+import com.moorango.medli.Fragments.Fragment_MedSettings;
+
 public class Activity_MedLi_light extends ActionBarActivity implements Fragment_Home.OnFragmentInteractionListener, Fragment_MedSettings.OnFragmentInteractionListener,
         Fragment_History.OnFragmentInteractionListener, Fragment_EmptyMedList.OnFragmentInteractionListener {
 
@@ -124,7 +130,7 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
 
             case 4:
                 getSupportFragmentManager().beginTransaction()
-                        .replace(android.R.id.content, Fragment_History.newInstance(null, null), "logFragment")
+                        .replace(android.R.id.content, Fragment_History.newInstance(), "logFragment")
                         .addToBackStack("logFragment")
                         .commit();
         }

@@ -1,6 +1,6 @@
 package com.moorango.medli.Models;
 
-import com.moorango.medli.Helper_DateTime;
+import com.moorango.medli.Helpers.Helper_DateTime;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -68,12 +68,12 @@ public class Object_MedLog {
      */
     public void deleteObject(String id) {
         List<Object_MedLog> tempList = new ArrayList<Object_MedLog>();
-        for (Object_MedLog log : this.medLogList) {
+        for (Object_MedLog log : medLogList) {
             if (!log.getUniqueID().equals(id)) {
                 tempList.add(log);
             }
         }
-        this.medLogList = tempList;
+        medLogList = tempList;
     }
 
     public String toString() {
@@ -97,7 +97,7 @@ public class Object_MedLog {
         } else {
             String wasMedLate = isLate ? "\nLATE" : "";
             lastDate = this.getTimestamp().split(" ")[0];
-            return dt.convertToTime12(this.getTimestamp().split(" ")[1]) + " " + this.getName().toUpperCase() + wasMedLate;
+            return Helper_DateTime.convertToTime12(this.getTimestamp().split(" ")[1]) + " " + this.getName().toUpperCase() + wasMedLate;
 
         }
     }

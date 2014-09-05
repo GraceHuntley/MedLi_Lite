@@ -20,6 +20,7 @@
         android:id="@+id/late_dose_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/late_image_desc"
         android:visibility="gone"
         android:layout_centerInParent="true"
         android:src="@drawable/past_due" />
@@ -48,9 +49,11 @@
         android:id="@+id/edit_med_button"
         android:src="@drawable/ic_action_edit"
         android:layout_width="wrap_content"
+        android:contentDescription="@string/delete_admin_desc"
         android:padding="5dp"
         android:clickable="true"
         android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_height="wrap_content" />
 

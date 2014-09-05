@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    tools:context="com.moorango.medli.Fragment_EmptyMedList">
+    tools:context="com.moorango.medli.Fragments.Fragment_EmptyMedList">
 
 
     <Button

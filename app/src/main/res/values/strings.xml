@@ -3,8 +3,6 @@
 
     <string name="app_name">MedLi</string>
     <string name="action_settings">Settings</string>
-    <string name="routine_label">Routine Medications</string>
-    <string name="prn_label">PRN Medications</string>
     <string name="clear_btn_label">Clear</string>
     <string name="submit_btn_label">Submit</string>
     <string name="delete_button">Delete</string>
@@ -20,24 +18,24 @@
     <string name="minus_button_label">-</string>
     <string name="admin_times_label">Maximum Doses per Day</string>
     <string name="zero">0</string>
-    <string name="last_filled">Date Medication Filled last</string>
-    <string name="date_format">MM/DD/YYYY</string>
+
     <string name="prn_freq_hint">Hours between doses</string>
     <string name="prn_freq_label">Enter how often to give dose</string>
     <string name="med_dose_dialog_title">Confirmation</string>
-    <string name="edit_med_label">Edit Med</string>
     <string name="plus_label">+</string>
+
+    <!-- Activity_MedLiLight -->
+    <string name="log_button_text">Logs</string>
+    <!-- END Activity_MedLiLight -->
+
+    <!-- Fragment_Home -->
+    <string name="late_image_desc">late_image</string>
+    <!-- END Fragment_Home -->
 
     <!-- Fragment_MedSettings -->
     <string name="dose_form_label">Dose Form ie. 1 tab or 2 drops</string>
 
     <!-- END Fragment_MedSettings -->
-
-    <!-- Fragment_EditMed Strings -->
-    <string name="edit_med_title">Select a Medication to edit: </string>
-
-    <!-- END Fragment_EditMed Strings -->
-
 
     <!-- Fragment_History Strings -->
 
@@ -47,15 +45,11 @@
     <string name="edit_dose_label">Logged Dose: </string>
     <string name="submit_changes_button">Submit Changes</string>
     <string name="cancel_changes_button">Cancel</string>
+    <string name="delete_admin_desc">del_button</string>
+    <string name="edit_admin_desc">edit_button</string>
 
     <!-- END Fragment_History Strings -->
 
-    <string-array name="dose_measure_type">
-        <item>ml</item>
-        <item>mg</item>
-        <item>tsp</item>
-        <item>drops</item>
-    </string-array>
     <string-array name="med_type">
         <item>SELECT</item>
         <item>ROUTINE</item>

@@ -12,12 +12,12 @@
     <item
         android:id="@+id/action_med_logs"
         android:icon="@drawable/ic_action_view_as_list"
-        android:title="logs"
-        app:showAsAction="always" />
+        android:title="@string/log_button_text"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_add_med"
         android:icon="@drawable/ic_action_new"
         android:title="@string/plus_label"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 </menu>

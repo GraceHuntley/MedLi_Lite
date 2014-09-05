@@ -33,12 +33,6 @@ public class Constants {
             "manual_entry BOOLEAN, " +
             "status TEXT)";
 
-    public static final String CREATE_DOSE_MEASURE_DB = "CREATE TABLE med_dose_measures (" +
-            "med_name TEXT, " +
-            "dose_measure_int TEXT, " +
-            "dose_measure_type TEXT NOT NULL, " +
-            "user_added boolean DEFAULT 0)";
-
     public static final String GET_MEDLIST_ROUTINE =
             "SELECT medlist.name as name, "
                     + "medlist.dose_int as dose_int, "
@@ -89,28 +83,6 @@ public class Constants {
                 + "ORDER BY timestamp DESC "
                 + "LIMIT 1";
     }
-
-    public static final String RX_ATTRIBUTES =
-            "consists_of+"
-                    + "constitutes+"
-                    + "contains+"
-                    + "dose_form_of+"
-                    + "has_dose_form+"
-                    + "has_form+"
-                    + "has_ingredient+"
-                    + "has_ingredients+"
-                    + "has_part+"
-                    + "has_precise_ingredient+"
-                    + "has_tradename+"
-                    + "has_doseformgroup+"
-                    + "ingredient_of+"
-                    + "ingredients_of+"
-                    + "inverse_isa+"
-                    + "isa+"
-                    + "precise_ingredient_of+"
-                    + "quantified_form_of+"
-                    + "reformulation_of+"
-                    + "doseformgroup_of";
 
     public static final String GET_TOTAL_MED_COUNT =
             "SELECT COUNT(name) FROM medlist "

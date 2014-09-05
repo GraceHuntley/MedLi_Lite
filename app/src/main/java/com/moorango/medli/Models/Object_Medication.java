@@ -12,6 +12,7 @@ import java.util.Date;
  */
 public class Object_Medication {
 
+    @SuppressWarnings("FieldCanBeLocal")
     private final String TAG = "Medication";
 
     private int idUnique;
@@ -43,8 +44,8 @@ public class Object_Medication {
         return isSubHeading;
     }
 
-    public void setSubHeading(boolean isSubHeading) {
-        this.isSubHeading = isSubHeading;
+    public void setSubHeading() {
+        this.isSubHeading = true;
     }
 
     public void setDoseForm(String doseForm) {
@@ -59,8 +60,8 @@ public class Object_Medication {
         return isForEditDisplay;
     }
 
-    public void setForEditDisplay(boolean isForEditDisplay) {
-        this.isForEditDisplay = isForEditDisplay;
+    public void setForEditDisplay() {
+        this.isForEditDisplay = true;
     }
 
     public String getMedName() {
@@ -109,14 +110,6 @@ public class Object_Medication {
 
     public void setStartDate(String startDate) {
         this.startDate = startDate;
-    }
-
-    public String getFillDate() {
-        return fillDate;
-    }
-
-    public void setFillDate(String fillDate) {
-        this.fillDate = fillDate;
     }
 
     public String getDoseTimes() {
@@ -170,11 +163,6 @@ public class Object_Medication {
         }
     }
 
-    public String printAll() {
-        return this.getMedName() + " " +
-                this.getAdminType();
-    }
-
     public int compareNextDue(Object_Medication med) {
 
         if (this.getNextDue().equals("COMPLETE")) {
@@ -199,11 +187,11 @@ public class Object_Medication {
                 date1 = df1.parse(this.getNextDue());
                 date2 = df1.parse(med.getNextDue());
             } catch (ParseException e) {
-                Log.d("Medication", e.toString());
+                Log.e("Medication", e.toString());
             }
 
             try {
-                if (date1.getTime() < date2.getTime()) {
+                if ((date1 != null ? date1.getTime() : 0) < (date2 != null ? date2.getTime() : 0)) {
                     return -1;
                 } else if (date1.getTime() > date2.getTime()) {
                     return 1;
@@ -211,7 +199,7 @@ public class Object_Medication {
                     return 0;
                 }
             } catch (NullPointerException e) {
-                Log.d(TAG, e.toString());
+                Log.e(TAG, e.toString());
             }
         }
         return 0;

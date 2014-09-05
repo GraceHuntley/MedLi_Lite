@@ -76,7 +76,8 @@
                     android:inputType="numberDecimal" />
 
                 <EditText
-                    android:id="@+id/med_measure_spinner"
+                    android:id="@+id/med_measure_input"
+                    android:inputType="text"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
@@ -91,7 +92,7 @@
 
             <EditText
                 android:id="@+id/dose_form_input"
-
+                android:inputType="text"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content" />
 
