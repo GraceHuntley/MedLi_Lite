@@ -13,6 +13,8 @@ import java.util.Date;
 public class Object_Medication {
 
     private final String TAG = "Medication";
+
+    private int idUnique;
     private String medName;
     private float doseMeasure; // numeric dose measure.
     private String doseMeasureType; // ex. ml tsp mg
@@ -28,6 +30,14 @@ public class Object_Medication {
     private String nextDue; // next due time.
     private int actualDoseCount; // actual count of doses given today.
     private int doseFrequency; // prn only frequency meds can be taken in hours.
+
+    public void setIdUnique(int id) {
+        this.idUnique = id;
+    }
+
+    public int getIdUnique() {
+        return this.idUnique;
+    }
 
     public boolean isSubHeading() {
         return isSubHeading;
@@ -158,6 +168,11 @@ public class Object_Medication {
             return this.getMedName().toUpperCase() + " " + this.getDoseMeasure() + this.getDoseMeasureType() + "\n" +
                     (!this.isForEditDisplay() ? "NEXT DUE: " + this.getNextDue() : "");
         }
+    }
+
+    public String printAll() {
+        return this.getMedName() + " " +
+                this.getAdminType();
     }
 
     public int compareNextDue(Object_Medication med) {

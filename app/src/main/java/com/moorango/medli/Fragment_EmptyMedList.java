@@ -77,7 +77,7 @@ public class Fragment_EmptyMedList extends Fragment {
             @Override
             public void onClick(View view) {
                 if (mListener != null) {
-                    mListener.onFragmentInteraction(LOAD_NEW_MED_SCREEN, null);
+                    mListener.onFragmentInteraction(LOAD_NEW_MED_SCREEN, null, 0);
                 }
             }
         });
@@ -87,7 +87,7 @@ public class Fragment_EmptyMedList extends Fragment {
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed() {
         if (mListener != null) {
-            mListener.onFragmentInteraction(LOAD_NEW_MED_SCREEN, null);
+            mListener.onFragmentInteraction(LOAD_NEW_MED_SCREEN, null, 0);
         }
     }
 
@@ -120,7 +120,7 @@ public class Fragment_EmptyMedList extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(int choice, String name);
+        public void onFragmentInteraction(int choice, String name, int id);
     }
 
 }

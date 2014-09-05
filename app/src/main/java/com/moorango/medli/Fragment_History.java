@@ -130,7 +130,7 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
                 editLog.setTimestamp(editLog.getDateOnly() + " " + formattedHour + ":" + formattedMinute + ":" + "00");
 
                 if (dbHelper.updateMedicationAdmin(editLog) > -1) {
-                    mListener.onFragmentInteraction(4, null);
+                    mListener.onFragmentInteraction(4, null, 0);
                     Toast.makeText(getActivity(), "Changes submitted", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getActivity(), "There was an Error", Toast.LENGTH_SHORT).show();
@@ -239,7 +239,7 @@ public class Fragment_History extends Fragment implements AbsListView.OnItemClic
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(int id, String name);
+        public void onFragmentInteraction(int id, String name, int holder);
     }
 
 

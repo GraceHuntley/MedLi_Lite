@@ -31,14 +31,14 @@ public class Helper_DrugData {
         // mandatory empty constructor.
     }
 
-    public ArrayList<String> getDrugNUI(String drugName) throws IOException, XmlPullParserException {
+    public ArrayList<MedDoseObject> getDrugNUI(String drugName) throws IOException, XmlPullParserException {
 
-        ArrayList<String> doseList = getDoseListFromNui(URLEncoder.encode(drugName, "utf-8"));
-        doseList.add("Other");
+        ArrayList<MedDoseObject> doseList = getDoseListFromNui(URLEncoder.encode(drugName, "utf-8"));
+
         return doseList;
     }
 
-    private ArrayList<String> getDoseListFromNui(String rxcui) throws IOException, XmlPullParserException {
+    private ArrayList<MedDoseObject> getDoseListFromNui(String rxcui) throws IOException, XmlPullParserException {
         ArrayList<MedDoseObject> doseList = new ArrayList<MedDoseObject>();
 
 
@@ -104,11 +104,11 @@ public class Helper_DrugData {
             eventType = parser.next();
         }
 
-        ArrayList<String> readyList = new ArrayList<String>();
+        ArrayList<MedDoseObject> readyList = new ArrayList<MedDoseObject>();
 
         for (MedDoseObject medObj : doseList) {
             if (medObj.getTty().equalsIgnoreCase("SBD") && medObj.getDoseDouble() > 0) {
-                readyList.add(medObj.getObject());
+                readyList.add(medObj);
             }
         }
 

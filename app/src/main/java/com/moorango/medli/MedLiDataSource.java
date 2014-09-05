@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.text.format.Time;
 import android.util.Log;
 
 import com.moorango.medli.Models.Object_MedLog;
@@ -130,7 +131,10 @@ public class MedLiDataSource {
         medication.setActualDoseCount(cursor.getInt(5));
         medication.setAdminType(cursor.getString(6));
         medication.setStatus(cursor.getString(8));
+        medication.setDoseForm(cursor.getString(9));
+        medication.setIdUnique(cursor.getInt(10));
 
+        Log.d(TAG, "DoseCount: " + medication.getDoseCount() + " actual: " + medication.getActualDoseCount());
         if (medication.getAdminType().equals("routine")) {
             medication.setNextDue(new Object() {
 
@@ -243,15 +247,23 @@ public class MedLiDataSource {
         return loggedMeds;
     }
 
-    public void submitNewMedication(Object_Medication medication) {
+    public void submitNewMedication(Object_Medication medication, boolean doUpdate) {
 
         ContentValues cv = new ContentValues();
         cv.put("name", medication.getMedName());
         cv.put("dose_int", medication.getDoseMeasure());
         cv.put("dose_measure_type", medication.getDoseMeasureType());
+        cv.put("dose_form", medication.getDoseForm());
         cv.put("admin_type", medication.getAdminType());
-        //cv.put("status", "active"); // switching to new for indication whether to mark as late or not.
-        cv.put("status", medication.getAdminType().equalsIgnoreCase("routine") ? "new" : "active");
+        if (doUpdate) {
+            Time now = new Time();
+            now.setToNow();
+
+            Log.d(TAG, now.format("mm-dd-yyyy hh:mm:ss"));
+            cv.put("last_modified", now.format("%Y-%m-%d %H:%M:%S").toString());
+        } else {
+            cv.put("status", medication.getAdminType().equalsIgnoreCase("routine") ? "new" : "active");
+        }
         cv.put("dose_count", medication.getDoseCount());
         //cv.put("fillDate", medication.getFillDate()); // will add this for next roll-out
         cv.put("startDate", medication.getStartDate());
@@ -262,7 +274,12 @@ public class MedLiDataSource {
             cv.put("dose_frequency", medication.getDoseFrequency());
         }
         this.open();
-        database.insert("medlist", "name", cv);
+        if (doUpdate) {
+
+            database.update("medlist", cv, "ID_UNIQUE='" + medication.getIdUnique() + "'", null);
+        } else {
+            database.insert("medlist", "name", cv);
+        }
 
 
     }
@@ -410,7 +427,7 @@ public class MedLiDataSource {
 
     }
 
-    public Object_Medication getSingleMedByName(String name) {
+    public Object_Medication getSingleMedByName(int uniqueID) {
 
         this.open();
 
@@ -421,10 +438,12 @@ public class MedLiDataSource {
                 + "admin_type, "
                 + "dose_count, "
                 + "dose_times, "
-                + "dose_frequency "
+                + "dose_frequency, "
+                + "dose_form, "
+                + "ID_UNIQUE "
                 + "FROM medlist "
-                + "WHERE name = '" + name + "' "
-                + "AND status = 'active' "
+                + "WHERE ID_UNIQUE = '" + uniqueID + "' "
+                + "AND status = 'active' OR status = 'new' "
                 + "LIMIT 1";
 
         Object_Medication medication = new Object_Medication();
@@ -440,6 +459,8 @@ public class MedLiDataSource {
             medication.setDoseCount(cs.getInt(4));
             medication.setDoseTimes(cs.getString(5));
             medication.setDoseFrequency(cs.getInt(6));
+            medication.setDoseForm(cs.getString(7));
+            medication.setIdUnique(cs.getInt(8));
         }
 
         return medication;

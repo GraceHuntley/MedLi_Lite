@@ -12,6 +12,7 @@ public class Constants {
             "name TEXT NOT NULL, " +
             "dose_int REAL NOT NULL, " +
             "dose_measure_type TEXT NOT NULL, " +
+            "dose_form TEXT NOT NULL, " +
             "admin_type TEXT NOT NULL, " +
             "status TEXT NOT NULL, " +
             "startDate TEXT NOT NULL, " +
@@ -47,7 +48,9 @@ public class Constants {
                     + "COUNT(CASE WHEN med_logs.status = 'active' AND DATE(med_logs.timestamp) = DATE('now', 'localtime') THEN 'ok' END) as actual_count, "
                     + "medlist.admin_type as type, "
                     + "medlist.dose_frequency as frequency, "
-                    + "medlist.status as status "
+                    + "medlist.status as status, "
+                    + "medlist.dose_form as doseform, "
+                    + "medlist.ID_UNIQUE as unique_id "
                     + "from medlist "
                     + "LEFT OUTER JOIN med_logs ON medlist.name = med_logs.name "
                     + "WHERE medlist.status = 'active' "
@@ -111,7 +114,7 @@ public class Constants {
 
     public static final String GET_TOTAL_MED_COUNT =
             "SELECT COUNT(name) FROM medlist "
-                    + "WHERE status='active'";
+                    + "WHERE status='active' OR status='new'";
 }
 
 

@@ -88,7 +88,7 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
         return super.onOptionsItemSelected(item);
     }
 
-    public void onFragmentInteraction(int tag, String name) {
+    public void onFragmentInteraction(int tag, String name, int id) {
         FragmentManager fragmentManager;
 
         switch (tag) {
@@ -116,7 +116,7 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
 
             case 3:
                 getSupportFragmentManager().beginTransaction()
-                        .replace(android.R.id.content, Fragment_MedSettings.newInstance(name, true), "medSettings")
+                        .replace(android.R.id.content, Fragment_MedSettings.newInstance(name, true, id), "medSettings")
                         .addToBackStack("medSettings")
                         .commit();
 

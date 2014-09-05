@@ -183,7 +183,7 @@ public class Fragment_Home extends Fragment {
 
             dataSource.submitMedicationAdmin(chosenList.get(index), null);
         }
-        mListener.onFragmentInteraction(1, null);
+        mListener.onFragmentInteraction(1, null, 0);
         //submitMed.setEnabled(false);
         Toast.makeText(getActivity(),
                 "Submitted", Toast.LENGTH_LONG)
@@ -252,7 +252,7 @@ public class Fragment_Home extends Fragment {
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(int tag, String name);
+        public void onFragmentInteraction(int tag, String name, int id);
     }
 
     public class MyAsyncTask extends AsyncTask<Void, Void, String> {
@@ -396,7 +396,7 @@ class HomeCustomAdapter extends ArrayAdapter<Object_Medication> {
             editMed.setVisibility(View.GONE);
             boxWrapper.setBackgroundResource(android.R.color.background_light);
         } else {
-            txtTitle.setText(Helper_DataCheck.capitalizeTitles(dataItem.getMedName()) + " " + dataItem.getDoseMeasure() + " " + dataItem.getDoseMeasureType());
+            txtTitle.setText(Helper_DataCheck.capitalizeTitles(dataItem.getMedName()) + " " + dataItem.getDoseForm());
 
             /***
              * Fill in missed doses for a new medication.
@@ -441,7 +441,7 @@ class HomeCustomAdapter extends ArrayAdapter<Object_Medication> {
             editMed.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    caller.mListener.onFragmentInteraction(3, dataItem.getMedName());
+                    caller.mListener.onFragmentInteraction(3, dataItem.getMedName(), dataItem.getIdUnique());
                     return true;
                 }
             });
