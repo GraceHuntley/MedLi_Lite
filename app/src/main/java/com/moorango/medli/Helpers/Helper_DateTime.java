@@ -7,6 +7,7 @@
 package com.moorango.medli.Helpers;
 
 
+import android.text.format.Time;
 import android.util.Log;
 
 import java.text.ParseException;
@@ -40,6 +41,34 @@ public class Helper_DateTime {
         sdFormat = getSDFormat("yyyy-MM-dd");
 
         return sdFormat.format(cal.getTime());
+    }
+
+    /**
+     * @param dateTime Date and time in form yyyy-mm-dd hh:mm:ss
+     * @return milliseconds UTC
+     * @throws ParseException
+     */
+    public static long getUTCTimeMillis(String dateTime) throws ParseException {
+
+        String dateSplit[] = dateTime.split("[-: ]");
+        int values[] = new int[dateSplit.length];
+
+        for (int index = 0; index < dateSplit.length; index++) {
+            values[index] = Integer.valueOf(dateSplit[index]);
+        }
+
+
+        int hour = values[3];
+        int minute = values[4];
+        int second = values[5];
+
+        Time prepTime = new Time();
+        prepTime.setToNow();
+        prepTime.hour = hour;
+        prepTime.minute = minute;
+        prepTime.second = second;
+
+        return prepTime.toMillis(true);
     }
 
     /**
@@ -88,7 +117,7 @@ public class Helper_DateTime {
         return "" + hours + ":" + minutes + " " + amPm;
     }
 
-    public String convertToTime24(String time) {
+    public static String convertToTime24(String time) {
 
         String formattedDate = "error";
         SimpleDateFormat input = new SimpleDateFormat("hh:mm a");

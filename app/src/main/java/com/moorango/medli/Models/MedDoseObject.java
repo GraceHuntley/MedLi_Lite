@@ -27,6 +27,7 @@ public class MedDoseObject {
         String splitEntry[] = entry.split(" ");
 
         setDoseType(splitEntry[splitEntry.length - 1]);
+        findDoseDouble(splitEntry, splitEntry.length);
 
     }
 
@@ -35,7 +36,7 @@ public class MedDoseObject {
         if (index == 0) return true; // failsafe.
         double dose;
         try {
-            dose = Double.valueOf(val[index].replace(",", ""));
+            dose = Double.valueOf(val[index - 1].replace(",", ""));
 
             String newName = "";
 
@@ -46,7 +47,7 @@ public class MedDoseObject {
                 setGenericName(newName);
             }
             setDoseDouble(dose);
-            setDoseMeasure(val[index + 1]);
+            setDoseMeasure(val[index]);
             return false;
 
         } catch (NumberFormatException nfe) {

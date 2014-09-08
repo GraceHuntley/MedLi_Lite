@@ -1,5 +1,7 @@
 package com.moorango.medli;
 
+import android.util.Log;
+
 import com.moorango.medli.Models.MedDoseObject;
 
 import org.apache.http.HttpResponse;
@@ -44,6 +46,8 @@ public class Helper_DrugData {
 
         String apiDomain = "http://rxnav.nlm.nih.gov/REST/drugs?name=" + rxcui;
 
+        Log.d(TAG, "getDoseListFromNui");
+
         DefaultHttpClient httpClient = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet(apiDomain);
         HttpResponse response = httpClient.execute(httpGet);
@@ -57,6 +61,7 @@ public class Helper_DrugData {
         int eventType = parser.getEventType();
 
         MedDoseObject mdo = new MedDoseObject();
+
 
         while (eventType != XmlPullParser.END_DOCUMENT) {
 

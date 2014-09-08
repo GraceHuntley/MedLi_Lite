@@ -42,10 +42,13 @@
             android:id="@+id/routine_listview"
             android:layout_width="fill_parent"
             android:choiceMode="multipleChoice"
+
             android:layout_height="0dip"
             android:layout_weight="10"
-            android:fadingEdgeLength="10dp"
-            android:overScrollFooter="@null" />
+            android:fadingEdge="horizontal"
+            android:fadingEdgeLength="100dp"
+
+            />
 
     </LinearLayout>
 

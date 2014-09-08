@@ -10,11 +10,14 @@ import android.text.format.Time;
 import android.util.Log;
 
 import com.moorango.medli.Constants;
+import com.moorango.medli.Helpers.AlarmHelpers;
 import com.moorango.medli.Helpers.Helper_DateTime;
 import com.moorango.medli.Models.Object_MedLog;
 import com.moorango.medli.Models.Object_Medication;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -75,7 +78,7 @@ public class MedLiDataSource {
 
     }
 
-    public List<Object_Medication> getAllMeds() {
+    public List<Object_Medication> getAllMeds(Context context, boolean makeAlarms) {
         List<Object_Medication> routineList = new ArrayList<Object_Medication>();
         List<Object_Medication> prnList = new ArrayList<Object_Medication>();
         this.open(); // open db.
@@ -83,7 +86,7 @@ public class MedLiDataSource {
         Cursor cursor = database.rawQuery(Constants.GET_MEDLIST_ROUTINE, null);
 
         while (cursor.moveToNext()) {
-            Object_Medication medication = cursorToRoutine(cursor);
+            Object_Medication medication = cursorToRoutine(cursor, context, makeAlarms);
             if (medication.getAdminType().equalsIgnoreCase("routine")) {
                 routineList.add(medication);
             } else {
@@ -117,10 +120,12 @@ public class MedLiDataSource {
             routineList.add(med);
         }
         cursor.close();
+
+
         return routineList;
     }
 
-    private Object_Medication cursorToRoutine(Cursor cursor) {
+    private Object_Medication cursorToRoutine(Cursor cursor, final Context context, final boolean makeAlarms) {
         final Object_Medication medication = new Object_Medication();
 
         medication.setMedName(cursor.getString(0));
@@ -141,7 +146,14 @@ public class MedLiDataSource {
 
                     if (medication.getDoseCount() > medication.getActualDoseCount()) {
                         String split[] = medication.getDoseTimes().split(";");
+                        AlarmHelpers ah = new AlarmHelpers(context);
+                        Calendar c = Calendar.getInstance();
+                        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                        String formattedDate = df.format(c.getTime());
 
+                        if (!makeAlarms) {
+                            ah.setAlarm(formattedDate + " " + Helper_DateTime.convertToTime24(split[medication.getActualDoseCount()]), medication.getMedName(), medication.getIdUnique());
+                        }
                         return split[medication.getActualDoseCount()];
                     } else {
                         return "COMPLETE";

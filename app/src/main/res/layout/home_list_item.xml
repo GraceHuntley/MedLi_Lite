@@ -7,6 +7,16 @@
     android:layout_gravity="center_vertical"
     android:padding="5dp">
 
+    <ImageView
+        android:id="@+id/late_dose_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/late_image_desc"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+
+        android:src="@drawable/past_due" />
+
     <TextView
         android:id="@+id/header_title"
         android:layout_width="wrap_content"
@@ -15,15 +25,6 @@
         android:layout_margin="5dip"
         android:layout_centerVertical="true"
         android:layout_height="wrap_content" />
-
-    <ImageView
-        android:id="@+id/late_dose_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/late_image_desc"
-        android:visibility="gone"
-        android:layout_centerInParent="true"
-        android:src="@drawable/past_due" />
 
     <CheckedTextView
         android:id="@+id/title"

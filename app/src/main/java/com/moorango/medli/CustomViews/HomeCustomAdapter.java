@@ -124,7 +124,8 @@ public class HomeCustomAdapter extends ArrayAdapter<Object_Medication> {
 
             headerText.setVisibility(View.VISIBLE);
             editMed.setVisibility(View.GONE);
-            boxWrapper.setBackgroundResource(android.R.color.background_light);
+            // boxWrapper.setBackgroundResource(android.R.color.background_light);
+            boxWrapper.setBackgroundResource(R.drawable.list_bg);
         } else {
             txtTitle.setText(Helper_DataCheck.capitalizeTitles(dataItem.getMedName()) + " " + dataItem.getDoseForm());
 

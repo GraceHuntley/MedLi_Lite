@@ -15,6 +15,8 @@ import com.moorango.medli.Fragments.Fragment_MedSettings;
 public class Activity_MedLi_light extends ActionBarActivity implements Fragment_Home.OnFragmentInteractionListener, Fragment_MedSettings.OnFragmentInteractionListener,
         Fragment_History.OnFragmentInteractionListener, Fragment_EmptyMedList.OnFragmentInteractionListener {
 
+    private final String TAG = "Activity_MedLi_Light";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

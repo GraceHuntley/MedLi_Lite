@@ -17,7 +17,9 @@ import android.widget.Toast;
 import com.moorango.medli.CustomObjects.SparseBooleanArrayParcelable;
 import com.moorango.medli.CustomViews.HomeCustomAdapter;
 import com.moorango.medli.Data.MedLiDataSource;
+import com.moorango.medli.Helpers.AlarmHelpers;
 import com.moorango.medli.Models.Object_Medication;
+import com.moorango.medli.NotifyService;
 import com.moorango.medli.R;
 
 import java.util.ArrayList;
@@ -176,9 +178,14 @@ public class Fragment_Home extends Fragment {
 
     public void doPositiveClick() {
 
+        AlarmHelpers ah = new AlarmHelpers(getActivity());
+
         for (Object_Medication aChosenList : chosenList) {
 
             dataSource.submitMedicationAdmin(aChosenList, null);
+
+            ah.clearAlarm(aChosenList.getMedName(), aChosenList.getIdUnique());
+
         }
         mListener.onFragmentInteraction(1, null, 0);
 
@@ -262,8 +269,12 @@ public class Fragment_Home extends Fragment {
 
         @Override
         protected String doInBackground(Void... voids) {
-
-            List<Object_Medication> meds = dataSource.getAllMeds();
+            List<Object_Medication> meds;
+            if (getActivity().getIntent().hasExtra(NotifyService.INTENT_FROM_NOTIFICATION)) {
+                meds = dataSource.getAllMeds(getActivity(), true);
+            } else {
+                meds = dataSource.getAllMeds(getActivity(), false);
+            }
 
             adapter = new HomeCustomAdapter(getActivity(), meds, fragmentHome);
 

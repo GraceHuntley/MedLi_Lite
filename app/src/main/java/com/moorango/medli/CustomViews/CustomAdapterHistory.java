@@ -144,7 +144,9 @@ public class CustomAdapterHistory extends BaseAdapter {
         if (dataItem.isSubHeading()) {
 
             medName.setText(dt.getReadableDate(dataItem.getDateOnly()));
-            boxWrapper.setBackgroundResource(android.R.color.background_light);
+            medName.setGravity(Gravity.CENTER);
+            boxWrapper.setBackgroundResource(R.drawable.list_bg);
+
             editButton.setVisibility(View.GONE);
             delButton.setVisibility(View.GONE);
 
