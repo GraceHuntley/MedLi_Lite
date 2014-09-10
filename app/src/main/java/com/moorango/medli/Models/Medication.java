@@ -10,17 +10,26 @@ import java.util.Date;
  * Created by Colin on 7/31/2014.
  * Copyright 2014
  */
-public class Object_Medication {
+public class Medication {
 
     @SuppressWarnings("FieldCanBeLocal")
     private final String TAG = "Medication";
+
+    /**
+     * Medication Status constants
+     */
+
+    public static int DELETED = 0;
+    public static int ACTIVE = 1;
+    public static int DISCONTINUED = 2;
+    public static int NEW = 3;
 
     private int idUnique;
     private String medName;
     private float doseMeasure; // numeric dose measure.
     private String doseMeasureType; // ex. ml tsp mg
     private String adminType; // prn or routine
-    private String status; // active, deleted, discontinued.
+    private int status; // active, deleted, discontinued.
     private String startDate; // date medication first started.
     private String doseForm; // the form of the dose user entered.
     private int doseCount; // max doses per day of medication.
@@ -95,11 +104,11 @@ public class Object_Medication {
         this.adminType = adminType;
     }
 
-    public String getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 
@@ -162,7 +171,7 @@ public class Object_Medication {
         }
     }
 
-    public int compareNextDue(Object_Medication med) {
+    public int compareNextDue(Medication med) {
 
         if (this.getNextDue().equals("COMPLETE")) {
             return 1;

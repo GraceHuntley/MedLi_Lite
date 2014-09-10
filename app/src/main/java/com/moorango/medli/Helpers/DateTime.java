@@ -14,9 +14,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 @SuppressWarnings("WeakerAccess")
-public class Helper_DateTime {
+public class DateTime {
 
     private static Calendar cal;
     private static SimpleDateFormat sdFormat;
@@ -117,6 +118,12 @@ public class Helper_DateTime {
         return "" + hours + ":" + minutes + " " + amPm;
     }
 
+    public static String getFormattedDate() {
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        return df.format(new Date());
+    }
+
     public static String convertToTime24(String time) {
 
         String formattedDate = "error";
@@ -132,6 +139,29 @@ public class Helper_DateTime {
 
         return formattedDate;
 
+    }
+
+    public static long getNowInMillisec() {
+        Time time = new Time();
+        time.setToNow();
+        return time.toMillis(true);
+    }
+
+    /**
+     * @param timeToConvert
+     * @param dateToConvert will be null for now until i figure out the date issues.
+     * @return
+     */
+    public static long convert12HrToTimeMillis(String timeToConvert, String dateToConvert) {
+        Time time = new Time();
+        time.setToNow();
+
+        String splitTime[] = convertToTime24(timeToConvert).split(":");
+        time.hour = Integer.valueOf(splitTime[0]);
+        time.minute = Integer.valueOf(splitTime[1]);
+        time.second = Integer.valueOf(splitTime[2]);
+
+        return time.toMillis(true);
     }
 
 }

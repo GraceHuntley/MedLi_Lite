@@ -15,9 +15,9 @@ import android.widget.Toast;
 
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Fragments.Fragment_History;
-import com.moorango.medli.Helpers.Helper_DataCheck;
-import com.moorango.medli.Helpers.Helper_DateTime;
-import com.moorango.medli.Models.Object_MedLog;
+import com.moorango.medli.Helpers.DataCheck;
+import com.moorango.medli.Helpers.DateTime;
+import com.moorango.medli.Models.MedLog;
 import com.moorango.medli.R;
 
 import java.util.List;
@@ -29,11 +29,11 @@ import java.util.List;
 public class CustomAdapterHistory extends BaseAdapter {
 
     private final Context context;
-    private final List<Object_MedLog> data;
+    private final List<MedLog> data;
     private final MedLiDataSource dbHelper;
     private final Fragment_History caller;
 
-    public CustomAdapterHistory(Context context, List<Object_MedLog> rowItem, Fragment_History caller) {
+    public CustomAdapterHistory(Context context, List<MedLog> rowItem, Fragment_History caller) {
         this.context = context;
         this.data = rowItem;
         this.caller = caller;
@@ -82,7 +82,7 @@ public class CustomAdapterHistory extends BaseAdapter {
                     .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
             convertView = mInflater.inflate(R.layout.history_list_item, null);
         }
-        Helper_DateTime dt = new Helper_DateTime();
+        DateTime dt = new DateTime();
 
         TextView medName = (TextView) convertView.findViewById(R.id.name);
         final TextView doseTime = (TextView) convertView.findViewById(R.id.dose_time);
@@ -94,7 +94,7 @@ public class CustomAdapterHistory extends BaseAdapter {
         ImageView delButton = (ImageView) convertView.findViewById(R.id.button_delete_med_admin);
         ImageView editButton = (ImageView) convertView.findViewById(R.id.button_edit_med_admin);
 
-        final Object_MedLog dataItem = data.get(position);
+        final MedLog dataItem = data.get(position);
 
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,7 +135,7 @@ public class CustomAdapterHistory extends BaseAdapter {
 
                 removeItem(position);
 
-                Toast.makeText(context, "Object Deleted", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "Entry Deleted", Toast.LENGTH_LONG).show();
 
                 return true;
             }
@@ -152,9 +152,9 @@ public class CustomAdapterHistory extends BaseAdapter {
 
         } else {
 
-            String messageNote = dataItem.isWasMissed() ? "MISSED" : dataItem.isWasManual() ? "MANUAL ENTRY" : dataItem.isLate() ? "LATE" : "ON-TIME";
-            medName.setText(Helper_DataCheck.capitalizeTitles(dataItem.getName()));
-            doseTime.setText(Helper_DateTime.convertToTime12(dataItem.getTimeOnly()));
+            String messageNote = dataItem.timeFrame();
+            medName.setText(DataCheck.capitalizeTitles(dataItem.getName()));
+            doseTime.setText(DateTime.convertToTime12(dataItem.getTimeOnly()));
             dose.setText(dataItem.getDose());
             message.setText(messageNote);
             boxWrapper.setBackgroundResource(android.R.color.white);

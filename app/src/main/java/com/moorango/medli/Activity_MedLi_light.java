@@ -108,9 +108,15 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
                 break;
             case 1:
 
-                getSupportFragmentManager().beginTransaction().replace(android.R.id.content, new Fragment_Home(), "home")
-                        .addToBackStack("home")
-                        .commit();
+                if (MedLiDataSource.getHelper(this).medListHasEntries()) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(android.R.id.content, new Fragment_Home(), "home").addToBackStack("home")
+                            .commit();
+                } else {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(android.R.id.content, new Fragment_EmptyMedList(), "emptyList").addToBackStack("emptyList")
+                            .commit();
+                }
                 break;
 
             case 2:
@@ -135,6 +141,10 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
                         .replace(android.R.id.content, Fragment_History.newInstance(), "logFragment")
                         .addToBackStack("logFragment")
                         .commit();
+                break;
+
+            case 5:
+
         }
 
     }

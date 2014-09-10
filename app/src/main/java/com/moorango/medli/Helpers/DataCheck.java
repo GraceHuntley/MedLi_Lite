@@ -5,14 +5,17 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import com.moorango.medli.Data.MedLiDataSource;
-import com.moorango.medli.Models.Object_Medication;
+import com.moorango.medli.Models.MedLog;
+import com.moorango.medli.Models.Medication;
+
+import java.util.Map;
 
 /**
  * Created by Colin on 7/17/2014.
  * Copyright 2014
  */
 @SuppressWarnings("WeakerAccess")
-public class Helper_DataCheck {
+public class DataCheck {
 
     public static boolean isNetworkAvailable(Context context) {
         ConnectivityManager connectivityManager
@@ -51,10 +54,10 @@ public class Helper_DataCheck {
 
     public static boolean isDoseLate(String due) {
         // TODO test whether admin time is late.
-        Helper_DateTime dt = new Helper_DateTime();
+        DateTime dt = new DateTime();
         @SuppressWarnings("UnusedAssignment") final String TAG = "VerifyHelpers";
         int nextDoseHour = Integer.valueOf(dt.convertToTime24(due).split(":")[0]);
-        int loggedHour = Integer.valueOf(Helper_DateTime.getTime24().split(":")[0]);
+        int loggedHour = Integer.valueOf(DateTime.getTime24().split(":")[0]);
 
         int difference = loggedHour - nextDoseHour;
 
@@ -68,7 +71,7 @@ public class Helper_DataCheck {
      * @param medication Medication Object.
      * @return
      */
-    public static String findNextDoseNewMed(Context con, Object_Medication medication) {
+    public static String findNextDoseNewMed(Context con, Medication medication) {
 
         MedLiDataSource dataSource = MedLiDataSource.getHelper(con);
 
@@ -81,6 +84,61 @@ public class Helper_DataCheck {
             }
             nextDose = dose;
         }
+        dataSource.changeMedicationStatus(medication.getIdUnique(), Medication.ACTIVE);
         return (nextDose != null) ? nextDose : "Complete";
+    }
+
+    public static int createUniqueID(String medName) {
+        return (medName + DateTime.getNowInMillisec()).hashCode();
+    }
+
+    /**
+     * Function compares current time, along with doses today, and available doses to fill in missed ones.
+     * meant only for Routine meds.
+     */
+    public static void fillInMissedDoses(Context context, int idUnique) {
+
+        Map<String, Boolean> map = MedLiDataSource.getHelper(context).getMedDosesByID(idUnique);
+
+
+    }
+
+    public static int isDoseLate(String time, String due) {
+        // TODO test whether admin time is late.
+        int nextDoseHour = Integer.valueOf(DateTime.convertToTime24(due).split(":")[0]);
+        int loggedHour = Integer.valueOf(DateTime.convertToTime24(time).split(":")[0]);
+
+        int difference = loggedHour - nextDoseHour;
+
+        if (difference > 1) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    public static int isDoseEarly(String time, String due) {
+        int nextDoseHour = Integer.valueOf(DateTime.convertToTime24(due).split(":")[0]);
+        int loggedHour = Integer.valueOf(DateTime.convertToTime24(time).split(":")[0]);
+
+        int difference = nextDoseHour - loggedHour;
+
+        if (difference > 1) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    public static int getDoseTimeFrame(String time, String due) {
+        int nextDoseHour = Integer.valueOf(DateTime.convertToTime24(due).split(":")[0]);
+        int loggedHour = Integer.valueOf(DateTime.convertToTime24(time).split(":")[0]);
+
+        if ((nextDoseHour - loggedHour) > 1) {
+            return MedLog.EARLY;
+        } else if ((loggedHour - nextDoseHour) > 1) {
+            return MedLog.LATE;
+        }
+        return MedLog.ON_TIME;
     }
 }

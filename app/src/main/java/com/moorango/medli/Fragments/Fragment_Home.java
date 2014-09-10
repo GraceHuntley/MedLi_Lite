@@ -18,7 +18,7 @@ import com.moorango.medli.CustomObjects.SparseBooleanArrayParcelable;
 import com.moorango.medli.CustomViews.HomeCustomAdapter;
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Helpers.AlarmHelpers;
-import com.moorango.medli.Models.Object_Medication;
+import com.moorango.medli.Models.Medication;
 import com.moorango.medli.NotifyService;
 import com.moorango.medli.R;
 
@@ -30,7 +30,7 @@ public class Fragment_Home extends Fragment {
 
     @SuppressWarnings("UnusedAssignment")
     private final String TAG = "Home.java";
-    private static ArrayList<Object_Medication> chosenList;
+    private static ArrayList<Medication> chosenList;
     private static MyAsyncTask updateLists;
     public OnFragmentInteractionListener mListener;
     private ListView routineList;
@@ -68,7 +68,7 @@ public class Fragment_Home extends Fragment {
         routineList = (ListView) getActivity().findViewById(R.id.routine_listview);
         Button clearChoices = (Button) getActivity().findViewById(R.id.clear_button);
         Button submitMed = (Button) getActivity().findViewById(R.id.submit_button);
-        chosenList = new ArrayList<Object_Medication>();
+        chosenList = new ArrayList<Medication>();
 
         dataSource = MedLiDataSource.getHelper(getActivity());
 
@@ -120,7 +120,7 @@ public class Fragment_Home extends Fragment {
                         String getReady() {
 
                             String ready = "";
-                            for (Object_Medication aChosenList : chosenList) {
+                            for (Medication aChosenList : chosenList) {
                                 ready += aChosenList.getMedName() + "\n";
                             }
 
@@ -180,7 +180,7 @@ public class Fragment_Home extends Fragment {
 
         AlarmHelpers ah = new AlarmHelpers(getActivity());
 
-        for (Object_Medication aChosenList : chosenList) {
+        for (Medication aChosenList : chosenList) {
 
             dataSource.submitMedicationAdmin(aChosenList, null);
 
@@ -269,7 +269,7 @@ public class Fragment_Home extends Fragment {
 
         @Override
         protected String doInBackground(Void... voids) {
-            List<Object_Medication> meds;
+            List<Medication> meds;
             if (getActivity().getIntent().hasExtra(NotifyService.INTENT_FROM_NOTIFICATION)) {
                 meds = dataSource.getAllMeds(getActivity(), true);
             } else {

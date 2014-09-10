@@ -1,6 +1,6 @@
 package com.moorango.medli.Models;
 
-public class MedDoseObject {
+public class MedDose {
 
     private String tty;
     private String genericName;

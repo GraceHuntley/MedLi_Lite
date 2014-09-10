@@ -1,6 +1,6 @@
 package com.moorango.medli.Models;
 
-import com.moorango.medli.Helpers.Helper_DateTime;
+import com.moorango.medli.Helpers.DateTime;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -10,7 +10,25 @@ import java.util.Date;
  * Created by Colin on 8/5/2014.
  * Copyright 2014
  */
-public class Object_MedLog {
+public class MedLog {
+
+    /**
+     * Status Constants
+     */
+
+    public static int DELETED = 0;
+    public static int ACTIVE = 1;
+    public static int DISCONTINUED = 2;
+    public static int MISSED = 3;
+    public static int SKIPPED = 4;
+    public static int SPACE_FILLER = 5;
+
+    public static int EARLY = 0;
+    public static int ON_TIME = 1;
+    public static int LATE = 2;
+
+    public static String TIME_FRAME_TEXT[] = {"EARLY", "ON-TIME", "LATE"};
+
 
     private String name;
     private String timestamp;
@@ -18,7 +36,9 @@ public class Object_MedLog {
     private static String lastDate;
     private String uniqueID;
 
-    private boolean isLate;
+    private String dueTime;
+
+    private int timeFrame;
     private boolean wasMissed;
     private boolean wasManual;
     private boolean isSubHeading;
@@ -27,18 +47,19 @@ public class Object_MedLog {
         return wasManual;
     }
 
-    public Object_MedLog() {
+    public MedLog() {
         // empty constructor.
     }
 
-    public Object_MedLog(String uniqueID, String name, String dose, String timestamp, boolean isLate, boolean wasMissed, boolean wasManual) {
+    public MedLog(String uniqueID, String name, String dose, String timestamp, int timeFrame, boolean wasMissed, boolean wasManual, String dueTime) {
         this.uniqueID = uniqueID;
         this.name = name;
         this.timestamp = timestamp;
         this.dose = dose;
-        this.isLate = isLate;
+        this.timeFrame = timeFrame;
         this.wasMissed = wasMissed;
         this.wasManual = wasManual;
+        this.dueTime = dueTime;
 
         if (lastDate == null) {
             lastDate = this.getTimestamp().split(" ")[0];
@@ -64,11 +85,19 @@ public class Object_MedLog {
             //return this.getTimestamp().split(" ")[0];
 
         } else {
-            String wasMedLate = isLate ? "\nLATE" : "";
+            String wasMedLate = TIME_FRAME_TEXT[timeFrame];
             lastDate = this.getTimestamp().split(" ")[0];
-            return Helper_DateTime.convertToTime12(this.getTimestamp().split(" ")[1]) + " " + this.getName().toUpperCase() + wasMedLate;
+            return DateTime.convertToTime12(this.getTimestamp().split(" ")[1]) + " " + this.getName().toUpperCase() + wasMedLate;
 
         }
+    }
+
+    public String getDueTime() {
+        return dueTime;
+    }
+
+    public void setDueTime(String dueTime) {
+        this.dueTime = dueTime;
     }
 
     public String getUniqueID() {
@@ -99,8 +128,8 @@ public class Object_MedLog {
         this.dose = dose;
     }
 
-    public boolean isLate() {
-        return isLate;
+    public String timeFrame() {
+        return TIME_FRAME_TEXT[timeFrame];
     }
 
     public boolean isWasMissed() {

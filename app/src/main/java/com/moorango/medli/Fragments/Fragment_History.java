@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,8 +18,8 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.moorango.medli.Data.MedLiDataSource;
-import com.moorango.medli.Helpers.Helper_DateTime;
-import com.moorango.medli.Models.Object_MedLog;
+import com.moorango.medli.Helpers.DateTime;
+import com.moorango.medli.Models.MedLog;
 import com.moorango.medli.R;
 
 import java.util.List;
@@ -69,7 +68,7 @@ public class Fragment_History extends Fragment {
 
         dbHelper = MedLiDataSource.getHelper(getActivity());
 
-        List<Object_MedLog> loggedMedsList = dbHelper.getMedHistory();
+        List<MedLog> loggedMedsList = dbHelper.getMedHistory();
 
         if (loggedMedsList.size() == 0) {
             flashTheScreen = true;
@@ -79,7 +78,7 @@ public class Fragment_History extends Fragment {
 
     }
 
-    public void editMedAdmin(final Object_MedLog medLog) {
+    public void editMedAdmin(final MedLog medLog) {
 
         final LinearLayout editMedBox = (LinearLayout) getActivity().findViewById(R.id.edit_med_admin);
         final TextView historyHeader = (TextView) getActivity().findViewById(R.id.history_header);
@@ -169,7 +168,7 @@ public class Fragment_History extends Fragment {
             @Override
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
                 if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
-                    Log.i(TAG, "stopped scrolling");
+
 
                 }
             }
@@ -178,9 +177,9 @@ public class Fragment_History extends Fragment {
             public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
                 if (mAdapter.getCount() > 0) { // do not perform this on an empty list.
-                    Object_MedLog mLog = (Object_MedLog) mAdapter.getItem(firstVisibleItem);
+                    MedLog mLog = (MedLog) mAdapter.getItem(firstVisibleItem);
 
-                    Helper_DateTime dt = new Helper_DateTime();
+                    DateTime dt = new DateTime();
 
                     historyHeader.setText(dt.getReadableDate(mLog.getDateOnly()));
 

@@ -39,7 +39,7 @@ public class NotifyService extends Service {
 
     @Override
     public void onCreate() {
-        Log.i("NotifyService", "onCreate()");
+
         mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
     }
@@ -48,12 +48,11 @@ public class NotifyService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i("LocalService", "Received start id " + startId + ": " + intent);
 
-        Log.d(TAG, intent.getStringExtra("med_name"));
         medicationName = intent.getStringExtra("med_name");
         // If this service was started by out AlarmTask intent then we want to show our notification
         if (intent.getBooleanExtra(INTENT_NOTIFY, false)) {
             showNotification();
-            Log.d(TAG, "inonStartCommand");
+
         }
 
         // We don't care if this service is stopped as we have already delivered our notification

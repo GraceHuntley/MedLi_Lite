@@ -3,6 +3,7 @@ package com.moorango.medli.CustomViews;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.text.format.Time;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,8 +16,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.moorango.medli.Fragments.Fragment_Home;
-import com.moorango.medli.Helpers.Helper_DataCheck;
-import com.moorango.medli.Models.Object_Medication;
+import com.moorango.medli.Helpers.AlarmHelpers;
+import com.moorango.medli.Helpers.DataCheck;
+import com.moorango.medli.Helpers.DateTime;
+import com.moorango.medli.Models.Medication;
 import com.moorango.medli.R;
 
 import java.util.List;
@@ -25,18 +28,18 @@ import java.util.List;
  * Created by Colin on 9/5/2014.
  * Copyright 2014
  */
-public class HomeCustomAdapter extends ArrayAdapter<Object_Medication> {
+public class HomeCustomAdapter extends ArrayAdapter<Medication> {
 
     @SuppressWarnings("UnusedAssignment")
     private final String TAG = "Home/HomeCustomAdapter";
     private final Fragment_Home caller;
     private final Context context;
 
-    private final List<Object_Medication> data;
+    private final List<Medication> data;
     private final SparseBooleanArray sparseBooleanArray;
 
     public HomeCustomAdapter(Context context,
-                             List<Object_Medication> rowItem, Fragment_Home caller) {
+                             List<Medication> rowItem, Fragment_Home caller) {
         super(context, R.layout.home_list_item, R.id.title, rowItem);
         this.context = context;
         this.data = rowItem;
@@ -61,7 +64,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Object_Medication> {
     }
 
     @Override
-    public Object_Medication getItem(int position) {
+    public Medication getItem(int position) {
 
         return data.get(position);
 
@@ -111,7 +114,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Object_Medication> {
         final ImageView editMed = (ImageView) convertView.findViewById(R.id.edit_med_button);
         RelativeLayout boxWrapper = (RelativeLayout) convertView.findViewById(R.id.box_wrapper);
 
-        final Object_Medication dataItem = data.get(position);
+        final Medication dataItem = data.get(position);
 
         txtTitle.setChecked(sparseBooleanArray.get(position));
 
@@ -127,16 +130,35 @@ public class HomeCustomAdapter extends ArrayAdapter<Object_Medication> {
             // boxWrapper.setBackgroundResource(android.R.color.background_light);
             boxWrapper.setBackgroundResource(R.drawable.list_bg);
         } else {
-            txtTitle.setText(Helper_DataCheck.capitalizeTitles(dataItem.getMedName()) + " " + dataItem.getDoseForm());
+            txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName()) + " " + dataItem.getDoseForm());
 
             /***
              * Fill in missed doses for a new medication.
              */
 
-            if (dataItem.getStatus().equalsIgnoreCase("new")) {
-                dataItem.setNextDue(Helper_DataCheck.findNextDoseNewMed(context, dataItem));
+            if (dataItem.getStatus() == Medication.NEW) {
+                dataItem.setNextDue(DataCheck.findNextDoseNewMed(context, dataItem));
 
             }
+            if (!dataItem.getNextDue().equalsIgnoreCase("complete") && dataItem.getAdminType().equalsIgnoreCase("routine")) {
+
+                Time nextDue = new Time();
+                Time now = new Time();
+                now.setToNow();
+                nextDue.setToNow();
+
+                String splitTime[] = DateTime.convertToTime24(dataItem.getNextDue()).split(":");
+
+                nextDue.hour = Integer.valueOf(splitTime[0]);
+                nextDue.minute = Integer.valueOf(splitTime[1]);
+                nextDue.second = Integer.valueOf(splitTime[2]);
+
+                if (nextDue.toMillis(true) > now.toMillis(true)) {
+                    AlarmHelpers ah = new AlarmHelpers(context);
+                    ah.setAlarm(DateTime.getFormattedDate() + " " + DateTime.convertToTime24(dataItem.getNextDue()), dataItem.getMedName(), dataItem.getIdUnique());
+                }
+            }
+
             String doseVerbage = (dataItem.getAdminType().equalsIgnoreCase("routine")) ? "Next Due: " : "Next Earliest Dose: ";
             String dueWording = (dataItem.getNextDue().equalsIgnoreCase("prn") ? "Any Time" : dataItem.getNextDue());
             nextDueTime.setText((dataItem.getNextDue().equalsIgnoreCase("complete")) ? dataItem.getNextDue() : doseVerbage + dueWording);
@@ -146,9 +168,9 @@ public class HomeCustomAdapter extends ArrayAdapter<Object_Medication> {
             if (!dataItem.getNextDue().equalsIgnoreCase("complete") &&
                     !dataItem.getNextDue().equalsIgnoreCase("prn") &&
                     !dataItem.getAdminType().equalsIgnoreCase("prn") &&
-                    dataItem.getStatus().equalsIgnoreCase("active")) {
+                    dataItem.getStatus() == Medication.ACTIVE) {
 
-                if (Helper_DataCheck.isDoseLate(dataItem.getNextDue())) {
+                if (DataCheck.isDoseLate(dataItem.getNextDue())) {
 
                     nextDueTime.setTextColor(context.getResources().getColor(R.color.red));
 

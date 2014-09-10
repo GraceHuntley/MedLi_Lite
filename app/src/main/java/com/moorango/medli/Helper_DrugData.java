@@ -1,8 +1,6 @@
 package com.moorango.medli;
 
-import android.util.Log;
-
-import com.moorango.medli.Models.MedDoseObject;
+import com.moorango.medli.Models.MedDose;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -34,19 +32,17 @@ public class Helper_DrugData {
         // mandatory empty constructor.
     }
 
-    public ArrayList<MedDoseObject> getDrugNUI(String drugName) throws IOException, XmlPullParserException {
+    public ArrayList<MedDose> getDrugNUI(String drugName) throws IOException, XmlPullParserException {
 
         return getDoseListFromNui(URLEncoder.encode(drugName, "utf-8"));
 
     }
 
-    private ArrayList<MedDoseObject> getDoseListFromNui(String rxcui) throws IOException, XmlPullParserException {
-        ArrayList<MedDoseObject> doseList = new ArrayList<MedDoseObject>();
+    private ArrayList<MedDose> getDoseListFromNui(String rxcui) throws IOException, XmlPullParserException {
+        ArrayList<MedDose> doseList = new ArrayList<MedDose>();
 
 
         String apiDomain = "http://rxnav.nlm.nih.gov/REST/drugs?name=" + rxcui;
-
-        Log.d(TAG, "getDoseListFromNui");
 
         DefaultHttpClient httpClient = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet(apiDomain);
@@ -60,7 +56,7 @@ public class Helper_DrugData {
 
         int eventType = parser.getEventType();
 
-        MedDoseObject mdo = new MedDoseObject();
+        MedDose mdo = new MedDose();
 
 
         while (eventType != XmlPullParser.END_DOCUMENT) {
@@ -71,7 +67,7 @@ public class Helper_DrugData {
                 case XmlPullParser.START_TAG:
 
                     if (tagName.equalsIgnoreCase("conceptProperties")) {
-                        mdo = new MedDoseObject();
+                        mdo = new MedDose();
                         mdo.setIsProperty();
                     }
                     break;
@@ -109,9 +105,9 @@ public class Helper_DrugData {
             eventType = parser.next();
         }
 
-        ArrayList<MedDoseObject> readyList = new ArrayList<MedDoseObject>();
+        ArrayList<MedDose> readyList = new ArrayList<MedDose>();
 
-        for (MedDoseObject medObj : doseList) {
+        for (MedDose medObj : doseList) {
             if (medObj.getTty().equalsIgnoreCase("SBD") && medObj.getDoseDouble() > 0) {
                 readyList.add(medObj);
             }

@@ -30,7 +30,7 @@ public class AlarmHelpers {
         intent.putExtra(NotifyService.INTENT_NOTIFY, true);
         intent.putExtra(NotifyService.MEDICATION_NAME, name);
 
-        PendingIntent pendingIntent = PendingIntent.getService(context, name.hashCode() + uniqueID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getService(context, uniqueID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
@@ -39,9 +39,9 @@ public class AlarmHelpers {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 
-                alarm.setWindow(AlarmManager.RTC_WAKEUP, Helper_DateTime.getUTCTimeMillis(time), 60 * 1000, pendingIntent);
+                alarm.setWindow(AlarmManager.RTC_WAKEUP, DateTime.getUTCTimeMillis(time), 60 * 1000, pendingIntent);
             } else {
-                alarm.set(AlarmManager.RTC_WAKEUP, Helper_DateTime.getUTCTimeMillis(time), pendingIntent);
+                alarm.set(AlarmManager.RTC_WAKEUP, DateTime.getUTCTimeMillis(time), pendingIntent);
             }
         } catch (ParseException pe) {
             Log.e(TAG, pe.toString());
@@ -51,7 +51,7 @@ public class AlarmHelpers {
     public void clearAlarm(String name, int uniqueID) {
 
         Intent intent = new Intent(context, NotifyService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(context, name.hashCode() + uniqueID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getService(context, uniqueID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarm.cancel(pendingIntent);
 
