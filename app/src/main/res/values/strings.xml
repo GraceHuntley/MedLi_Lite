@@ -21,7 +21,7 @@
 
     <string name="prn_freq_hint">Hours between doses</string>
     <string name="prn_freq_label">Enter how often to give dose</string>
-    <string name="med_dose_dialog_title">Confirmation</string>
+    <string name="med_dose_dialog_title">Confirm Medication Choices</string>
     <string name="plus_label">+</string>
 
     <!-- Activity_MedLiLight -->

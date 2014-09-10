@@ -3,6 +3,7 @@ package com.moorango.medli.Helpers;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Models.MedLog;
@@ -16,6 +17,8 @@ import java.util.Map;
  */
 @SuppressWarnings("WeakerAccess")
 public class DataCheck {
+
+    private static final String TAG = "DataCheck";
 
     public static boolean isNetworkAvailable(Context context) {
         ConnectivityManager connectivityManager
@@ -131,13 +134,18 @@ public class DataCheck {
     }
 
     public static int getDoseTimeFrame(String time, String due) {
-        int nextDoseHour = Integer.valueOf(DateTime.convertToTime24(due).split(":")[0]);
-        int loggedHour = Integer.valueOf(DateTime.convertToTime24(time).split(":")[0]);
 
-        if ((nextDoseHour - loggedHour) > 1) {
-            return MedLog.EARLY;
-        } else if ((loggedHour - nextDoseHour) > 1) {
-            return MedLog.LATE;
+        try {
+            int nextDoseHour = Integer.valueOf(DateTime.convertToTime24(due).split(":")[0]);
+            int loggedHour = Integer.valueOf(DateTime.convertToTime24(time).split(":")[0]);
+
+            if ((nextDoseHour - loggedHour) > 1) {
+                return MedLog.EARLY;
+            } else if ((loggedHour - nextDoseHour) > 1) {
+                return MedLog.LATE;
+            }
+        } catch (NumberFormatException nfe) {
+            Log.e(TAG + " getDoseTimeFrame", nfe.toString());
         }
         return MedLog.ON_TIME;
     }

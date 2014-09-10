@@ -18,6 +18,7 @@ import com.moorango.medli.CustomObjects.SparseBooleanArrayParcelable;
 import com.moorango.medli.CustomViews.HomeCustomAdapter;
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Helpers.AlarmHelpers;
+import com.moorango.medli.Helpers.DataCheck;
 import com.moorango.medli.Models.Medication;
 import com.moorango.medli.NotifyService;
 import com.moorango.medli.R;
@@ -121,14 +122,14 @@ public class Fragment_Home extends Fragment {
 
                             String ready = "";
                             for (Medication aChosenList : chosenList) {
-                                ready += aChosenList.getMedName() + "\n";
+                                ready += DataCheck.capitalizeTitles(aChosenList.getMedName()) + " " + aChosenList.getDoseForm() + "\n";
                             }
 
                             return ready;
                         }
                     }.getReady();
 
-                    showDialog("Submit:\n" + for_display + "?");
+                    showDialog("Double check the list before Submitting:\n\n" + for_display);
 
                 }
             }

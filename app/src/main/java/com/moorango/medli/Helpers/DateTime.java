@@ -7,6 +7,7 @@
 package com.moorango.medli.Helpers;
 
 
+import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.util.Log;
 
@@ -80,15 +81,22 @@ public class DateTime {
      * @return fully formated String with date only.
      * @throws ParseException
      */
-    public String getReadableDate(String date) {
+    public static String getReadableDate(String date) {
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        try {
+        Time incoming = new Time();
+        incoming.parse3339(date);
 
-            String dateSplit[] = sdf.parse(date.split(" ")[0]).toString().split(" ");
-            return dateSplit[0] + " " + dateSplit[1] + " " + dateSplit[2];
-        } catch (ParseException p) {
-            return "Parse Error";
+        if (DateUtils.isToday(incoming.toMillis(true))) {
+            return "Today";
+        } else {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+
+                String dateSplit[] = sdf.parse(date.split(" ")[0]).toString().split(" ");
+                return dateSplit[0] + " " + dateSplit[1] + " " + dateSplit[2];
+            } catch (ParseException p) {
+                return "Parse Error";
+            }
         }
 
     }

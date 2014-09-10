@@ -25,17 +25,6 @@ public class Constants {
             "dose_frequency TEXT, " + // 11
             "last_modified TEXT)"; // 12
 
-    /*public static final String CREATE_MEDLOGS_DB = "CREATE TABLE med_logs (" +
-            "ID_UNIQUE INTEGER PRIMARY KEY NOT NULL, " +
-            "name TEXT NOT NULL, " +
-            "dose TEXT NOT NULL, " +
-            "timestamp TEXT NOT NULL, " +
-            "late BOOLEAN, " +
-            "missed BOOLEAN, " +
-            "manual_entry BOOLEAN, " +
-            "status INTEGER NOT NULL, " +
-            "ID_FK INTEGER NOT NULL)"; */
-
     public static final String CREATE_MEDLOGS_DB = "CREATE TABLE med_logs (" +
             "ID_UNIQUE INTEGER PRIMARY KEY NOT NULL, " +
             "name TEXT NOT NULL, " +
@@ -46,7 +35,8 @@ public class Constants {
             "manual_entry BOOLEAN, " +
             "status INTEGER NOT NULL, " +
             "ID_FK INTEGER NOT NULL, " +
-            "due_time TEXT NOT NULL)";
+            "due_time TEXT NOT NULL, " +
+            "admin_type INTEGER NOT NULL)";
 
 
     public static final String GET_MEDLIST_ROUTINE =
@@ -80,7 +70,8 @@ public class Constants {
                     + "med_logs.missed as missed, " // 5
                     + "med_logs.manual_entry as manual, "  // 6
                     + "DATE(strftime('%s',timestamp), 'unixepoch', 'localtime') as date, " // 7
-                    + "med_logs.due_time as duetime " // 8
+                    + "med_logs.due_time as duetime, " // 8
+                    + "med_logs.admin_type as type " // 9
                     + "FROM med_logs "
                     + "WHERE status =" + MedLog.ACTIVE
                     + " OR status =" + MedLog.SKIPPED

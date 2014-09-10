@@ -229,7 +229,7 @@ public class MedLiDataSource {
             }
 
             if (thisDate.equals(lastDate)) {
-                medLog = new MedLog(cs.getString(0), cs.getString(1), cs.getString(2), cs.getString(3), cs.getInt(4), (cs.getInt(5) == 1), (cs.getInt(6) == 1), cs.getString(8));
+                medLog = new MedLog(cs.getString(0), cs.getString(1), cs.getString(2), cs.getString(3), cs.getInt(4), (cs.getInt(5) == 1), (cs.getInt(6) == 1), cs.getString(8), cs.getInt(9));
                 medLog.setSubHeading(false);
                 makeHeader = false;
                 lastDate = thisDate;
@@ -303,7 +303,11 @@ public class MedLiDataSource {
         cv.put("manual_entry", 1);
         cv.put("missed", 0);
 
-        cv.put("time_frame", DataCheck.getDoseTimeFrame(DateTime.convertToTime12(medLog.getTimeOnly()), medLog.getDueTime()));
+        if (medLog.getAdminType() == MedLog.ROUTINE) {
+            cv.put("time_frame", DataCheck.getDoseTimeFrame(DateTime.convertToTime12(medLog.getTimeOnly()), medLog.getDueTime()));
+        } else {
+            cv.put("time_frame", MedLog.ON_TIME);
+        }
 
         return database.update("med_logs", cv, "ID_UNIQUE='" + medLog.getUniqueID() + "'", null);
     }
@@ -316,6 +320,7 @@ public class MedLiDataSource {
         cv.put("name", medication.getMedName());
         cv.put("dose", medication.getDoseMeasure() + " " + medication.getDoseMeasureType());
         cv.put("due_time", medication.getNextDue());
+        cv.put("admin_type", medication.getAdminType().equalsIgnoreCase("routine") ? MedLog.ROUTINE : MedLog.PRN);
 
         if (manualTime != null) { // dose time being entered manually.
             cv.put("manual_entry", 1);
@@ -327,7 +332,10 @@ public class MedLiDataSource {
             if (medication.getAdminType().equals("routine")) {
 
                 cv.put("time_frame", DataCheck.getDoseTimeFrame(DateTime.getTime12(), medication.getNextDue()));
+            } else {
+                cv.put("time_frame", MedLog.ON_TIME);
             }
+
             cv.put("manual_entry", 0);
         }
         cv.put("status", MedLog.ACTIVE);
@@ -350,6 +358,7 @@ public class MedLiDataSource {
         cv.put("missed", 1);
         cv.put("status", MedLog.SPACE_FILLER);
         cv.put("due_time", time);
+        cv.put("admin_type", medication.getAdminType().equalsIgnoreCase("routine") ? MedLog.ROUTINE : MedLog.PRN);
 
         this.open();
         database.insert("med_logs", "ID_UNIQUE", cv);

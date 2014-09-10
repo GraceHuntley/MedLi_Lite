@@ -2,7 +2,9 @@ package com.moorango.medli.CustomViews;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.moorango.medli.Activity_MedLi_light;
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Fragments.Fragment_History;
 import com.moorango.medli.Helpers.DataCheck;
@@ -32,6 +35,7 @@ public class CustomAdapterHistory extends BaseAdapter {
     private final List<MedLog> data;
     private final MedLiDataSource dbHelper;
     private final Fragment_History caller;
+    private AlertDialog.Builder dialog;
 
     public CustomAdapterHistory(Context context, List<MedLog> rowItem, Fragment_History caller) {
         this.context = context;
@@ -131,11 +135,35 @@ public class CustomAdapterHistory extends BaseAdapter {
             @Override
             public boolean onLongClick(View view) {
 
-                dbHelper.deleteMedEntry(dataItem.getUniqueID());
+                dialog = new AlertDialog.Builder(context)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle("Confirm Delete")
+                        .setMessage("Are you sure you want to delete " + dataItem.getName() + "\n")
+                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog,
+                                                int which) {
 
-                removeItem(position);
+                                if (dbHelper.deleteMedEntry(dataItem.getUniqueID()) > 0) {
+                                    Toast.makeText(context, "Entry Deleted", Toast.LENGTH_LONG).show();
+                                    Activity_MedLi_light fh = (Activity_MedLi_light) context;
+                                    fh.onFragmentInteraction(4, null, 0);
+                                } else {
+                                    Toast.makeText(context, "There was an Error", Toast.LENGTH_LONG).show();
+                                }
 
-                Toast.makeText(context, "Entry Deleted", Toast.LENGTH_LONG).show();
+                                removeItem(position);
+                                dialog.dismiss();
+                            }
+                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog,
+                                                int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                dialog.show();
+
 
                 return true;
             }
@@ -152,11 +180,14 @@ public class CustomAdapterHistory extends BaseAdapter {
 
         } else {
 
-            String messageNote = dataItem.timeFrame();
+            if (dataItem.getAdminType() == MedLog.ROUTINE) {
+                String messageNote = dataItem.timeFrame();
+                message.setText(messageNote);
+            }
             medName.setText(DataCheck.capitalizeTitles(dataItem.getName()));
             doseTime.setText(DateTime.convertToTime12(dataItem.getTimeOnly()));
             dose.setText(dataItem.getDose());
-            message.setText(messageNote);
+
             boxWrapper.setBackgroundResource(android.R.color.white);
             editButton.setVisibility(View.VISIBLE);
             delButton.setVisibility(View.VISIBLE);

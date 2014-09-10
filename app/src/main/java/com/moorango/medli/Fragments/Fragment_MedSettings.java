@@ -75,6 +75,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     private Helper_DrugData drugDataHelper;
     private MedLiDataSource dataSource;
     private OnFragmentInteractionListener mListener;
+    private AlertDialog.Builder dialog;
 
     public Fragment_MedSettings() {
         // Required empty public constructor

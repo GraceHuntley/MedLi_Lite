@@ -29,6 +29,11 @@ public class MedLog {
 
     public static String TIME_FRAME_TEXT[] = {"EARLY", "ON-TIME", "LATE"};
 
+    /**
+     * Admin_type constants.
+     */
+    public static int ROUTINE = 0;
+    public static int PRN = 1;
 
     private String name;
     private String timestamp;
@@ -39,6 +44,8 @@ public class MedLog {
     private String dueTime;
 
     private int timeFrame;
+
+    private int adminType;
     private boolean wasMissed;
     private boolean wasManual;
     private boolean isSubHeading;
@@ -51,7 +58,7 @@ public class MedLog {
         // empty constructor.
     }
 
-    public MedLog(String uniqueID, String name, String dose, String timestamp, int timeFrame, boolean wasMissed, boolean wasManual, String dueTime) {
+    public MedLog(String uniqueID, String name, String dose, String timestamp, int timeFrame, boolean wasMissed, boolean wasManual, String dueTime, int adminType) {
         this.uniqueID = uniqueID;
         this.name = name;
         this.timestamp = timestamp;
@@ -60,6 +67,7 @@ public class MedLog {
         this.wasMissed = wasMissed;
         this.wasManual = wasManual;
         this.dueTime = dueTime;
+        this.adminType = adminType;
 
         if (lastDate == null) {
             lastDate = this.getTimestamp().split(" ")[0];
@@ -90,6 +98,14 @@ public class MedLog {
             return DateTime.convertToTime12(this.getTimestamp().split(" ")[1]) + " " + this.getName().toUpperCase() + wasMedLate;
 
         }
+    }
+
+    public int getAdminType() {
+        return adminType;
+    }
+
+    public void setAdminType(int adminType) {
+        this.adminType = adminType;
     }
 
     public String getDueTime() {

@@ -179,9 +179,7 @@ public class Fragment_History extends Fragment {
                 if (mAdapter.getCount() > 0) { // do not perform this on an empty list.
                     MedLog mLog = (MedLog) mAdapter.getItem(firstVisibleItem);
 
-                    DateTime dt = new DateTime();
-
-                    historyHeader.setText(dt.getReadableDate(mLog.getDateOnly()));
+                    historyHeader.setText(DateTime.getReadableDate(mLog.getDateOnly()));
 
                 }
             }
