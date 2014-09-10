@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Service;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.net.Uri;
@@ -560,18 +561,51 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         delete_med.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dataSource.changeMedicationStatus(idUnique, Medication.DELETED);
-                mListener.onFragmentInteraction(1, null, 0);
+                String message = "Delete " + acMedName.getText().toString() + "?\n"
+                        + "This will also delete all associated Medication logs!";
+                dialog = getDialog(message + "?", "Delete", 0, idUnique);
+                dialog.show();
             }
         });
 
         dc_med.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dataSource.changeMedicationStatus(idUnique, Medication.DISCONTINUED);
-                mListener.onFragmentInteraction(1, null, 0);
+                dialog = getDialog("Discontinue " + acMedName.getText().toString() + "?", "Discontinue", 0, idUnique);
+                dialog.show();
             }
         });
+    }
+
+    private AlertDialog.Builder getDialog(String message, String positiveAction, final int action, final int idUnique) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setIcon(android.R.drawable.ic_dialog_alert)
+                .setMessage(message)
+                .setTitle("Confirm Action")
+                .setPositiveButton(positiveAction, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        switch (action) {
+                            case 0:
+                                dataSource.changeMedicationStatus(idUnique, Medication.DELETED);
+                                mListener.onFragmentInteraction(1, null, 0);
+                                break;
+
+                            case 1:
+                                dataSource.changeMedicationStatus(idUnique, Medication.DISCONTINUED);
+                                mListener.onFragmentInteraction(1, null, 0);
+                                break;
+
+                        }
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        return builder;
     }
 
     private ScrollView buildDoseChoicesForDialog(final ArrayList<MedDose> choices) {
