@@ -77,6 +77,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     private MedLiDataSource dataSource;
     private OnFragmentInteractionListener mListener;
     private AlertDialog.Builder dialog;
+    private TextView medTypePrompt;
 
     public Fragment_MedSettings() {
         // Required empty public constructor
@@ -116,6 +117,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         med_dose = (EditText) view.findViewById(R.id.med_dose_input);
         adminTimes = (TextView) view.findViewById(R.id.admin_count_edittext);
         adminTimesList = (LinearLayout) view.findViewById(R.id.admin_times_add_box);
+        medTypePrompt = (TextView) view.findViewById(R.id.med_type_label);
         return view;
     }
 
@@ -152,17 +154,19 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                     secondaryForm.setVisibility(View.VISIBLE);
                     isRoutine = (adapterView.getSelectedItem().toString().toLowerCase().equals("routine"));
                     if (isRoutine) { // setup form for routine medication.
-
+                        medTypePrompt.setText("Setting up a Routine medication");
                         setTextChangeListener();
                         prnFreqBox.setVisibility(View.GONE);
                     } else { // setup form for prn med.
                         adminTimes.removeTextChangedListener(textWatcher);
-
+                        medTypePrompt.setText("Setting up a Non-Routine medication");
                         adminTimesList.removeAllViews();
                         etList.clear();
                         prnFreqBox.setVisibility(View.VISIBLE);
                     }
                 } else {
+
+                    medTypePrompt.setText(getResources().getString(R.string.medtype_label));
                     secondaryForm.setVisibility(View.GONE);
                     isRoutine = false;
                 }

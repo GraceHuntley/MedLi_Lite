@@ -13,7 +13,7 @@
     <string name="med_name_label">Medication Name</string>
     <string name="dose_label">Dose</string>
     <string name="dose_hint">Enter Dose</string>
-    <string name="medtype_label">Select Routine or PRN(As Needed)</string>
+    <string name="medtype_label">Will this medication be taken Routinely, or As Needed(PRN)?</string>
     <string name="plus_button_label">+</string>
     <string name="minus_button_label">-</string>
     <string name="admin_times_label">Maximum Doses per Day</string>
