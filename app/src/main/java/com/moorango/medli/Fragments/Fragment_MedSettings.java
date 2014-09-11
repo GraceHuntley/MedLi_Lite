@@ -61,12 +61,13 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     private final String TAG = "MedSettingsFragment.java";
     private final ArrayList<EditText> etList = new ArrayList<EditText>();
     private EditText med_dose, doseFrequency, doseFormEntry, med_measure_spinner;
-    private TextView adminTimes;
+    private EditText maxDoses;
     private LinearLayout adminTimesList;
     private Spinner med_type;
     private AutoCompleteTextView acMedName;
     private TextWatcher textWatcher;
     private LinearLayout prnFreqBox, secondaryForm;
+    private ScrollView formWrapper;
     private int index = 0;
     private boolean isRoutine = false;
     private Button delete_med, dc_med;
@@ -78,6 +79,9 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     private OnFragmentInteractionListener mListener;
     private AlertDialog.Builder dialog;
     private TextView medTypePrompt;
+    private int errorCount = 0;
+
+    private int recurseCountTest = 0;
 
     public Fragment_MedSettings() {
         // Required empty public constructor
@@ -115,9 +119,10 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         doseFormEntry = (EditText) view.findViewById(R.id.dose_form_input);
         doseFrequency = (EditText) view.findViewById(R.id.prn_frequency_input);
         med_dose = (EditText) view.findViewById(R.id.med_dose_input);
-        adminTimes = (TextView) view.findViewById(R.id.admin_count_edittext);
+        maxDoses = (EditText) view.findViewById(R.id.admin_count_edittext);
         adminTimesList = (LinearLayout) view.findViewById(R.id.admin_times_add_box);
         medTypePrompt = (TextView) view.findViewById(R.id.med_type_label);
+        formWrapper = (ScrollView) view.findViewById(R.id.scrollview_wrapper);
         return view;
     }
 
@@ -129,7 +134,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         StrictMode.setThreadPolicy(policy);
 
         delete_med = (Button) getActivity().findViewById(R.id.del_med);
-        //adminTimes = (TextView) getActivity().findViewById(R.id.admin_count_edittext);
+        //maxDoses = (TextView) getActivity().findViewById(R.id.admin_count_edittext);
         getActivity().findViewById(R.id.minus_button).setOnClickListener(this);
         getActivity().findViewById(R.id.plus_button).setOnClickListener(this);
         getActivity().findViewById(R.id.btn_add_med).setOnClickListener(this);
@@ -142,43 +147,75 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         acMedName = (AutoCompleteTextView) getActivity().findViewById(R.id.ac_Med_name);
         acMedName.setThreshold(3);
 
+        doseFormEntry.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+
+            public void afterTextChanged(Editable edt) {
+                if (doseFormEntry.getText().length() > 0) {
+                    doseFormEntry.setError(null);
+                }
+            }
+        });
+
         /***
          * Spinner for setting medication type ie. routine or prn.
          * if routine boolean isRoutine set to true.
          * --> if true form will be setup for routine medication.
          */
-        med_type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if (!adapterView.getSelectedItem().toString().toLowerCase().equals("select")) {
-                    secondaryForm.setVisibility(View.VISIBLE);
-                    isRoutine = (adapterView.getSelectedItem().toString().toLowerCase().equals("routine"));
-                    if (isRoutine) { // setup form for routine medication.
-                        medTypePrompt.setText("Setting up a Routine medication");
-                        setTextChangeListener();
-                        prnFreqBox.setVisibility(View.GONE);
-                    } else { // setup form for prn med.
-                        adminTimes.removeTextChangedListener(textWatcher);
-                        medTypePrompt.setText("Setting up a Non-Routine medication");
-                        adminTimesList.removeAllViews();
-                        etList.clear();
-                        prnFreqBox.setVisibility(View.VISIBLE);
-                    }
-                } else {
+        med_type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
 
-                    medTypePrompt.setText(getResources().getString(R.string.medtype_label));
-                    secondaryForm.setVisibility(View.GONE);
-                    isRoutine = false;
-                }
-            }
+                                           {
+                                               @Override
+                                               public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                                                   DataCheck.clearFormErrors(formWrapper);
+                                                   errorCount = 0;
+                                                   if (!adapterView.getSelectedItem().toString().toLowerCase().equals("select")) {
+                                                       secondaryForm.setVisibility(View.VISIBLE);
+                                                       isRoutine = (adapterView.getSelectedItem().toString().toLowerCase().equals("routine"));
+                                                       if (isRoutine) { // setup form for routine medication.
+                                                           medTypePrompt.setText("Setting up a Routine medication");
+                                                           setTextChangeListener();
+                                                           prnFreqBox.setVisibility(View.GONE);
+                                                           doseFrequency.setVisibility(View.GONE);
+                                                       } else { // setup form for prn med.
+                                                           maxDoses.removeTextChangedListener(textWatcher);
+                                                           medTypePrompt.setText("Setting up a Non-Routine medication");
+                                                           adminTimesList.removeAllViews();
+                                                           etList.clear();
+                                                           prnFreqBox.setVisibility(View.VISIBLE);
+                                                           doseFrequency.setVisibility(View.VISIBLE);
+                                                       }
+                                                   } else {
 
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
+                                                       medTypePrompt.setText(getResources().getString(R.string.medtype_label));
+                                                       secondaryForm.setVisibility(View.GONE);
+                                                       isRoutine = false;
+                                                   }
+                                               }
 
-            }
-        });
+                                               @Override
+                                               public void onNothingSelected(AdapterView<?> adapterView) {
 
-        if (DataCheck.isNetworkAvailable(getActivity())) {
+                                               }
+                                           }
+
+        );
+
+        if (DataCheck.isNetworkAvailable(
+
+                getActivity()
+
+        ))
+
+        {
             acMedName.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -242,6 +279,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     /**
      * TextChange Listener for  Dose count edittext.
      */
+
     private void setTextChangeListener() {
         textWatcher = new TextWatcher() {
             @Override
@@ -251,7 +289,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-
+                maxDoses.setError(null);
             }
 
             @Override
@@ -270,23 +308,20 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                 } catch (NullPointerException npe) {
                     Log.e(TAG, npe.toString());
                 }
-
             }
         };
-        adminTimes.addTextChangedListener(textWatcher);
+        maxDoses.addTextChangedListener(textWatcher);
     }
 
     private Medication prepareMedicationObject() {
         Medication medication = new Medication();
         String type = med_type.getSelectedItem().toString().toLowerCase().trim();
-
         medication.setMedName(acMedName.getText().toString().toLowerCase().trim());
-
         medication.setAdminType(type);
         medication.setDoseMeasure(Float.valueOf(med_dose.getText().toString().trim()));
         medication.setDoseMeasureType(med_measure_spinner.getText().toString().toLowerCase().trim());
         medication.setDoseForm(doseFormEntry.getText().toString());
-        medication.setDoseCount(Integer.valueOf(adminTimes.getText().toString()));
+        medication.setDoseCount(Integer.valueOf(maxDoses.getText().toString()));
         medication.setDoseForm(doseFormEntry.getText().toString());
         //medication.setFillDate(lastFilled.getText().toString().toLowerCase().trim()); // Will add to next roll-out.
         Calendar cal = Calendar.getInstance();
@@ -296,7 +331,6 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         if (getArguments() != null && getArguments().getBoolean("edit")) {
             medication.setIdUnique(getArguments().getInt("unique_id"));
         }
-
 
         if (type.equals("routine")) {
             medication.setDoseTimes(new Object() {
@@ -318,50 +352,41 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         return medication;
     }
 
-    /**
-     * Validates that form was filled.
-     * <p/>
-     * TODO validate data in form modules.
-     * TODO Mark parts of form that were invalid.
-     *
-     * @param type
-     * @return
-     */
-    private boolean isFormComplete(String type) {
+    private boolean isFormCompleted(ViewGroup group) {
 
-        int emptyCount = 0;
-        if (type.equalsIgnoreCase("routine")) {
+        for (int i = 0, count = group.getChildCount(); i < count; ++i) {
+            View view = group.getChildAt(i);
+            if (view instanceof EditText && view.getVisibility() == View.VISIBLE) {
 
-            for (EditText et : etList) { // check that times have been entered.
-                if (et.getText().length() == 0) {
-                    et.setBackgroundColor(getResources().getColor(R.color.red));
-                    emptyCount++;
+                if (view.getId() == R.id.admin_count_edittext) {
+                    if (Integer.valueOf(((EditText) view).getText().toString()) < 1) {
+                        ((EditText) view).setError("This cannot be empty");
+                        Log.d(TAG, "count");
+                        errorCount++;
+                    }
+                } else if (view instanceof EditText && ((EditText) view).getText().length() == 0) {
+                    Log.d(TAG, "empty edittexxt");
+                    ((EditText) view).setError("This cannot be empty.");
+
+                    errorCount++;
                 }
-
-            }
-        }
-
-        if (type.equals("prn")) {
-            if (acMedName.getText().length() == 0
-                    || med_dose.getText().length() == 0
-                    || doseFrequency.getText().length() == 0
-                    || adminTimes.getText().toString().equals("0")
-                    || doseFormEntry.getText().toString().length() == 0) {
-                return false;
-            }
-        }
-
-        if (type.equals("routine")) {
-            if (acMedName.getText().length() == 0
-                    || med_dose.getText().length() == 0
-                    || adminTimes.getText().length() == 0
-                    || doseFormEntry.getText().length() == 0
-                    || emptyCount > 0) {
-                return false;
             }
 
+
+            if (view instanceof ViewGroup && (((ViewGroup) view).getChildCount() > 0))
+                isFormCompleted((ViewGroup) view);
+
         }
-        return true;
+
+        return errorCount > 0 ? false : true;
+    }
+
+    private boolean checkFormData(ViewGroup view) {
+
+        errorCount = 0;
+        if (acMedName.getText().length() == 0)
+            acMedName.setError("This cannot be empty.");
+        return isFormCompleted(view) && acMedName.getText().length() > 0;
     }
 
     /**
@@ -392,7 +417,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
             if (splitTimes.length > 0) {
                 for (int index = 0; index < medication.getDoseCount(); index++) {
                     setTextChangeListener();
-                    adminTimes.setText(String.valueOf(index + 1));
+                    maxDoses.setText(String.valueOf(index + 1));
                     //etList.get(index).setText(splitTimes[etList.get(index).getId()]);
 
                 }
@@ -425,33 +450,28 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                     // TODO alert they have not entered a med yet.
                     Toast.makeText(getActivity(), "You have not selected a medication type", Toast.LENGTH_LONG).show();
 
-                } else if (selection.equals("routine")) { // routine
-                    if (isFormComplete("routine")) {
+                } else {
+                    errorCount = 0;
+                    if (checkFormData(formWrapper)) {
 
+                        errorCount = 0;
                         dataSource.submitNewMedication(prepareMedicationObject(), doUpdate);
                         hideKeyboard();
                         mListener.onFragmentInteraction(1, null, 0);
                     } else {
                         Toast.makeText(getActivity(), "You forgot to enter something", Toast.LENGTH_SHORT).show();
                     }
-                } else { // prn med
-                    if (isFormComplete("prn")) {
-                        dataSource.submitNewMedication(prepareMedicationObject(), doUpdate);
-                        hideKeyboard();
-                        mListener.onFragmentInteraction(1, null, 0);
-                    } else {
-                        Toast.makeText(getActivity(), "You forgot to enter something", Toast.LENGTH_LONG).show();
-                    }
+                    Log.d(TAG, "ln 447: " + recurseCountTest);
                 }
                 break;
             case R.id.plus_button:
 
-                adminTimes.setText("" + (Integer.valueOf(adminTimes.getText().toString()) + 1));
+                maxDoses.setText("" + (Integer.valueOf(maxDoses.getText().toString()) + 1));
                 break;
             case R.id.minus_button:
 
-                if (Integer.valueOf(adminTimes.getText().toString()) != 0) {
-                    adminTimes.setText("" + (Integer.valueOf(adminTimes.getText().toString()) - 1));
+                if (Integer.valueOf(maxDoses.getText().toString()) != 0) {
+                    maxDoses.setText("" + (Integer.valueOf(maxDoses.getText().toString()) - 1));
                 }
                 break;
 
@@ -536,6 +556,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
                             et.setText(DateTime.convertToTime12("" + hourOfDay + ":" + String.format("%02d", minute)));
                             et.setBackgroundColor(getResources().getColor(android.R.color.white));
+                            et.setError(null);
 
                             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Service.INPUT_METHOD_SERVICE);
                             if (imm.isAcceptingText()) {
@@ -641,8 +662,10 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                 if (!checkedRadioButton.getText().toString().equalsIgnoreCase("Other")) {
 
                     med_dose.setText(String.valueOf(choices.get(id).getDoseDouble()));
+                    med_dose.setError(null);
 
                     med_measure_spinner.setText(choices.get(id).getDoseMeasure());
+                    med_measure_spinner.setError(null);
 
                 }
                 adDoseChoices.dismiss();

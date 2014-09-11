@@ -286,6 +286,8 @@ public class MedLiDataSource {
             database.insert("medlist", "ID_UNIQUE", cv);
         }
 
+        Log.d(TAG, cv.toString());
+
     }
 
     @SuppressWarnings("UnusedReturnValue")
@@ -360,6 +362,8 @@ public class MedLiDataSource {
         cv.put("due_time", time);
         cv.put("admin_type", medication.getAdminType().equalsIgnoreCase("routine") ? MedLog.ROUTINE : MedLog.PRN);
 
+        Log.d(TAG, "submitMissedDose" + cv.toString());
+
         this.open();
         database.insert("med_logs", "ID_UNIQUE", cv);
 
@@ -395,7 +399,7 @@ public class MedLiDataSource {
         ContentValues cv = new ContentValues();
         cv.put("status", newStatus);
 
-        database.update("medlist", cv, "ID_UNIQUE='" + idUnique + "'", null);
+        database.update("medlist", cv, "ID_UNIQUE=" + idUnique, null);
         if (newStatus == Medication.DELETED) {
             database.delete("med_logs", "ID_FK = " + idUnique, null);
         }
@@ -425,5 +429,15 @@ public class MedLiDataSource {
         }
 
         return map;
+    }
+
+    public boolean checkIfMedDoseIDExists(int unique) {
+        this.open();
+
+        Cursor cs = database.rawQuery("SELECT ID_UNIQUE FROM med_logs WHERE ID_UNIQUE=" + unique, null);
+        if (cs.getCount() > 0) {
+            return true;
+        }
+        return false;
     }
 }

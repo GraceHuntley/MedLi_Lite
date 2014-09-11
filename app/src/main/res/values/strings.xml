@@ -39,7 +39,7 @@
 
     <!-- Fragment_History Strings -->
 
-    <string name="flash_screen_title">There are currently no records Yet!</string>
+    <string name="flash_screen_title">There are no medication doses logged yet.</string>
     <string name="edit_med_admin_title">Edit medication Admin data</string>
     <string name="time_label">Logged Time: </string>
     <string name="edit_dose_label">Logged Dose: </string>

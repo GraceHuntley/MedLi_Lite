@@ -170,7 +170,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                     !dataItem.getAdminType().equalsIgnoreCase("prn") &&
                     dataItem.getStatus() == Medication.ACTIVE) {
 
-                if (DataCheck.isDoseLate(dataItem.getNextDue())) {
+                if (DataCheck.isDoseLate(dataItem.getNextDue(), false)) {
 
                     nextDueTime.setTextColor(context.getResources().getColor(R.color.red));
 

@@ -4,12 +4,17 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Models.MedLog;
 import com.moorango.medli.Models.Medication;
+import com.moorango.medli.R;
 
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Created by Colin on 7/17/2014.
@@ -55,17 +60,7 @@ public class DataCheck {
         return readyForReturn;
     }
 
-    public static boolean isDoseLate(String due) {
-        // TODO test whether admin time is late.
-        DateTime dt = new DateTime();
-        @SuppressWarnings("UnusedAssignment") final String TAG = "VerifyHelpers";
-        int nextDoseHour = Integer.valueOf(dt.convertToTime24(due).split(":")[0]);
-        int loggedHour = Integer.valueOf(DateTime.getTime24().split(":")[0]);
 
-        int difference = loggedHour - nextDoseHour;
-
-        return difference > 1;
-    }
 
     /**
      * Matches current hour to corresponding dose.
@@ -79,11 +74,14 @@ public class DataCheck {
         MedLiDataSource dataSource = MedLiDataSource.getHelper(con);
 
         String availableDoses[] = medication.getDoseTimes().split(";");
-
+        Log.d(TAG, "findNextDoseNewMed");
         String nextDose = null;
         for (String dose : availableDoses) {
-            if (isDoseLate(dose)) {
+            if (isDoseLate(dose, true)) {
                 dataSource.submitMissedDose(medication, dose);
+            } else {
+                dataSource.changeMedicationStatus(medication.getIdUnique(), Medication.ACTIVE);
+                return dose;
             }
             nextDose = dose;
         }
@@ -92,7 +90,9 @@ public class DataCheck {
     }
 
     public static int createUniqueID(String medName) {
-        return (medName + DateTime.getNowInMillisec()).hashCode();
+
+
+        return (new Random().nextInt() + medName + DateTime.getNowInMillisec()).hashCode();
     }
 
     /**
@@ -106,32 +106,59 @@ public class DataCheck {
 
     }
 
-    public static int isDoseLate(String time, String due) {
+    public static void clearForm(ViewGroup group) {
+
+        for (int i = 0, count = group.getChildCount(); i < count; ++i) {
+            View view = group.getChildAt(i);
+            if (view instanceof EditText) {
+                if (view.getId() == R.id.admin_count_edittext) {
+                    ((EditText) view).setText("0");
+                } else {
+                    ((EditText) view).setText("");
+                }
+                ((EditText) view).setError(null);
+
+            }
+
+            if (view instanceof ViewGroup && (((ViewGroup) view).getChildCount() > 0))
+                clearForm((ViewGroup) view);
+        }
+
+    }
+
+    public static void clearFormErrors(ViewGroup group) {
+
+        for (int i = 0, count = group.getChildCount(); i < count; ++i) {
+            View view = group.getChildAt(i);
+            if (view instanceof EditText) {
+
+                ((EditText) view).setError(null);
+
+            }
+
+            if (view instanceof ViewGroup && (((ViewGroup) view).getChildCount() > 0))
+                clearFormErrors((ViewGroup) view);
+        }
+
+    }
+
+    public static boolean isDoseLate(String due, boolean filler) {
         // TODO test whether admin time is late.
+
         int nextDoseHour = Integer.valueOf(DateTime.convertToTime24(due).split(":")[0]);
-        int loggedHour = Integer.valueOf(DateTime.convertToTime24(time).split(":")[0]);
+        int loggedHour = Integer.valueOf(DateTime.getTime24().split(":")[0]);
+        int nextDoseMinute = Integer.valueOf(DateTime.convertToTime24(due).split(":")[1]);
+        int loggedMinute = Integer.valueOf(DateTime.getTime24().split(":")[1]);
 
         int difference = loggedHour - nextDoseHour;
-
-        if (difference > 1) {
-            return 1;
-        } else {
-            return 0;
+        int minuteDifference = loggedMinute - nextDoseMinute;
+        if (filler) {
+            return difference > 1;
         }
+
+        return difference > 0 && minuteDifference > 0;
     }
 
-    public static int isDoseEarly(String time, String due) {
-        int nextDoseHour = Integer.valueOf(DateTime.convertToTime24(due).split(":")[0]);
-        int loggedHour = Integer.valueOf(DateTime.convertToTime24(time).split(":")[0]);
-
-        int difference = nextDoseHour - loggedHour;
-
-        if (difference > 1) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
 
     public static int getDoseTimeFrame(String time, String due) {
 

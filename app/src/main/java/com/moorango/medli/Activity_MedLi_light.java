@@ -17,7 +17,6 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
 
     private final String TAG = "Activity_MedLi_Light";
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,11 +28,13 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
 
             if (MedLiDataSource.getHelper(this).medListHasEntries()) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(android.R.id.content, new Fragment_Home(), "home").addToBackStack("home")
+                        .replace(android.R.id.content, new Fragment_Home(), "home")
+                                //.addToBackStack("home")
                         .commit();
             } else {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(android.R.id.content, new Fragment_EmptyMedList(), "emptyList").addToBackStack("emptyList")
+                        .replace(android.R.id.content, new Fragment_EmptyMedList(), "emptyList")
+                                //.addToBackStack("emptyList")
                         .commit();
             }
 
@@ -76,13 +77,13 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
             case android.R.id.home:
 
                 if (MedLiDataSource.getHelper(this).medListHasEntries()) {
-                    if (!getSupportFragmentManager().findFragmentByTag("home").isVisible()) {
 
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(android.R.id.content, new Fragment_Home(), "home").addToBackStack("home")
-                                .commit();
 
-                    }
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(android.R.id.content, new Fragment_Home(), "home").addToBackStack("home")
+                            .commit();
+
+
                 } else {
                     getSupportFragmentManager().beginTransaction()
                             .replace(android.R.id.content, new Fragment_EmptyMedList(), "emptyList").addToBackStack("emptyList")
