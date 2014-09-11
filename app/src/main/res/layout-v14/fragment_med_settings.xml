@@ -14,14 +14,17 @@
 
     <LinearLayout
         android:id="@+id/btm_buttons_lay"
+        style="?android:attr/buttonBarStyle"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_gravity="center|bottom"
+
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/btn_add_med"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -29,6 +32,7 @@
 
         <Button
             android:id="@+id/dc_med"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -37,7 +41,7 @@
 
         <Button
             android:id="@+id/clear_btn"
-
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -45,7 +49,7 @@
 
         <Button
             android:id="@+id/del_med"
-
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -103,6 +107,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="0dip"
                 android:hint="@string/med_name_hint"
+                android:inputType="textNoSuggestions"
                 android:layout_weight="1"
                 android:singleLine="true"
                 android:textColor="#000000" />
@@ -131,6 +136,7 @@
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:hint="@string/measure_hint"
+
                     android:layout_weight="1"
                     android:inputType="text" />
             </LinearLayout>
@@ -180,9 +186,6 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="2"
-                    android:inputType="number"
-                    android:focusableInTouchMode="false"
-                    android:focusable="false"
                     android:clickable="false"
                     android:singleLine="true"
                     android:cursorVisible="false"
@@ -218,7 +221,6 @@
                 <EditText
                     android:id="@+id/prn_frequency_input"
                     android:layout_width="fill_parent"
-
                     android:layout_height="wrap_content"
                     android:hint="@string/prn_freq_hint"
                     android:inputType="number" />

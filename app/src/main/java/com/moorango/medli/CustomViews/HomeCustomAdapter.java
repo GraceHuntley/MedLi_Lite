@@ -159,7 +159,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                 }
             }
 
-            String doseVerbage = (dataItem.getAdminType().equalsIgnoreCase("routine")) ? "Next Due: " : "Next Earliest Dose: ";
+            String doseVerbage = (dataItem.getAdminType().equalsIgnoreCase("routine")) ? "Next Due: " : "Earliest dose: ";
             String dueWording = (dataItem.getNextDue().equalsIgnoreCase("prn") ? "Any Time" : dataItem.getNextDue());
             nextDueTime.setText((dataItem.getNextDue().equalsIgnoreCase("complete")) ? dataItem.getNextDue() : doseVerbage + dueWording);
             boxWrapper.setBackgroundResource(android.R.color.white);

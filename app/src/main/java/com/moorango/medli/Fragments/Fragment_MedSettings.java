@@ -67,11 +67,12 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     private Spinner med_type;
     private AutoCompleteTextView acMedName;
     private TextWatcher textWatcher;
-    private LinearLayout prnFreqBox, secondaryForm;
+    private LinearLayout prnFreqBox;
+    private ScrollView secondaryForm;
     private ScrollView formWrapper;
     private int index = 0;
     private boolean isRoutine = false;
-    private Button delete_med, dc_med;
+    private Button delete_med, dc_med, clear;
     private AlertDialog.Builder adb;
     private AlertDialog adDoseChoices;
     private static boolean isRunning = false;
@@ -118,7 +119,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
         View view = inflater.inflate(R.layout.fragment_med_settings, container, false);
 
-        secondaryForm = (LinearLayout) view.findViewById(R.id.secondary_form_wrapper);
+        secondaryForm = (ScrollView) view.findViewById(R.id.scrollview_wrapper);
         doseFormEntry = (EditText) view.findViewById(R.id.dose_form_input);
         doseFrequency = (EditText) view.findViewById(R.id.prn_frequency_input);
         med_dose = (EditText) view.findViewById(R.id.med_dose_input);
@@ -126,6 +127,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         adminTimesList = (LinearLayout) view.findViewById(R.id.admin_times_add_box);
         medTypePrompt = (TextView) view.findViewById(R.id.med_type_label);
         formWrapper = (ScrollView) view.findViewById(R.id.scrollview_wrapper);
+        clear = (Button) view.findViewById(R.id.clear_btn);
         return view;
     }
 
@@ -277,6 +279,18 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
             populateForEdit(getArguments().getInt("unique_id"));
         }
+
+        clear.setOnClickListener(new View.OnClickListener() { // clears all entries on form.
+            @Override
+            public void onClick(View view) {
+                DataCheck.clearForm(formWrapper);
+                if (etList != null && adminTimesList != null) {
+                    etList.clear();
+                    adminTimesList.removeAllViews();
+                }
+
+            }
+        });
 
     } // end onActivityCreated()
 

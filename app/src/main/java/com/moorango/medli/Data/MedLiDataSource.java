@@ -160,8 +160,11 @@ public class MedLiDataSource {
                 medication.setNextDue("COMPLETE");
             } else {
                 // TODO get last dose then see if it was recent.
+                String nextDose = getPrnNextDose(medication.getIdUnique(), medication.getDoseFrequency());
+                String splitTest[] = getPrnNextDose(medication.getIdUnique(), medication.getDoseFrequency()).split(" ");
 
-                medication.setNextDue(getPrnNextDose(medication.getIdUnique(), medication.getDoseFrequency()));
+                medication.setNextDue(nextDose);
+
 
             }
         }
@@ -201,6 +204,7 @@ public class MedLiDataSource {
             if ((lastDosePlusHour - currentHour) >= 0) {
                 String nextDoseHour = "" + (lastDoseHour + freq);
                 String minutes = "" + nextDose.split(" ")[1].split(":")[1];
+                Log.d(TAG, "getPrnNextDose" + nextDoseHour + ":" + minutes + ":" + "00");
                 nextDose = DateTime.convertToTime12(nextDoseHour + ":" + minutes + ":" + "00");
             } else {
                 nextDose = "PRN";

@@ -108,6 +108,12 @@ public class DateTime {
     public static String convertToTime12(String time) {
         String[] splitTime = time.split(":");
         int hours = Integer.parseInt(splitTime[0]);
+        boolean nextDay = false;
+
+        if (hours > 24) { // then it is tommorow.
+            hours = hours - 24;
+            nextDay = true;
+        }
         String minutes = splitTime[1];
         String amPm;
         if (hours >= 12) {
@@ -123,7 +129,7 @@ public class DateTime {
             amPm = "AM";
         }
 
-        return "" + hours + ":" + minutes + " " + amPm;
+        return hours + ":" + minutes + " " + amPm;
     }
 
     public static String getFormattedDate() {

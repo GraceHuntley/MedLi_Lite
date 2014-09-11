@@ -11,13 +11,16 @@
     <string name="cancel">Cancel</string>
     <string name="d_c">D/C</string>
     <string name="med_name_label">Medication Name</string>
-    <string name="dose_label">Dose</string>
-    <string name="dose_hint">Enter Dose</string>
+    <string name="dose_label">Medication Dose per unit ie. 10 mg</string>
+    <string name="dose_hint">Numeric value</string>
+    <string name="measure_hint">Measure unit</string>
+    <string name="med_name_hint">Generic or Brandname</string>
     <string name="medtype_label">Will this medication be taken Routinely, or As Needed(PRN)?</string>
     <string name="plus_button_label">+</string>
     <string name="minus_button_label">-</string>
     <string name="admin_times_label">Maximum Doses per Day</string>
     <string name="zero">0</string>
+    <string name="earliest_dose_prn">Earliest dose: </string>
 
     <string name="prn_freq_hint">Hours between doses</string>
     <string name="prn_freq_label">Enter how often to give dose</string>
@@ -34,6 +37,7 @@
 
     <!-- Fragment_MedSettings -->
     <string name="dose_form_label">Dose Form ie. 1 tab or 2 drops</string>
+    <string name="prn_form_hint">This will be displayed on home screen</string>
 
     <!-- END Fragment_MedSettings -->
 
