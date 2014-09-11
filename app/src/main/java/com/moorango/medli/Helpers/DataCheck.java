@@ -86,7 +86,8 @@ public class DataCheck {
             nextDose = dose;
         }
         dataSource.changeMedicationStatus(medication.getIdUnique(), Medication.ACTIVE);
-        return (nextDose != null) ? nextDose : "Complete";
+
+        return (nextDose != null && !isDoseLate(nextDose, false)) ? nextDose : "Complete";
     }
 
     public static int createUniqueID(String medName) {

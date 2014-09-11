@@ -38,6 +38,7 @@ import android.widget.Toast;
 
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Helper_DrugData;
+import com.moorango.medli.Helpers.AlarmHelpers;
 import com.moorango.medli.Helpers.DataCheck;
 import com.moorango.medli.Helpers.DateTime;
 import com.moorango.medli.Models.MedDose;
@@ -80,6 +81,8 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     private AlertDialog.Builder dialog;
     private TextView medTypePrompt;
     private int errorCount = 0;
+    private GetSuggestions getSuggestions;
+    private ArrayList<String> errorMessages;
 
     private int recurseCountTest = 0;
 
@@ -227,7 +230,8 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
                     if (!isRunning) { // only start new asynctask if one is no running already.
                         isRunning = true;
-                        new GetSuggestions().setParName(Uri.encode(charSequence.toString())).execute();
+                        getSuggestions = new GetSuggestions().setParName(Uri.encode(charSequence.toString()));
+                        getSuggestions.execute();
                     }
 
                     acMedName.setTextColor(Color.BLACK);
@@ -382,11 +386,52 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     }
 
     private boolean checkFormData(ViewGroup view) {
-
+        errorMessages = new ArrayList<String>();
         errorCount = 0;
-        if (acMedName.getText().length() == 0)
+        if (acMedName.getText().length() == 0) {
             acMedName.setError("This cannot be empty.");
-        return isFormCompleted(view) && acMedName.getText().length() > 0;
+            errorMessages.add("- The medication name cannot be empty\n");
+
+        }
+
+        if (!isFormCompleted(view)) {
+            errorMessages.add("- All medication information should be filled\n");
+        }
+
+        if (errorMessages.size() == 0 && !checkDoseTimes(etList)) {
+            errorMessages.add("- Each dose time must be later then the previous one\n");
+        }
+
+        String toastMessage = "";
+        for (String error : errorMessages) {
+
+            toastMessage += error;
+        }
+        if (toastMessage.length() > 0) {
+            Toast.makeText(getActivity(), toastMessage, Toast.LENGTH_LONG).show();
+        }
+        return errorMessages.size() == 0;
+    }
+
+    private boolean checkDoseTimes(ArrayList<EditText> etList) {
+
+        if (etList.size() == 1) {
+            return true;
+        }
+
+        int errors = 0;
+        for (int index = etList.size() - 1; index > 0; index--) {
+            String fDate = DateTime.convertToTime24(etList.get(index).getText().toString());
+            String sDate = DateTime.convertToTime24(etList.get(index - 1).getText().toString());
+
+            if (fDate.compareTo(sDate) <= 0) {
+                etList.get(index).setError("Invalid Time");
+                errors++;
+            }
+
+        }
+
+        return errors == 0;
     }
 
     /**
@@ -454,12 +499,12 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                     errorCount = 0;
                     if (checkFormData(formWrapper)) {
 
-                        errorCount = 0;
+                        //checkDoseTimes(etList);
                         dataSource.submitNewMedication(prepareMedicationObject(), doUpdate);
                         hideKeyboard();
                         mListener.onFragmentInteraction(1, null, 0);
                     } else {
-                        Toast.makeText(getActivity(), "You forgot to enter something", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getActivity(), "You forgot to enter something", Toast.LENGTH_SHORT).show();
                     }
                     Log.d(TAG, "ln 447: " + recurseCountTest);
                 }
@@ -486,6 +531,10 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     @Override
     public void onPause() {
         dataSource.close();
+
+        if (getSuggestions != null && getSuggestions.getStatus() == AsyncTask.Status.RUNNING) {
+            getSuggestions.cancel(true);
+        }
 
         InputMethodManager imm = (InputMethodManager)
                 getActivity().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -538,6 +587,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
             etList.add(location, new EditText(getActivity()));
 
             etList.get(location).setId(location);
+
             etList.get(location).setFocusable(false);
             Time now = new Time();
             now.setToNow();
@@ -548,6 +598,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                 @Override
                 public void onClick(View view) {
                     final View v = view;
+
                     TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
                         @Override
                         public void onTimeSet(TimePicker view2, int hourOfDay, int minute) {
@@ -572,6 +623,15 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                     };
 
                     TimePickerDialog tpd = new TimePickerDialog(getActivity(), t, 0, 0, false);
+                    EditText et = etList.get(v.getId());
+                    if (et.length() > 0) {
+                        String convertedTime[] = DateTime.convertToTime24(et.getText().toString()).split(":");
+                        int hour = Integer.valueOf(convertedTime[0]);
+                        int minute = Integer.valueOf(convertedTime[1]);
+                        tpd.updateTime(hour, minute);
+
+
+                    }
 
                     tpd.show();
                 }
@@ -603,6 +663,8 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     }
 
     private AlertDialog.Builder getDialog(String message, String positiveAction, final int action, final int idUnique) {
+
+
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setIcon(android.R.drawable.ic_dialog_alert)
                 .setMessage(message)
@@ -610,14 +672,21 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                 .setPositiveButton(positiveAction, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+
+                        AlarmHelpers ah = new AlarmHelpers(getActivity());
+
                         switch (action) {
                             case 0:
                                 dataSource.changeMedicationStatus(idUnique, Medication.DELETED);
+
+                                ah.clearAlarm(idUnique);
                                 mListener.onFragmentInteraction(1, null, 0);
                                 break;
 
                             case 1:
                                 dataSource.changeMedicationStatus(idUnique, Medication.DISCONTINUED);
+
+                                ah.clearAlarm(idUnique);
                                 mListener.onFragmentInteraction(1, null, 0);
                                 break;
 
@@ -738,12 +807,13 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
         @Override
         protected void onPostExecute(ArrayList<String> list) {
+            if (!isCancelled()) {
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                        android.R.layout.select_dialog_item, list);
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                    android.R.layout.select_dialog_item, list);
-
-            acMedName.setAdapter(adapter);
-            isRunning = false;
+                acMedName.setAdapter(adapter);
+                isRunning = false;
+            }
             super.onPostExecute(list);
         }
     }

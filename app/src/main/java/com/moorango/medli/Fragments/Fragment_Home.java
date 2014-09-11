@@ -185,7 +185,7 @@ public class Fragment_Home extends Fragment {
 
             dataSource.submitMedicationAdmin(aChosenList, null);
 
-            ah.clearAlarm(aChosenList.getMedName(), aChosenList.getIdUnique());
+            ah.clearAlarm(aChosenList.getIdUnique());
 
         }
         mListener.onFragmentInteraction(1, null, 0);

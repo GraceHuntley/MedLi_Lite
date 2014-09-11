@@ -48,7 +48,7 @@ public class AlarmHelpers {
         }
     }
 
-    public void clearAlarm(String name, int uniqueID) {
+    public void clearAlarm(int uniqueID) {
 
         Intent intent = new Intent(context, NotifyService.class);
         PendingIntent pendingIntent = PendingIntent.getService(context, uniqueID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
