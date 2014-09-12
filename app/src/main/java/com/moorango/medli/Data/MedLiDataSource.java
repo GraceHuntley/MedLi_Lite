@@ -439,4 +439,50 @@ public class MedLiDataSource {
         Cursor cs = database.rawQuery("SELECT ID_UNIQUE FROM med_logs WHERE ID_UNIQUE=" + unique, null);
         return cs.getCount() > 0;
     }
+
+    private void insertPreference(String prefName, ContentValues cv) {
+        this.open();
+        Cursor cs = database.rawQuery("SELECT pref_name FROM prefs WHERE pref_name = '" + prefName + "'", null);
+        if (cs.moveToFirst()) {
+            database.update("prefs", cv, "pref_name = " + prefName, null);
+        } else {
+            database.insert("prefs", "pref_name", cv);
+        }
+
+    }
+
+    public boolean getPreferenceBool(String name) {
+
+        this.open();
+        Cursor cs = database.rawQuery("SELECT pref_bool FROM prefs WHERE pref_name = '" + name + "'", null);
+
+        if (cs.moveToFirst()) {
+            return cs.getInt(0) == 1;
+        }
+        return true;
+
+    }
+
+    public void addOrUpdatePreference(String prefName, String prefValue) {
+        ContentValues cv = new ContentValues();
+        cv.put("pref_name", prefName);
+        cv.put("pref_string", prefValue);
+        insertPreference(prefName, cv);
+    }
+
+    public void addOrUpdatePreference(String prefName, boolean prefValue) {
+
+        ContentValues cv = new ContentValues();
+        cv.put("pref_name", prefName);
+        cv.put("pref_bool", prefValue);
+        insertPreference(prefName, cv);
+    }
+
+    public void addOrUpdatePreference(String prefName, int prefValue) {
+
+        ContentValues cv = new ContentValues();
+        cv.put("pref_name", prefName);
+        cv.put("pref_int", prefValue);
+        insertPreference(prefName, cv);
+    }
 }

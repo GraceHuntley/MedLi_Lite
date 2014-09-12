@@ -25,6 +25,7 @@ public class Helper_SQLiteHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(Constants.CREATE_MEDLIST_DB);
         sqLiteDatabase.execSQL(Constants.CREATE_MEDLOGS_DB);
+        sqLiteDatabase.execSQL(Constants.CREATE_PREFERENCES_DB);
 
     }
 

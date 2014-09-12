@@ -10,6 +10,13 @@ import com.moorango.medli.Models.Medication;
 
 public class Constants {
 
+    public static final String CREATE_PREFERENCES_DB = "CREATE TABLE prefs (" +
+            "last_modified DATE DEFAULT (datetime('now','localtime')), " + // 0
+            "pref_name TEXT PRIMARY KEY NOT NULL, " + // 1
+            "pref_string TEXT, " + // 2
+            "pref_int INTEGER, " + // 3
+            "pref_bool BOOLEAN)";// 4
+
     public static final String CREATE_MEDLIST_DB = "CREATE TABLE medlist (" +
             "ID_UNIQUE INTEGER PRIMARY KEY NOT NULL, " + // 0
             "name TEXT NOT NULL, " + // 1

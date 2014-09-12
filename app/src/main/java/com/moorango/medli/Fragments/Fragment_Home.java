@@ -1,17 +1,23 @@
 package com.moorango.medli.Fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.moorango.medli.CustomObjects.SparseBooleanArrayParcelable;
@@ -38,6 +44,7 @@ public class Fragment_Home extends Fragment {
     private MedLiDataSource dataSource;
     private HomeCustomAdapter adapter;
     private SparseBooleanArray routineChoicesFromInstance = null;
+    private int imageNumber = 1; //int to check which image is displayed
 
 
     public Fragment_Home() {
@@ -55,6 +62,8 @@ public class Fragment_Home extends Fragment {
             routineChoicesFromInstance = (SparseBooleanArray) savedInstanceState.getParcelable("routine_array");
 
         }
+
+
     }
 
     @Override
@@ -62,6 +71,14 @@ public class Fragment_Home extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (dataSource.getPreferenceBool("show_home_welcome")) {
+            introDialogBuilder();
+        }
     }
 
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -73,7 +90,6 @@ public class Fragment_Home extends Fragment {
 
         dataSource = MedLiDataSource.getHelper(getActivity());
 
-        dataSource.checkSQLiteCurrentDate();
 
         if (updateLists == null || !updateLists.getStatus().equals(AsyncTask.Status.RUNNING)) {
             updateLists = new MyAsyncTask(this);
@@ -256,6 +272,56 @@ public class Fragment_Home extends Fragment {
         }
     }
 
+    private void introDialogBuilder() {
+        AlertDialog.Builder adB = new AlertDialog.Builder(getActivity());
+        adB.setIcon(android.R.drawable.ic_dialog_info);
+        adB.setTitle("A few words..");
+
+
+        View view = getActivity().getLayoutInflater().inflate(R.layout.info_dialog, null);
+        final CheckBox checkBox = (CheckBox) view.findViewById(R.id.no_show_checkbox);
+
+        String home_welcome_info = "<html><body>" +
+                getResources().getString(R.string.home_welcome_info) +
+                "<img src=\"history.png\"/>.<br/>" +
+                getResources().getString(R.string.home_welcome_info_2) +
+                "<img src=\"edit.png\"/>." +
+                " <br/> " +
+                getResources().getString(R.string.home_welcome_info_3) +
+                "</body></html>";
+        TextView tv1 = (TextView) view.findViewById(R.id.main_text);
+        tv1.setText(Html.fromHtml(home_welcome_info, imgGetter, null));
+
+
+        ((TextView) view.findViewById(R.id.dont_show_message)).setText(getResources().getString(R.string.do_not_show));
+
+        adB.setView(view)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (checkBox.isChecked()) {
+                            dataSource.addOrUpdatePreference("show_home_welcome", false);
+                        }
+                    }
+                }).show();
+
+    }
+
+    private Html.ImageGetter imgGetter = new Html.ImageGetter() {
+
+        public Drawable getDrawable(String source) {
+            Drawable drawable = null;
+            if (imageNumber == 1) {
+                drawable = getResources().getDrawable(R.drawable.ic_action_view_as_list);
+                ++imageNumber;
+            } else drawable = getResources().getDrawable(R.drawable.ic_action_edit);
+            drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable
+                    .getIntrinsicHeight());
+
+            return drawable;
+        }
+    };
+
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
@@ -303,5 +369,6 @@ public class Fragment_Home extends Fragment {
             }
         }
     }
+
 }
 

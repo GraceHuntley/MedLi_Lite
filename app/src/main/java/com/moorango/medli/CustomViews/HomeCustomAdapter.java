@@ -132,6 +132,13 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
         } else {
             txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName()) + " " + dataItem.getDoseForm());
 
+            if (txtTitle.isChecked()) {
+                boxWrapper.setBackgroundResource(android.R.color.holo_green_light);
+            } else {
+                boxWrapper.setBackgroundResource(android.R.color.white);
+            }
+
+
             /***
              * Fill in missed doses for a new medication.
              */
@@ -159,11 +166,10 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                 }
             }
 
+
             String doseVerbage = (dataItem.getAdminType().equalsIgnoreCase("routine")) ? "Next Due: " : "Earliest dose: ";
             String dueWording = (dataItem.getNextDue().equalsIgnoreCase("prn") ? "Any Time" : dataItem.getNextDue());
             nextDueTime.setText((dataItem.getNextDue().equalsIgnoreCase("complete")) ? dataItem.getNextDue() : doseVerbage + dueWording);
-            boxWrapper.setBackgroundResource(android.R.color.white);
-
 
             if (!dataItem.getNextDue().equalsIgnoreCase("complete") &&
                     !dataItem.getNextDue().equalsIgnoreCase("prn") &&
@@ -173,9 +179,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                 if (DataCheck.isDoseLate(dataItem.getNextDue(), false)) {
 
                     nextDueTime.setTextColor(context.getResources().getColor(R.color.red));
-
                     convertView.findViewById(R.id.late_dose_image).setVisibility(View.VISIBLE);
-                    boxWrapper.setBackgroundColor(context.getResources().getColor(android.R.color.white));
 
                 }
             }

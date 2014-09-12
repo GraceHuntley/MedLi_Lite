@@ -488,6 +488,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         doseFormEntry.setText(medication.getDoseForm());
         dc_med.setVisibility(View.VISIBLE);
         delete_med.setVisibility(View.VISIBLE);
+        clear.setVisibility(View.GONE);
         setEditButtonListeners(uniqueID); // turn on listeners for buttons.
     }
 

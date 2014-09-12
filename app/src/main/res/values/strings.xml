@@ -33,6 +33,11 @@
 
     <!-- Fragment_Home -->
     <string name="late_image_desc">late_image</string>
+    <string name="do_not_show">Do not show this message again </string>
+    <string name="home_welcome_info">With MedLi you can log multiple medications at a time. Just select as many as you would like then press submit and the records will be stored locally on your device. The records will then be available via the med history screen</string>
+    <string name="home_welcome_info_2">You can also edit a medication by long pressing the pencil for each medication</string>
+    <string name="home_welcome_info_3">Enjoy!</string>
+
     <!-- END Fragment_Home -->
 
     <!-- Fragment_MedSettings -->
