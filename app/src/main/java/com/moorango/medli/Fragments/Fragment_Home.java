@@ -73,6 +73,8 @@ public class Fragment_Home extends Fragment {
 
         dataSource = MedLiDataSource.getHelper(getActivity());
 
+        dataSource.checkSQLiteCurrentDate();
+
         if (updateLists == null || !updateLists.getStatus().equals(AsyncTask.Status.RUNNING)) {
             updateLists = new MyAsyncTask(this);
             updateLists.execute();

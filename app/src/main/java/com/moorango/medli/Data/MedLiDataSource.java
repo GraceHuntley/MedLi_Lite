@@ -164,8 +164,6 @@ public class MedLiDataSource {
                 String splitTest[] = getPrnNextDose(medication.getIdUnique(), medication.getDoseFrequency()).split(" ");
 
                 medication.setNextDue(nextDose);
-
-
             }
         }
 

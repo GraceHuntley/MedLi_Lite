@@ -46,10 +46,8 @@ public class Constants {
                     + "medlist.dose_measure_type as dose_type, " // 2
                     + "medlist.dose_count as max_count, " // 3
                     + "medlist.dose_times as dose_times, " // 4
-                    + "COUNT(CASE WHEN med_logs.status =" + MedLog.ACTIVE
-                    + " OR med_logs.status =" + MedLog.SPACE_FILLER
-                    + " OR med_logs.status =" + MedLog.SKIPPED
-                    + " AND DATE(med_logs.timestamp) = DATE('now', 'localtime') THEN 'ok' END) as actual_count, " // 5
+                    + "COUNT(CASE WHEN med_logs.status !=" + MedLog.DELETED
+                    + " AND DATE(med_logs.timestamp, 'localtime') = DATE('now', 'localtime') THEN 'ok' END) as actual_count, " // 5
                     + "medlist.admin_type as type, " // 6
                     + "medlist.dose_frequency as frequency, " // 7
                     + "medlist.status as status, " // 8
