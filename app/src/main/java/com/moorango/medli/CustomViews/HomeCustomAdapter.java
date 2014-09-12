@@ -182,6 +182,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
 
             txtTitle.setVisibility(View.VISIBLE);
             nextDueTime.setVisibility(View.VISIBLE);
+            editMed.setVisibility(View.VISIBLE);
             headerText.setVisibility(View.GONE);
 
             editMed.setOnClickListener(new View.OnClickListener() {

@@ -188,6 +188,9 @@
                     android:layout_weight="2"
                     android:clickable="false"
                     android:singleLine="true"
+                    android:inputType="none"
+                    android:focusable="false"
+
                     android:cursorVisible="false"
                     android:gravity="center"
                     android:longClickable="false"

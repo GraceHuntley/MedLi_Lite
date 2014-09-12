@@ -171,7 +171,7 @@ public class CustomAdapterHistory extends BaseAdapter {
 
         if (dataItem.isSubHeading()) {
 
-            medName.setText(dt.getReadableDate(dataItem.getDateOnly()));
+            medName.setText(DateTime.getReadableDate(dataItem.getDateOnly()));
             medName.setGravity(Gravity.CENTER);
             boxWrapper.setBackgroundResource(R.drawable.list_bg);
 

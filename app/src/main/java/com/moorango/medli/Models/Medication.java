@@ -19,10 +19,10 @@ public class Medication {
      * Medication Status constants
      */
 
-    public static int DELETED = 0;
-    public static int ACTIVE = 1;
-    public static int DISCONTINUED = 2;
-    public static int NEW = 3;
+    public static final int DELETED = 0;
+    public static final int ACTIVE = 1;
+    public static final int DISCONTINUED = 2;
+    public static final int NEW = 3;
 
     private int idUnique;
     private String medName;

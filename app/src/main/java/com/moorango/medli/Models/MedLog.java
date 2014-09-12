@@ -17,23 +17,23 @@ public class MedLog {
      */
 
     public static int DELETED = 0;
-    public static int ACTIVE = 1;
+    public static final int ACTIVE = 1;
     public static int DISCONTINUED = 2;
     public static int MISSED = 3;
-    public static int SKIPPED = 4;
-    public static int SPACE_FILLER = 5;
+    public static final int SKIPPED = 4;
+    public static final int SPACE_FILLER = 5;
 
-    public static int EARLY = 0;
-    public static int ON_TIME = 1;
-    public static int LATE = 2;
+    public static final int EARLY = 0;
+    public static final int ON_TIME = 1;
+    public static final int LATE = 2;
 
-    public static String TIME_FRAME_TEXT[] = {"EARLY", "ON-TIME", "LATE"};
+    public static final String[] TIME_FRAME_TEXT = {"EARLY", "ON-TIME", "LATE"};
 
     /**
      * Admin_type constants.
      */
-    public static int ROUTINE = 0;
-    public static int PRN = 1;
+    public static final int ROUTINE = 0;
+    public static final int PRN = 1;
 
     private String name;
     private String timestamp;

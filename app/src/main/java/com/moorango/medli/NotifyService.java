@@ -91,6 +91,7 @@ public class NotifyService extends Service {
                     .setVibrate(new long[]{100, 250, 100, 500})
                     .build();
         } else {
+            //noinspection deprecation
             notification = new Notification(icon, text, time);
             //notification.vibrate(new long[]{100, 250, 100,500});
         }

@@ -85,8 +85,6 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     private GetSuggestions getSuggestions;
     private ArrayList<String> errorMessages;
 
-    private int recurseCountTest = 0;
-
     public Fragment_MedSettings() {
         // Required empty public constructor
     }
@@ -119,7 +117,6 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
         View view = inflater.inflate(R.layout.fragment_med_settings, container, false);
 
-        secondaryForm = (ScrollView) view.findViewById(R.id.scrollview_wrapper);
         doseFormEntry = (EditText) view.findViewById(R.id.dose_form_input);
         doseFrequency = (EditText) view.findViewById(R.id.prn_frequency_input);
         med_dose = (EditText) view.findViewById(R.id.med_dose_input);
@@ -183,7 +180,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                                                    DataCheck.clearFormErrors(formWrapper);
                                                    errorCount = 0;
                                                    if (!adapterView.getSelectedItem().toString().toLowerCase().equals("select")) {
-                                                       secondaryForm.setVisibility(View.VISIBLE);
+                                                       formWrapper.setVisibility(View.VISIBLE);
                                                        isRoutine = (adapterView.getSelectedItem().toString().toLowerCase().equals("routine"));
                                                        if (isRoutine) { // setup form for routine medication.
                                                            medTypePrompt.setText("Setting up a Routine medication");
@@ -201,7 +198,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                                                    } else {
 
                                                        medTypePrompt.setText(getResources().getString(R.string.medtype_label));
-                                                       secondaryForm.setVisibility(View.GONE);
+                                                       formWrapper.setVisibility(View.GONE);
                                                        isRoutine = false;
                                                    }
                                                }
@@ -396,7 +393,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
         }
 
-        return errorCount > 0 ? false : true;
+        return errorCount <= 0;
     }
 
     private boolean checkFormData(ViewGroup view) {
@@ -520,6 +517,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                     } else {
                         //Toast.makeText(getActivity(), "You forgot to enter something", Toast.LENGTH_SHORT).show();
                     }
+                    int recurseCountTest = 0;
                     Log.d(TAG, "ln 447: " + recurseCountTest);
                 }
                 break;

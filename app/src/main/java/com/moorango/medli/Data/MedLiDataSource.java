@@ -330,7 +330,7 @@ public class MedLiDataSource {
 
         if (manualTime != null) { // dose time being entered manually.
             cv.put("manual_entry", 1);
-            cv.put("timestamp", dt.getDate() + " " + dt.convertToTime24(manualTime));
+            cv.put("timestamp", dt.getDate() + " " + DateTime.convertToTime24(manualTime));
 
             cv.put("time_frame", DataCheck.getDoseTimeFrame(manualTime, medication.getNextDue()));
         } else { // no manual entry.
@@ -360,7 +360,7 @@ public class MedLiDataSource {
         cv.put("ID_FK", medication.getIdUnique());
         cv.put("name", medication.getMedName());
         cv.put("dose", medication.getDoseMeasure() + " " + medication.getDoseMeasureType());
-        cv.put("timestamp", dt.getDate() + " " + dt.convertToTime24(time));
+        cv.put("timestamp", dt.getDate() + " " + DateTime.convertToTime24(time));
         cv.put("missed", 1);
         cv.put("status", MedLog.SPACE_FILLER);
         cv.put("due_time", time);
@@ -439,9 +439,6 @@ public class MedLiDataSource {
         this.open();
 
         Cursor cs = database.rawQuery("SELECT ID_UNIQUE FROM med_logs WHERE ID_UNIQUE=" + unique, null);
-        if (cs.getCount() > 0) {
-            return true;
-        }
-        return false;
+        return cs.getCount() > 0;
     }
 }

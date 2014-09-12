@@ -50,7 +50,7 @@ public class DateTime {
      * @return milliseconds UTC
      * @throws ParseException
      */
-    public static long getUTCTimeMillis(String dateTime) throws ParseException {
+    public static long getUTCTimeMillis(String dateTime) {
 
         String dateSplit[] = dateTime.split("[-: ]");
         int values[] = new int[dateSplit.length];
@@ -133,7 +133,7 @@ public class DateTime {
     }
 
     public static String getFormattedDate() {
-        Calendar c = Calendar.getInstance();
+
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         return df.format(new Date());
     }
