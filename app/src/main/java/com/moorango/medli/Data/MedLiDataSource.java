@@ -295,7 +295,7 @@ public class MedLiDataSource {
     @SuppressWarnings("UnusedReturnValue")
     public int deleteMedEntry(String uniqueId) {
         ContentValues cv = new ContentValues();
-        cv.put("status", "del");
+        cv.put("status", MedLog.DELETED);
         return database.update("med_logs", cv, "ID_UNIQUE='" + uniqueId + "'", null);
 
     }
@@ -364,11 +364,27 @@ public class MedLiDataSource {
         cv.put("due_time", time);
         cv.put("admin_type", medication.getAdminType().equalsIgnoreCase("routine") ? MedLog.ROUTINE : MedLog.PRN);
 
-        Log.d(TAG, "submitMissedDose" + cv.toString());
 
         this.open();
         database.insert("med_logs", "ID_UNIQUE", cv);
 
+    }
+
+    public void submitSkippedDose(Medication medication) {
+        ContentValues cv = new ContentValues();
+        cv.put("ID_UNIQUE", DataCheck.createUniqueID(medication.getMedName()));
+        cv.put("time_frame", MedLog.SKIPPED);
+        cv.put("ID_FK", medication.getIdUnique());
+        cv.put("name", medication.getMedName());
+        cv.put("dose", medication.getDoseMeasure() + " " + medication.getDoseMeasureType());
+        cv.put("timestamp", dt.getDate() + " " + DateTime.convertToTime24(medication.getNextDue()));
+        cv.put("missed", 1);
+        cv.put("status", MedLog.SKIPPED);
+        cv.put("due_time", medication.getNextDue());
+        cv.put("admin_type", medication.getAdminType().equalsIgnoreCase("routine") ? MedLog.ROUTINE : MedLog.PRN);
+
+        this.open();
+        database.insert("med_logs", "ID_UNIQUE", cv);
     }
 
     public Medication getSingleMedByName(int uniqueID) {

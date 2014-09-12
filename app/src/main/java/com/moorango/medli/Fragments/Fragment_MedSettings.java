@@ -85,6 +85,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     private GetSuggestions getSuggestions;
     private ArrayList<String> errorMessages;
 
+
     public Fragment_MedSettings() {
         // Required empty public constructor
     }
@@ -257,8 +258,27 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                             adDoseChoices.show();
 
                         } else {
+
+                            dialog = new AlertDialog.Builder(getActivity())
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .setTitle("No dose suggestions")
+                                    .setMessage("Sorry there are no dose suggestions available for this medication. " +
+                                            "But that's ok. " +
+                                            "If the drug your adding is for example Miralax crystals do as follows\n" +
+                                            "ex." +
+                                            "\nNumeric value: 1" +
+                                            "\nMeasure unit: tsp" +
+                                            "\nDose Form: 1 tsp")
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.dismiss();
+                                        }
+                                    });
+                            dialog.show();
+
                             med_dose.requestFocus();
-                            Toast.makeText(getActivity(), "Sorry there are no medication suggestions available.", Toast.LENGTH_SHORT).show();
+
                         }
 
                     } catch (XmlPullParserException xmp) {
@@ -555,6 +575,8 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
             imm.hideSoftInputFromWindow(getActivity().getWindow().getDecorView().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
         }
+
+
         super.onPause();
     }
 
@@ -659,9 +681,15 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         delete_med.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String message = "Delete " + acMedName.getText().toString() + "?\n"
-                        + "This will also delete all associated Medication logs!";
-                dialog = getDialog(message + "?", "Delete", 0, idUnique);
+
+                Medication medication = dataSource.getSingleMedByName(idUnique);
+                String message = "Delete " + DataCheck.capitalizeTitles(acMedName.getText().toString())
+                        + " " + medication.getDoseMeasure() + " " + medication.getDoseMeasureType()
+                        + "?\n\n"
+                        + "This will delete all records associated with " + DataCheck.capitalizeTitles(acMedName.getText().toString()) + "!\n\n"
+                        + "If you would like to just stop taking this medication "
+                        + "but keep the records use D/C instead.";
+                dialog = getDialog(message, "Delete", 0, idUnique);
                 dialog.show();
             }
         });

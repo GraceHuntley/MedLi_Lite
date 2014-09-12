@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.text.format.Time;
 import android.util.SparseBooleanArray;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Fragments.Fragment_Home;
 import com.moorango.medli.Helpers.AlarmHelpers;
 import com.moorango.medli.Helpers.DataCheck;
@@ -91,6 +93,10 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
         notifyDataSetChanged();
     }
 
+    public boolean isChecked(int position) {
+        return sparseBooleanArray.get(position);
+    }
+
     @Override
     public long getItemId(int position) {
 
@@ -110,6 +116,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
         final CheckedTextView txtTitle = (CheckedTextView) convertView.findViewById(R.id.title);
         final TextView headerText = (TextView) convertView.findViewById(R.id.header_title);
         final TextView nextDueTime = (TextView) convertView.findViewById(R.id.next_dose_time);
+        final ImageView skipButton = (ImageView) convertView.findViewById(R.id.skip_dose);
 
         final ImageView editMed = (ImageView) convertView.findViewById(R.id.edit_med_button);
         RelativeLayout boxWrapper = (RelativeLayout) convertView.findViewById(R.id.box_wrapper);
@@ -124,7 +131,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
             txtTitle.setChecked(false);
             txtTitle.setVisibility(View.INVISIBLE);
             nextDueTime.setVisibility(View.GONE);
-
+            skipButton.setVisibility(View.GONE);
             headerText.setVisibility(View.VISIBLE);
             editMed.setVisibility(View.GONE);
             // boxWrapper.setBackgroundResource(android.R.color.background_light);
@@ -133,6 +140,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
             txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName()) + " " + dataItem.getDoseForm());
 
             if (txtTitle.isChecked()) {
+
                 boxWrapper.setBackgroundResource(android.R.color.holo_green_light);
             } else {
                 boxWrapper.setBackgroundResource(android.R.color.white);
@@ -147,6 +155,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                 dataItem.setNextDue(DataCheck.findNextDoseNewMed(context, dataItem));
 
             }
+
             if (!dataItem.getNextDue().equalsIgnoreCase("complete") && dataItem.getAdminType().equalsIgnoreCase("routine")) {
 
                 Time nextDue = new Time();
@@ -186,13 +195,20 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
 
             txtTitle.setVisibility(View.VISIBLE);
             nextDueTime.setVisibility(View.VISIBLE);
+            if (dataItem.getNextDue().equalsIgnoreCase("complete") || dataItem.getAdminType().equalsIgnoreCase("prn")) {
+                skipButton.setVisibility(View.GONE);
+            } else {
+                skipButton.setVisibility(View.VISIBLE);
+            }
             editMed.setVisibility(View.VISIBLE);
             headerText.setVisibility(View.GONE);
 
             editMed.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(context, "Long press to Edit Medication", Toast.LENGTH_SHORT).show();
+                    Toast toast = Toast.makeText(context, "Long press to Edit Medication", Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
                 }
             });
 
@@ -200,6 +216,27 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                 @Override
                 public boolean onLongClick(View view) {
                     caller.mListener.onFragmentInteraction(3, dataItem.getMedName(), dataItem.getIdUnique());
+                    return true;
+                }
+            });
+
+            skipButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast toast = Toast.makeText(context, "Long press to Skip Dose", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                }
+            });
+
+            skipButton.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    MedLiDataSource.getHelper(context).submitSkippedDose(dataItem);
+                    caller.mListener.onFragmentInteraction(1, null, 0);
+                    Toast toast = Toast.makeText(context, "Skipped Dose", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.TOP, 0, 0);
+                    toast.show();
                     return true;
                 }
             });

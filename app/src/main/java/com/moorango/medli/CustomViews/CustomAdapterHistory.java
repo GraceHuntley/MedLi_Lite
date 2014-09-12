@@ -86,7 +86,7 @@ public class CustomAdapterHistory extends BaseAdapter {
                     .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
             convertView = mInflater.inflate(R.layout.history_list_item, null);
         }
-        DateTime dt = new DateTime();
+
 
         TextView medName = (TextView) convertView.findViewById(R.id.name);
         final TextView doseTime = (TextView) convertView.findViewById(R.id.dose_time);

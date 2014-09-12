@@ -79,6 +79,16 @@ public class Fragment_Home extends Fragment {
         if (dataSource.getPreferenceBool("show_home_welcome")) {
             introDialogBuilder();
         }
+
+        if (updateLists == null || !updateLists.getStatus().equals(AsyncTask.Status.RUNNING)) {
+            updateLists = new MyAsyncTask(this);
+            updateLists.execute();
+        } else {
+            updateLists.cancel(true);
+            updateLists = null;
+            updateLists = new MyAsyncTask(this);
+            updateLists.execute();
+        }
     }
 
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -106,9 +116,27 @@ public class Fragment_Home extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
+                final int pos = position;
 
-                if (!adapter.getItem(position).isSubHeading()) {
-                    adapter.toggleChecked(position);
+                if (!adapter.getItem(pos).isSubHeading()) {
+                    if (adapter.getItem(pos).getNextDue().equalsIgnoreCase("complete") && !adapter.isChecked(pos)) {
+
+                        AlertDialog.Builder adB = new AlertDialog.Builder(getActivity())
+                                .setTitle("Maximum Doses Reached")
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setMessage("You have reached the maximum set dose count for this Medication. "
+                                        + "If you would still like to proceed entering it press proceed, else press cancel.")
+                                .setNegativeButton("Cancel", null)
+                                .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        adapter.toggleChecked(pos);
+                                    }
+                                });
+                        adB.show();
+                    } else {
+                        adapter.toggleChecked(position);
+                    }
                 }
 
             }
@@ -147,7 +175,7 @@ public class Fragment_Home extends Fragment {
                         }
                     }.getReady();
 
-                    showDialog("Double check the list before Submitting:\n\n" + for_display);
+                    showDialog("Double check the following medication(s)\nbefore pressing submit.\n\n" + for_display);
 
                 }
             }
@@ -239,6 +267,11 @@ public class Fragment_Home extends Fragment {
         if (dataSource != null) {
             dataSource.close();
         }
+
+        if (updateLists != null && updateLists.getStatus() == AsyncTask.Status.RUNNING) {
+            updateLists.cancel(true);
+            updateLists = null;
+        }
         super.onPause();
     }
 
@@ -276,7 +309,6 @@ public class Fragment_Home extends Fragment {
         AlertDialog.Builder adB = new AlertDialog.Builder(getActivity());
         adB.setIcon(android.R.drawable.ic_dialog_info);
         adB.setTitle("A few words..");
-
 
         View view = getActivity().getLayoutInflater().inflate(R.layout.info_dialog, null);
         final CheckBox checkBox = (CheckBox) view.findViewById(R.id.no_show_checkbox);
@@ -352,20 +384,21 @@ public class Fragment_Home extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
+            if (!isCancelled()) {
+                routineList.setAdapter(adapter);
 
-            routineList.setAdapter(adapter);
+                if (routineChoicesFromInstance != null) {
 
-            if (routineChoicesFromInstance != null) {
+                    int routine = routineChoicesFromInstance.size();
 
-                int routine = routineChoicesFromInstance.size();
+                    for (int index = 0; index < routine; index++) {
+                        //adapter.setItemChecked(index, routineChoicesFromInstance.valueAt(index));
+                        adapter.setItemChecked(index, routineChoicesFromInstance.valueAt(index));
 
-                for (int index = 0; index < routine; index++) {
-                    //adapter.setItemChecked(index, routineChoicesFromInstance.valueAt(index));
-                    adapter.setItemChecked(index, routineChoicesFromInstance.valueAt(index));
+                    }
 
+                    grabChoices();
                 }
-
-                grabChoices();
             }
         }
     }

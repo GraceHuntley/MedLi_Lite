@@ -22,13 +22,14 @@
 
         android:orientation="horizontal">
 
+
         <Button
-            android:id="@+id/btn_add_med"
+            android:id="@+id/clear_btn"
             style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
+            android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/save" />
+            android:text="@string/clear_btn_label" />
 
         <Button
             android:id="@+id/dc_med"
@@ -40,14 +41,6 @@
             android:visibility="gone" />
 
         <Button
-            android:id="@+id/clear_btn"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/clear_btn_label" />
-
-        <Button
             android:id="@+id/del_med"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
@@ -55,6 +48,15 @@
             android:layout_weight="1"
             android:text="@string/delete_button"
             android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btn_add_med"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/save" />
+
 
     </LinearLayout>
 

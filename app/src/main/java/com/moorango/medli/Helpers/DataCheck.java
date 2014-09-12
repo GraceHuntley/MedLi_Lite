@@ -61,7 +61,6 @@ public class DataCheck {
     }
 
 
-
     /**
      * Matches current hour to corresponding dose.
      *
@@ -146,30 +145,50 @@ public class DataCheck {
     public static boolean isDoseLate(String due, boolean filler) {
         // TODO test whether admin time is late.
 
-        int nextDoseHour = Integer.valueOf(DateTime.convertToTime24(due).split(":")[0]);
-        int loggedHour = Integer.valueOf(DateTime.getTime24().split(":")[0]);
-        int nextDoseMinute = Integer.valueOf(DateTime.convertToTime24(due).split(":")[1]);
-        int loggedMinute = Integer.valueOf(DateTime.getTime24().split(":")[1]);
+        String nextDose24Hour[] = DateTime.convertToTime24(due).split(":");
+        String loggedDose24Hour[] = DateTime.getTime24().split(":");
 
-        int difference = loggedHour - nextDoseHour;
-        int minuteDifference = loggedMinute - nextDoseMinute;
+        int nextDoseHour = Integer.valueOf(nextDose24Hour[0]);
+        int loggedHour = Integer.valueOf(loggedDose24Hour[0]);
+
+        int nextDoseMinute = Integer.valueOf(nextDose24Hour[1]);
+        int loggedMinute = Integer.valueOf(loggedDose24Hour[1]);
+
+        int nextDoseTotalMinutes = (nextDoseHour * 60) + nextDoseMinute;
+        int loggedDoseTotalMinutes = (loggedHour * 60) + loggedMinute;
+
+        int difference = loggedDoseTotalMinutes - nextDoseTotalMinutes;
+
         if (filler) {
             return difference > 1;
         }
 
-        return difference > 0 && minuteDifference > 0;
+        return difference > 2;
     }
 
 
     public static int getDoseTimeFrame(String time, String due) {
 
+        Log.d(TAG, "getDoseTimeFrame " + due);
+        if (due.equalsIgnoreCase("complete")) {
+            return MedLog.EXTRA_DOSE;
+        }
         try {
-            int nextDoseHour = Integer.valueOf(DateTime.convertToTime24(due).split(":")[0]);
-            int loggedHour = Integer.valueOf(DateTime.convertToTime24(time).split(":")[0]);
+            String nextDose24Hour[] = DateTime.convertToTime24(due).split(":");
+            String loggedDose24Hour[] = DateTime.convertToTime24(time).split(":");
 
-            if ((nextDoseHour - loggedHour) > 1) {
+            int nextDoseHour = Integer.valueOf(nextDose24Hour[0]);
+            int nextDoseMinute = Integer.valueOf(nextDose24Hour[1]);
+
+            int loggedDoseHour = Integer.valueOf(loggedDose24Hour[0]);
+            int loggedDoseMinute = Integer.valueOf(loggedDose24Hour[1]);
+
+            int nextDoseTotalMinutes = (nextDoseHour * 60) + nextDoseMinute;
+            int loggedDoseTotalMinutes = (loggedDoseHour * 60) + loggedDoseMinute;
+
+            if ((nextDoseTotalMinutes - loggedDoseTotalMinutes) > 30) {
                 return MedLog.EARLY;
-            } else if ((loggedHour - nextDoseHour) > 1) {
+            } else if ((loggedDoseTotalMinutes - nextDoseTotalMinutes) > 30) {
                 return MedLog.LATE;
             }
         } catch (NumberFormatException nfe) {

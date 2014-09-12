@@ -2,6 +2,7 @@ package com.moorango.medli;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +17,7 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
         Fragment_History.OnFragmentInteractionListener, Fragment_EmptyMedList.OnFragmentInteractionListener {
 
     private final String TAG = "Activity_MedLi_Light";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +42,9 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
 
         }
 
+
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -112,10 +116,12 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
                 if (MedLiDataSource.getHelper(this).medListHasEntries()) {
                     getSupportFragmentManager().beginTransaction()
                             .replace(android.R.id.content, new Fragment_Home(), "home").addToBackStack("home")
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                             .commit();
                 } else {
                     getSupportFragmentManager().beginTransaction()
                             .replace(android.R.id.content, new Fragment_EmptyMedList(), "emptyList").addToBackStack("emptyList")
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                             .commit();
                 }
                 break;

@@ -14,6 +14,14 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/clear_button"
+            android:layout_width="0dip"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/clear_btn_label" />
+
+        <Button
             android:id="@+id/submit_button"
             android:layout_width="0dip"
             style="?android:attr/buttonBarButtonStyle"
@@ -22,20 +30,51 @@
             android:enabled="true"
             android:text="@string/submit_btn_label" />
 
-        <Button
-            android:id="@+id/clear_button"
-            android:layout_width="0dip"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/clear_btn_label" />
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/legend"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center"
+
+        android:layout_alignParentTop="true"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:text="Legend: "
+            android:gravity="center"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingLeft="10dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:drawableLeft="@drawable/ic_action_edit"
+            android:text="Edit Medication" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingLeft="10dp"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:text="Skip Dose"
+            android:drawableLeft="@drawable/ic_action_next" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/top_layout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_above="@id/button_box"
+        android:layout_below="@id/legend"
         android:orientation="vertical"
         android:weightSum="10">
 
@@ -49,5 +88,6 @@
             android:overScrollFooter="@null" />
 
     </LinearLayout>
+
 
 </RelativeLayout>

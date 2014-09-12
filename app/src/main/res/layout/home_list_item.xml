@@ -9,12 +9,12 @@
 
     <ImageView
         android:id="@+id/late_dose_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:alpha="170"
+        android:visibility="gone"
         android:contentDescription="@string/late_image_desc"
         android:layout_centerInParent="true"
-        android:visibility="gone"
-
         android:src="@drawable/past_due" />
 
     <TextView
@@ -56,6 +56,18 @@
         android:clickable="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:id="@+id/skip_dose"
+        android:src="@drawable/ic_action_next"
+        android:layout_width="wrap_content"
+        android:contentDescription="skip_med"
+        android:padding="5dp"
+        android:clickable="true"
+        android:text="Skip"
+        android:layout_toLeftOf="@id/edit_med_button"
         android:layout_alignParentBottom="true"
         android:layout_height="wrap_content" />
 
