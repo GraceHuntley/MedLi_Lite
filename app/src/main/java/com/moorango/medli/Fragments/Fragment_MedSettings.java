@@ -212,13 +212,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
         );
 
-        if (DataCheck.isNetworkAvailable(
-
-                getActivity()
-
-        ))
-
-        {
+        if (DataCheck.isNetworkAvailable(getActivity())) {
             acMedName.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -290,6 +284,25 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                     imm.hideSoftInputFromWindow(acMedName.getWindowToken(), 0);
                 }
             });
+        } else {
+            AlertDialog.Builder adB = new AlertDialog.Builder(getActivity());
+            adB.setTitle("No Internet Connection")
+                    .setMessage("Sorry there is no internet connection which means you will not get any dose suggestions for this medication. " +
+                            "But that's ok. " +
+                            "If the drug you are adding is for example Miralax crystals do as follows\n" +
+                            "ex." +
+                            "\nNumeric value: 1" +
+                            "\nMeasure unit: tsp" +
+                            "\nDose Form: 1 tsp\n" +
+                            "Otherwise you can just wait till your online to add the new medication.")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+            adB.show();
+
         }
 
         if (getArguments() != null && getArguments().getBoolean("edit")) {
@@ -404,6 +417,10 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                     ((EditText) view).setError("This cannot be empty.");
 
                     errorCount++;
+                } else if (view instanceof EditText && ((EditText) view).getText().toString().matches("^.*[^a-zA-Z0-9 ./:].*$")) {
+                    Log.d(TAG, "checkText:");
+                    ((EditText) view).setError("Invalid Characters");
+                    errorCount++;
                 }
             }
 
@@ -422,6 +439,10 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         if (acMedName.getText().length() == 0) {
             acMedName.setError("This cannot be empty.");
             errorMessages.add("- The medication name cannot be empty\n");
+
+        } else if (acMedName.getText().toString().matches("^.*[^a-zA-Z0-9 ].*$")) {
+            acMedName.setError("Invalid Characters");
+            errorMessages.add("- You must use valid characters.");
 
         }
 
@@ -696,7 +717,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         dc_med.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialog = getDialog("Discontinue " + acMedName.getText().toString() + "?", "Discontinue", 0, idUnique);
+                dialog = getDialog("Discontinue " + acMedName.getText().toString() + "?", "Discontinue", 1, idUnique);
                 dialog.show();
             }
         });

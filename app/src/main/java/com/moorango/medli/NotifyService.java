@@ -4,10 +4,14 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.RingtoneManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -86,31 +90,28 @@ public class NotifyService extends Service {
         Notification notification;
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean isVibrator = false;
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            String vs = Context.VIBRATOR_SERVICE;
+            Vibrator mVibrator = (Vibrator) getSystemService(vs);
 
-/*        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            notification = new Notification.Builder(this)
-                    .setContentTitle(title)
-                    .setSmallIcon(R.drawable.ic_launcher)
-                    .setContentText(text)
-                    .build()
+            isVibrator = mVibrator.hasVibrator();
 
-        } else {
-            //noinspection deprecation
-            notification = new Notification(icon, text, time);
-            //notification.vibrate(new long[]{100, 250, 100,500});
-        } */
+        }
 
         NotificationCompat.Builder notify = new NotificationCompat.Builder(this);
         notify.setContentTitle(title)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentText(text);
-        if (prefs.getBoolean("vibrate_preference", true)) {
+        if (prefs.getBoolean("vibrate_preference", true) && isVibrator) {
             notify.setVibrate(new long[]{100, 250, 100, 500});
+        } else if (prefs.getBoolean("vibrate_preference", true) && !isVibrator) {
+            Log.d(TAG, "no_vibrate");
+            notify.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+
         }
         notification = notify.build();
-
-
 
         // The PendingIntent to launch our activity if the user selects this notification
         Intent backIntent = new Intent(this, Activity_MedLi_light.class);

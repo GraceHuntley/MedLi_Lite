@@ -1,10 +1,6 @@
 package com.moorango.medli.Models;
 
-import android.util.Log;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.moorango.medli.Helpers.DateTime;
 
 /**
  * Created by Colin on 7/31/2014.
@@ -188,29 +184,10 @@ public class Medication {
         } else if (med.getNextDue().equals("PRN")) {
             return -1;
         } else {
-            SimpleDateFormat df1 = new SimpleDateFormat("hh:mm aa");
-            Date date1 = null;
-            Date date2 = null;
-            try {
-                date1 = df1.parse(this.getNextDue());
-                date2 = df1.parse(med.getNextDue());
-            } catch (ParseException e) {
-                Log.e("Medication", e.toString());
-            }
 
-            try {
-                if ((date1 != null ? date1.getTime() : 0) < (date2 != null ? date2.getTime() : 0)) {
-                    return -1;
-                } else if ((date1 != null ? date1.getTime() : 0) > (date2 != null ? date2.getTime() : 0)) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            } catch (NullPointerException e) {
-                Log.e(TAG, e.toString());
-            }
+            return DateTime.convertToTime24(this.getNextDue()).compareTo(DateTime.convertToTime24(med.getNextDue()));
         }
-        return 0;
+        //return 0;
     }
 
 }
