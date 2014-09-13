@@ -78,6 +78,13 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
 
                 break;
 
+            case R.id.action_settings:
+                getSupportFragmentManager().beginTransaction()
+                        .replace(android.R.id.content, new Preferences(), "preferences")
+                        .addToBackStack("preferences")
+                        .commit();
+                break;
+
             case android.R.id.home:
 
                 if (MedLiDataSource.getHelper(this).medListHasEntries()) {
@@ -94,7 +101,9 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
                             .commit();
                 }
 
+
                 return super.onOptionsItemSelected(item);
+
 
         }
 

@@ -264,7 +264,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                                     .setTitle("No dose suggestions")
                                     .setMessage("Sorry there are no dose suggestions available for this medication. " +
                                             "But that's ok. " +
-                                            "If the drug your adding is for example Miralax crystals do as follows\n" +
+                                            "If the drug you are adding is for example Miralax crystals do as follows\n" +
                                             "ex." +
                                             "\nNumeric value: 1" +
                                             "\nMeasure unit: tsp" +
@@ -396,11 +396,11 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                 if (view.getId() == R.id.admin_count_edittext) {
                     if (Integer.valueOf(((EditText) view).getText().toString()) < 1) {
                         ((EditText) view).setError("This cannot be empty");
-                        Log.d(TAG, "count");
+
                         errorCount++;
                     }
                 } else if (view instanceof EditText && ((EditText) view).getText().length() == 0) {
-                    Log.d(TAG, "empty edittexxt");
+
                     ((EditText) view).setError("This cannot be empty.");
 
                     errorCount++;
@@ -538,8 +538,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                     } else {
                         //Toast.makeText(getActivity(), "You forgot to enter something", Toast.LENGTH_SHORT).show();
                     }
-                    int recurseCountTest = 0;
-                    Log.d(TAG, "ln 447: " + recurseCountTest);
+
                 }
                 break;
             case R.id.plus_button:

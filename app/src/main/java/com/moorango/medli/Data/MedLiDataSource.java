@@ -202,7 +202,7 @@ public class MedLiDataSource {
             if ((lastDosePlusHour - currentHour) >= 0) {
                 String nextDoseHour = "" + (lastDoseHour + freq);
                 String minutes = "" + nextDose.split(" ")[1].split(":")[1];
-                Log.d(TAG, "getPrnNextDose" + nextDoseHour + ":" + minutes + ":" + "00");
+
                 nextDose = DateTime.convertToTime12(nextDoseHour + ":" + minutes + ":" + "00");
             } else {
                 nextDose = "PRN";
@@ -287,9 +287,6 @@ public class MedLiDataSource {
 
             database.insert("medlist", "ID_UNIQUE", cv);
         }
-
-        Log.d(TAG, cv.toString());
-
     }
 
     @SuppressWarnings("UnusedReturnValue")

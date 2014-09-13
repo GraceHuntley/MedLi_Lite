@@ -73,7 +73,7 @@ public class DataCheck {
         MedLiDataSource dataSource = MedLiDataSource.getHelper(con);
 
         String availableDoses[] = medication.getDoseTimes().split(";");
-        Log.d(TAG, "findNextDoseNewMed");
+
         String nextDose = null;
         for (String dose : availableDoses) {
             if (isDoseLate(dose, true)) {
@@ -166,10 +166,8 @@ public class DataCheck {
         return difference > 2;
     }
 
-
     public static int getDoseTimeFrame(String time, String due) {
 
-        Log.d(TAG, "getDoseTimeFrame " + due);
         if (due.equalsIgnoreCase("complete")) {
             return MedLog.EXTRA_DOSE;
         }
