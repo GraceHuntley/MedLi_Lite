@@ -18,11 +18,9 @@ public class MedLog {
 
     public static int DELETED = 0;
     public static final int ACTIVE = 1;
-    public static int DISCONTINUED = 2;
-    public static int MISSED = 3;
-
     public static final int SKIPPED = 4;
     public static final int SPACE_FILLER = 5;
+
     public static final int EARLY = 0;
     public static final int ON_TIME = 1;
     public static final int LATE = 2;

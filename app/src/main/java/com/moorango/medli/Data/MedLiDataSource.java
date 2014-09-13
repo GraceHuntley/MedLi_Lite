@@ -127,6 +127,22 @@ public class MedLiDataSource {
     private Medication cursorToRoutine(Cursor cursor, final Context context, final boolean makeAlarms) {
         final Medication medication = new Medication();
 
+
+        /*String test1 = "";
+        for (int index = 0; index < cursor.getColumnCount(); index++) {
+
+
+            switch(cursor.getType(index)) {
+                case Cursor.FIELD_TYPE_STRING:
+                    test1 += cursor.getColumnName(index) + " " + cursor.getString(index) + " ";
+                    break;
+                case Cursor.FIELD_TYPE_INTEGER:
+                    test1 += cursor.getColumnName(index) + " " + cursor.getInt(index) + " ";
+            }
+        } */
+
+        //Log.d(TAG, "cursorToRoutine: " + test1);
+
         medication.setMedName(cursor.getString(0));
         medication.setDoseMeasure(cursor.getFloat(1));
         medication.setDoseMeasureType(cursor.getString(2));
@@ -360,11 +376,9 @@ public class MedLiDataSource {
         cv.put("status", MedLog.SPACE_FILLER);
         cv.put("due_time", time);
         cv.put("admin_type", medication.getAdminType().equalsIgnoreCase("routine") ? MedLog.ROUTINE : MedLog.PRN);
-
-
+        Log.d(TAG, "submitmissed: " + cv.toString());
         this.open();
         database.insert("med_logs", "ID_UNIQUE", cv);
-
     }
 
     public void submitSkippedDose(Medication medication) {
@@ -379,7 +393,7 @@ public class MedLiDataSource {
         cv.put("status", MedLog.SKIPPED);
         cv.put("due_time", medication.getNextDue());
         cv.put("admin_type", medication.getAdminType().equalsIgnoreCase("routine") ? MedLog.ROUTINE : MedLog.PRN);
-
+        Log.d(TAG, "submitSkipped: " + cv.toString());
         this.open();
         database.insert("med_logs", "ID_UNIQUE", cv);
     }

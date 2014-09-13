@@ -54,7 +54,7 @@ public class Constants {
                     + "medlist.dose_count as max_count, " // 3
                     + "medlist.dose_times as dose_times, " // 4
                     + "COUNT(CASE WHEN med_logs.status !=" + MedLog.DELETED
-                    + " AND DATE(med_logs.timestamp, 'localtime') = DATE('now', 'localtime') THEN 'ok' END) as actual_count, " // 5
+                    + " AND DATE(med_logs.timestamp) = DATE('now', 'localtime') THEN 'ok' END) as actual_count, " // 5
                     + "medlist.admin_type as type, " // 6
                     + "medlist.dose_frequency as frequency, " // 7
                     + "medlist.status as status, " // 8
@@ -78,8 +78,7 @@ public class Constants {
                     + "med_logs.due_time as duetime, " // 8
                     + "med_logs.admin_type as type " // 9
                     + "FROM med_logs "
-                    + "WHERE status =" + MedLog.ACTIVE
-                    + " OR status =" + MedLog.SKIPPED
+                    + "WHERE status !=" + MedLog.DELETED
                     + " ORDER BY DATETIME(strftime('%s',timestamp), 'unixepoch', 'localtime') DESC ";
 
     public static String GET_SINGLE_MED_BY_ID(int id) {
@@ -103,7 +102,7 @@ public class Constants {
 
     public static String GET_COUNT_LAST_24HOURS(int fk) {
         return "SELECT COUNT(timestamp) FROM med_logs "
-                + "WHERE status=" + MedLog.ACTIVE
+                + "WHERE status !=" + MedLog.DELETED
                 + " AND "
                 + "ID_FK=" + fk
                 + " AND "

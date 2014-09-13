@@ -309,6 +309,7 @@ public class Fragment_Home extends Fragment {
         AlertDialog.Builder adB = new AlertDialog.Builder(getActivity());
         adB.setIcon(android.R.drawable.ic_dialog_info);
         adB.setTitle("A few words..");
+        adB.setInverseBackgroundForced(true); // fixed bug in older versions of android.
 
         View view = getActivity().getLayoutInflater().inflate(R.layout.info_dialog, null);
         final CheckBox checkBox = (CheckBox) view.findViewById(R.id.no_show_checkbox);
