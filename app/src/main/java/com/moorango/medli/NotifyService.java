@@ -107,7 +107,7 @@ public class NotifyService extends Service {
         if (prefs.getBoolean("vibrate_preference", true) && isVibrator) {
             notify.setVibrate(new long[]{100, 250, 100, 500});
         } else if (prefs.getBoolean("vibrate_preference", true) && !isVibrator) {
-            Log.d(TAG, "no_vibrate");
+
             notify.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
 
         }

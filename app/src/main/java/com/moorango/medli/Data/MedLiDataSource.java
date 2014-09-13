@@ -376,7 +376,7 @@ public class MedLiDataSource {
         cv.put("status", MedLog.SPACE_FILLER);
         cv.put("due_time", time);
         cv.put("admin_type", medication.getAdminType().equalsIgnoreCase("routine") ? MedLog.ROUTINE : MedLog.PRN);
-        Log.d(TAG, "submitmissed: " + cv.toString());
+
         this.open();
         database.insert("med_logs", "ID_UNIQUE", cv);
     }
@@ -393,7 +393,7 @@ public class MedLiDataSource {
         cv.put("status", MedLog.SKIPPED);
         cv.put("due_time", medication.getNextDue());
         cv.put("admin_type", medication.getAdminType().equalsIgnoreCase("routine") ? MedLog.ROUTINE : MedLog.PRN);
-        Log.d(TAG, "submitSkipped: " + cv.toString());
+
         this.open();
         database.insert("med_logs", "ID_UNIQUE", cv);
     }

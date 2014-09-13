@@ -418,7 +418,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
                     errorCount++;
                 } else if (view instanceof EditText && ((EditText) view).getText().toString().matches("^.*[^a-zA-Z0-9 ./:].*$")) {
-                    Log.d(TAG, "checkText:");
+
                     ((EditText) view).setError("Invalid Characters");
                     errorCount++;
                 }
@@ -525,6 +525,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
             }
         } else {
             doseFrequency.setText(String.valueOf(medication.getDoseFrequency()));
+            maxDoses.setText(String.valueOf(medication.getDoseCount()));
         }
         doseFormEntry.setText(medication.getDoseForm());
         dc_med.setVisibility(View.VISIBLE);
