@@ -154,7 +154,7 @@ public class MedLiDataSource {
         medication.setDoseForm(cursor.getString(9));
         medication.setIdUnique(cursor.getInt(10));
 
-        if (medication.getAdminType().equals("routine")) {
+        if (medication.getAdminType().equalsIgnoreCase("routine")) {
             medication.setNextDue(new Object() {
 
                 String setTime() {
@@ -246,7 +246,7 @@ public class MedLiDataSource {
                 lastDate = thisDate;
             }
 
-            if (thisDate.equals(lastDate)) {
+            if (thisDate.equalsIgnoreCase(lastDate)) {
                 medLog = new MedLog(cs.getString(0), cs.getString(1), cs.getString(2), cs.getString(3), cs.getInt(4), (cs.getInt(5) == 1), (cs.getInt(6) == 1), cs.getString(8), cs.getInt(9));
                 medLog.setSubHeading(false);
                 makeHeader = false;
@@ -290,7 +290,7 @@ public class MedLiDataSource {
         //cv.put("fillDate", medication.getFillDate()); // will add this for next roll-out
         cv.put("startDate", medication.getStartDate());
 
-        if (medication.getAdminType().equals("routine")) {
+        if (medication.getAdminType().equalsIgnoreCase("routine")) {
             cv.put("dose_times", medication.getDoseTimes());
         } else {
             cv.put("dose_frequency", medication.getDoseFrequency());
@@ -346,7 +346,7 @@ public class MedLiDataSource {
             cv.put("time_frame", DataCheck.getDoseTimeFrame(manualTime, medication.getNextDue()));
         } else { // no manual entry.
             cv.put("timestamp", dt.getDate() + " " + DateTime.getTime24());
-            if (medication.getAdminType().equals("routine")) {
+            if (medication.getAdminType().equalsIgnoreCase("routine")) {
 
                 cv.put("time_frame", DataCheck.getDoseTimeFrame(DateTime.getTime12(), medication.getNextDue()));
             } else {

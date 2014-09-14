@@ -180,9 +180,9 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                                                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                                                    DataCheck.clearFormErrors(formWrapper);
                                                    errorCount = 0;
-                                                   if (!adapterView.getSelectedItem().toString().toLowerCase().equals("select")) {
+                                                   if (!adapterView.getSelectedItem().toString().equalsIgnoreCase("select")) {
                                                        formWrapper.setVisibility(View.VISIBLE);
-                                                       isRoutine = (adapterView.getSelectedItem().toString().toLowerCase().equals("routine"));
+                                                       isRoutine = (adapterView.getSelectedItem().toString().equalsIgnoreCase("routine"));
                                                        if (isRoutine) { // setup form for routine medication.
                                                            medTypePrompt.setText("Setting up a Routine medication");
                                                            setTextChangeListener();
@@ -380,7 +380,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
             medication.setIdUnique(getArguments().getInt("unique_id"));
         }
 
-        if (type.equals("routine")) {
+        if (type.equalsIgnoreCase("routine")) {
             medication.setDoseTimes(new Object() {
                 @Override
                 public String toString() {
@@ -417,7 +417,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                     ((EditText) view).setError("This cannot be empty.");
 
                     errorCount++;
-                } else if (view instanceof EditText && ((EditText) view).getText().toString().matches("^.*[^a-zA-Z0-9 ./:].*$")) {
+                } else if (view instanceof EditText && ((EditText) view).getText().toString().matches("^.*[^a-zA-Z0-9 ./:-].*$")) {
 
                     ((EditText) view).setError("Invalid Characters");
                     errorCount++;
@@ -440,7 +440,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
             acMedName.setError("This cannot be empty.");
             errorMessages.add("- The medication name cannot be empty\n");
 
-        } else if (acMedName.getText().toString().matches("^.*[^a-zA-Z0-9 ].*$")) {
+        } else if (acMedName.getText().toString().matches("^.*[^a-zA-Z0-9 -].*$")) {
             acMedName.setError("Invalid Characters");
             errorMessages.add("- You must use valid characters.");
 
@@ -545,7 +545,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                     doUpdate = true;
                 }
 
-                if (selection.equals("select")) {
+                if (selection.equalsIgnoreCase("select")) {
                     // TODO alert they have not entered a med yet.
                     Toast.makeText(getActivity(), "You have not selected a medication type", Toast.LENGTH_LONG).show();
 
@@ -850,7 +850,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                             text = parser.getText();
                             break;
                         case XmlPullParser.END_TAG:
-                            if (parser.getName().equals("suggestion")) {
+                            if (parser.getName().equalsIgnoreCase("suggestion")) {
                                 list.add(text);
                             }
                             break;

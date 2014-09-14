@@ -169,19 +169,19 @@ public class Medication {
 
     public int compareNextDue(Medication med) {
 
-        if (this.getNextDue().equals("COMPLETE")) {
+        if (this.getNextDue().equalsIgnoreCase("COMPLETE")) {
             return 1;
 
-        } else if (med.getNextDue().equals("COMPLETE")) {
+        } else if (med.getNextDue().equalsIgnoreCase("COMPLETE")) {
             return -1;
-        } else if (this.getNextDue().equals("MAXED DOSES!")) {
+        } else if (this.getNextDue().equalsIgnoreCase("MAXED DOSES!")) {
             return 1;
 
-        } else if (med.getNextDue().equals("MAXED DOSES!")) {
+        } else if (med.getNextDue().equalsIgnoreCase("MAXED DOSES!")) {
             return -1;
-        } else if (this.getNextDue().equals("PRN")) {
+        } else if (this.getNextDue().equalsIgnoreCase("PRN")) {
             return 1;
-        } else if (med.getNextDue().equals("PRN")) {
+        } else if (med.getNextDue().equalsIgnoreCase("PRN")) {
             return -1;
         } else {
 

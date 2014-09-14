@@ -80,7 +80,7 @@ public class Fragment_Home extends Fragment {
             introDialogBuilder();
         }
 
-        if (updateLists == null || !updateLists.getStatus().equals(AsyncTask.Status.RUNNING)) {
+        if (updateLists == null || updateLists.getStatus() != AsyncTask.Status.RUNNING) {
             updateLists = new MyAsyncTask(this);
             updateLists.execute();
         } else {
@@ -101,7 +101,7 @@ public class Fragment_Home extends Fragment {
         dataSource = MedLiDataSource.getHelper(getActivity());
 
 
-        if (updateLists == null || !updateLists.getStatus().equals(AsyncTask.Status.RUNNING)) {
+        if (updateLists == null || updateLists.getStatus() != AsyncTask.Status.RUNNING) {
             updateLists = new MyAsyncTask(this);
             updateLists.execute();
         } else {
@@ -119,7 +119,7 @@ public class Fragment_Home extends Fragment {
                 final int pos = position;
 
                 if (!adapter.getItem(pos).isSubHeading()) {
-                    if (adapter.getItem(pos).getNextDue().equalsIgnoreCase("complete") && !adapter.isChecked(pos)) {
+                    if (adapter.getItem(pos).getNextDue().equalsIgnoreCase("COMPLETE") && !adapter.isChecked(pos)) {
 
                         AlertDialog.Builder adB = new AlertDialog.Builder(getActivity())
                                 .setTitle("Maximum Doses Reached")
@@ -278,7 +278,7 @@ public class Fragment_Home extends Fragment {
     @Override
     public void onDestroy() {
 
-        if (updateLists != null && updateLists.getStatus().equals(AsyncTask.Status.RUNNING)) {
+        if (updateLists != null && updateLists.getStatus() == AsyncTask.Status.RUNNING) {
             updateLists.cancel(true);
         }
 

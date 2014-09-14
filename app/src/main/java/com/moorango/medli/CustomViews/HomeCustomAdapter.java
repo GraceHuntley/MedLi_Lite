@@ -156,7 +156,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
 
             }
 
-            if (!dataItem.getNextDue().equalsIgnoreCase("complete") && dataItem.getAdminType().equalsIgnoreCase("routine")) {
+            if (!dataItem.getNextDue().equalsIgnoreCase("COMPLETE") && dataItem.getAdminType().equalsIgnoreCase("routine")) {
 
                 Time nextDue = new Time();
                 Time now = new Time();
@@ -178,9 +178,9 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
 
             String doseVerbage = (dataItem.getAdminType().equalsIgnoreCase("routine")) ? "Next Due: " : "Earliest dose: ";
             String dueWording = (dataItem.getNextDue().equalsIgnoreCase("prn") ? "Any Time" : dataItem.getNextDue());
-            nextDueTime.setText((dataItem.getNextDue().equalsIgnoreCase("complete")) ? dataItem.getNextDue() : doseVerbage + dueWording);
+            nextDueTime.setText((dataItem.getNextDue().equalsIgnoreCase("COMPLETE")) ? dataItem.getNextDue() : doseVerbage + dueWording);
 
-            if (!dataItem.getNextDue().equalsIgnoreCase("complete") &&
+            if (!dataItem.getNextDue().equalsIgnoreCase("COMPLETE") &&
                     !dataItem.getNextDue().equalsIgnoreCase("prn") &&
                     !dataItem.getAdminType().equalsIgnoreCase("prn") &&
                     dataItem.getStatus() == Medication.ACTIVE) {
@@ -195,7 +195,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
 
             txtTitle.setVisibility(View.VISIBLE);
             nextDueTime.setVisibility(View.VISIBLE);
-            if (dataItem.getNextDue().equalsIgnoreCase("complete") || dataItem.getAdminType().equalsIgnoreCase("prn")) {
+            if (dataItem.getNextDue().equalsIgnoreCase("COMPLETE") || dataItem.getAdminType().equalsIgnoreCase("prn")) {
                 skipButton.setVisibility(View.GONE);
             } else {
                 skipButton.setVisibility(View.VISIBLE);

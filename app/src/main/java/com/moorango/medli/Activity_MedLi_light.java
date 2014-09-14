@@ -41,8 +41,6 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
             }
 
         }
-
-
     }
 
 
@@ -97,7 +95,7 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
 
                 } else {
                     getSupportFragmentManager().beginTransaction()
-                            .replace(android.R.id.content, new Fragment_EmptyMedList(), "emptyList").addToBackStack("emptyList")
+                            .replace(android.R.id.content, new Fragment_EmptyMedList(), "emptyList")
                             .commit();
                 }
 
@@ -129,7 +127,7 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
                             .commit();
                 } else {
                     getSupportFragmentManager().beginTransaction()
-                            .replace(android.R.id.content, new Fragment_EmptyMedList(), "emptyList").addToBackStack("emptyList")
+                            .replace(android.R.id.content, new Fragment_EmptyMedList(), "emptyList")
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                             .commit();
                 }

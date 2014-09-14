@@ -54,8 +54,9 @@ public class DataCheck {
         String readyForReturn = "";
 
         for (String titleWord : splitString) {
-            readyForReturn += titleWord.substring(0, 1).toUpperCase() + titleWord.substring(1, titleWord.length());
+            readyForReturn += titleWord.substring(0, 1).toUpperCase() + titleWord.substring(1, titleWord.length()) + " ";
         }
+        readyForReturn = readyForReturn.substring(0, readyForReturn.length() - 1);
 
         return readyForReturn;
     }
@@ -168,7 +169,7 @@ public class DataCheck {
 
     public static int getDoseTimeFrame(String time, String due) {
 
-        if (due.equalsIgnoreCase("complete")) {
+        if (due.equalsIgnoreCase("COMPLETE")) {
             return MedLog.EXTRA_DOSE;
         }
         try {
