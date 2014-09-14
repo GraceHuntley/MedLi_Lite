@@ -31,7 +31,7 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
             if (MedLiDataSource.getHelper(this).medListHasEntries()) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(android.R.id.content, new Fragment_Home(), "home")
-                                //.addToBackStack("home")
+                                // .addToBackStack("home")
                         .commit();
             } else {
                 getSupportFragmentManager().beginTransaction()
@@ -42,7 +42,6 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
 
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -63,7 +62,8 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
             case R.id.action_add_med:
 
                 getSupportFragmentManager().beginTransaction()
-                        .replace(android.R.id.content, new Fragment_MedSettings(), "medSettings").addToBackStack("medSettings")
+                        .replace(android.R.id.content, new Fragment_MedSettings(), "medSettings")
+                        .addToBackStack("medSettings")
                         .commit();
 
                 break;
@@ -71,7 +71,8 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
             case R.id.action_med_logs:
 
                 getSupportFragmentManager().beginTransaction()
-                        .replace(android.R.id.content, new Fragment_History(), "logFragment").addToBackStack("logFragment")
+                        .replace(android.R.id.content, new Fragment_History(), "logFragment")
+                        .addToBackStack("logFragment")
                         .commit();
 
                 break;
@@ -107,6 +108,31 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onBackPressed() {
+
+        Fragment_Home fh = (Fragment_Home) getSupportFragmentManager().findFragmentByTag("home");
+        Fragment_EmptyMedList feM = (Fragment_EmptyMedList) getSupportFragmentManager().findFragmentByTag("emptyList");
+
+        if ((feM != null && feM.isVisible()) || (fh != null && fh.isVisible())) {
+            finish();
+        } else {
+            if (MedLiDataSource.getHelper(this).medListHasEntries()) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(android.R.id.content, new Fragment_Home(), "home")
+                                // .addToBackStack("home")
+                        .commit();
+            } else {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(android.R.id.content, new Fragment_EmptyMedList(), "emptyList")
+                                //.addToBackStack("emptyList")
+                        .commit();
+            }
+
+        }
+    }
+
 
     public void onFragmentInteraction(int tag, String name, int id) {
         FragmentManager fragmentManager;

@@ -3,7 +3,6 @@ package com.moorango.medli.CustomViews;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.text.format.Time;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -134,7 +133,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
             skipButton.setVisibility(View.GONE);
             headerText.setVisibility(View.VISIBLE);
             editMed.setVisibility(View.GONE);
-            // boxWrapper.setBackgroundResource(android.R.color.background_light);
+
             boxWrapper.setBackgroundResource(R.drawable.list_bg);
         } else {
             txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName()) + " " + dataItem.getDoseForm());
@@ -156,31 +155,20 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
 
             }
 
-            if (!dataItem.getNextDue().equalsIgnoreCase("COMPLETE") && dataItem.getAdminType().equalsIgnoreCase("routine")) {
+            if (dataItem.getAdminType().equalsIgnoreCase("routine")) {
 
-                Time nextDue = new Time();
-                Time now = new Time();
-                now.setToNow();
-                nextDue.setToNow();
+                if (dataItem.getNextDue().compareTo(DateTime.getCurrentTimestamp(false, null)) == 1) {
 
-                String splitTime[] = DateTime.convertToTime24(dataItem.getNextDue()).split(":");
-
-                nextDue.hour = Integer.valueOf(splitTime[0]);
-                nextDue.minute = Integer.valueOf(splitTime[1]);
-                nextDue.second = Integer.valueOf(splitTime[2]);
-
-                if (nextDue.toMillis(true) > now.toMillis(true)) {
                     AlarmHelpers ah = new AlarmHelpers(context);
-                    ah.setAlarm(DateTime.getFormattedDate() + " " + DateTime.convertToTime24(dataItem.getNextDue()), dataItem.getMedName(), dataItem.getIdUnique());
+                    ah.setAlarm(dataItem.getNextDue(), dataItem.getMedName(), dataItem.getIdUnique());
                 }
             }
 
-
             String doseVerbage = (dataItem.getAdminType().equalsIgnoreCase("routine")) ? "Next Due: " : "Earliest dose: ";
-            String dueWording = (dataItem.getNextDue().equalsIgnoreCase("prn") ? "Any Time" : dataItem.getNextDue());
-            nextDueTime.setText((dataItem.getNextDue().equalsIgnoreCase("COMPLETE")) ? dataItem.getNextDue() : doseVerbage + dueWording);
+            String dueWording = (dataItem.getNextDue().equalsIgnoreCase("prn") ? "Any Time" : DateTime.convertToTime12(dataItem.getNextDue().split(" ")[1]));
+            nextDueTime.setText(!DataCheck.isToday(dataItem.getNextDue()) && !dataItem.getAdminType().equalsIgnoreCase("prn") ? "COMPLETE" : doseVerbage + dueWording);
 
-            if (!dataItem.getNextDue().equalsIgnoreCase("COMPLETE") &&
+            if (DataCheck.isToday(dataItem.getNextDue()) &&
                     !dataItem.getNextDue().equalsIgnoreCase("prn") &&
                     !dataItem.getAdminType().equalsIgnoreCase("prn") &&
                     dataItem.getStatus() == Medication.ACTIVE) {
@@ -190,12 +178,15 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                     nextDueTime.setTextColor(context.getResources().getColor(R.color.red));
                     convertView.findViewById(R.id.late_dose_image).setVisibility(View.VISIBLE);
 
+                } else {
+                    nextDueTime.setTextColor(context.getResources().getColor(android.R.color.black));
+                    convertView.findViewById(R.id.late_dose_image).setVisibility(View.GONE);
                 }
             }
 
             txtTitle.setVisibility(View.VISIBLE);
             nextDueTime.setVisibility(View.VISIBLE);
-            if (dataItem.getNextDue().equalsIgnoreCase("COMPLETE") || dataItem.getAdminType().equalsIgnoreCase("prn")) {
+            if (!DataCheck.isToday(dataItem.getNextDue()) || dataItem.getAdminType().equalsIgnoreCase("prn")) {
                 skipButton.setVisibility(View.GONE);
             } else {
                 skipButton.setVisibility(View.VISIBLE);

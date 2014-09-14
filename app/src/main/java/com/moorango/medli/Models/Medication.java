@@ -1,6 +1,6 @@
 package com.moorango.medli.Models;
 
-import com.moorango.medli.Helpers.DateTime;
+import com.moorango.medli.Helpers.DataCheck;
 
 /**
  * Created by Colin on 7/31/2014.
@@ -169,10 +169,10 @@ public class Medication {
 
     public int compareNextDue(Medication med) {
 
-        if (this.getNextDue().equalsIgnoreCase("COMPLETE")) {
+        if (!DataCheck.isToday(this.getNextDue())) {
             return 1;
 
-        } else if (med.getNextDue().equalsIgnoreCase("COMPLETE")) {
+        } else if (!DataCheck.isToday(med.getNextDue())) {
             return -1;
         } else if (this.getNextDue().equalsIgnoreCase("MAXED DOSES!")) {
             return 1;
@@ -185,7 +185,7 @@ public class Medication {
             return -1;
         } else {
 
-            return DateTime.convertToTime24(this.getNextDue()).compareTo(DateTime.convertToTime24(med.getNextDue()));
+            return this.getNextDue().compareTo(med.getNextDue());
         }
         //return 0;
     }

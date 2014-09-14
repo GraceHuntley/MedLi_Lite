@@ -13,7 +13,6 @@ import com.moorango.medli.Models.MedLog;
 import com.moorango.medli.Models.Medication;
 import com.moorango.medli.R;
 
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -77,17 +76,18 @@ public class DataCheck {
 
         String nextDose = null;
         for (String dose : availableDoses) {
-            if (isDoseLate(dose, true)) {
-                dataSource.submitMissedDose(medication, dose);
+            String doseTS = DateTime.getCurrentTimestamp(true, dose);
+            if (isDoseLate(doseTS, true)) {
+                dataSource.submitMissedDose(medication, doseTS);
             } else {
                 dataSource.changeMedicationStatus(medication.getIdUnique(), Medication.ACTIVE);
-                return dose;
+                return doseTS;
             }
-            nextDose = dose;
+            nextDose = doseTS;
         }
         dataSource.changeMedicationStatus(medication.getIdUnique(), Medication.ACTIVE);
 
-        return (nextDose != null && !isDoseLate(nextDose, false)) ? nextDose : "Complete";
+        return (nextDose != null && !isDoseLate(nextDose, false)) ? nextDose : "COMPLETE";
     }
 
     public static int createUniqueID(String medName) {
@@ -96,16 +96,6 @@ public class DataCheck {
         return (new Random().nextInt() + medName + DateTime.getNowInMillisec()).hashCode();
     }
 
-    /**
-     * Function compares current time, along with doses today, and available doses to fill in missed ones.
-     * meant only for Routine meds.
-     */
-    public static void fillInMissedDoses(Context context, int idUnique) {
-
-        Map<String, Boolean> map = MedLiDataSource.getHelper(context).getMedDosesByID(idUnique);
-
-
-    }
 
     public static void clearForm(ViewGroup group) {
 
@@ -143,37 +133,19 @@ public class DataCheck {
 
     }
 
-    public static boolean isDoseLate(String due, boolean filler) {
+    public static boolean isDoseLate(String dueTime, boolean filler) {
         // TODO test whether admin time is late.
 
-        String nextDose24Hour[] = DateTime.convertToTime24(due).split(":");
-        String loggedDose24Hour[] = DateTime.getTime24().split(":");
-
-        int nextDoseHour = Integer.valueOf(nextDose24Hour[0]);
-        int loggedHour = Integer.valueOf(loggedDose24Hour[0]);
-
-        int nextDoseMinute = Integer.valueOf(nextDose24Hour[1]);
-        int loggedMinute = Integer.valueOf(loggedDose24Hour[1]);
-
-        int nextDoseTotalMinutes = (nextDoseHour * 60) + nextDoseMinute;
-        int loggedDoseTotalMinutes = (loggedHour * 60) + loggedMinute;
-
-        int difference = loggedDoseTotalMinutes - nextDoseTotalMinutes;
-
-        if (filler) {
-            return difference > 1;
-        }
-
-        return difference > 2;
+        return dueTime.compareTo(DateTime.getCurrentTimestamp(false, null)) < 0;
     }
 
     public static int getDoseTimeFrame(String time, String due) {
 
-        if (due.equalsIgnoreCase("COMPLETE")) {
+        if (!DataCheck.isToday(due)) {
             return MedLog.EXTRA_DOSE;
         }
         try {
-            String nextDose24Hour[] = DateTime.convertToTime24(due).split(":");
+            String nextDose24Hour[] = due.split(" ")[1].split(":");
             String loggedDose24Hour[] = DateTime.convertToTime24(time).split(":");
 
             int nextDoseHour = Integer.valueOf(nextDose24Hour[0]);
@@ -194,5 +166,17 @@ public class DataCheck {
             Log.e(TAG + " getDoseTimeFrame", nfe.toString());
         }
         return MedLog.ON_TIME;
+    }
+
+    /**
+     * Checks if provided String is today. returns true if date equal to day
+     * false otherwise.
+     *
+     * @param nextDue
+     * @return
+     */
+    public static boolean isToday(String nextDue) {
+
+        return nextDue.split(" ")[0].equals(DateTime.getCurrentTimestamp(false, null).split(" ")[0]);
     }
 }

@@ -6,16 +6,15 @@
 
 package com.moorango.medli.Helpers;
 
-
 import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.util.Log;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 @SuppressWarnings("WeakerAccess")
 public class DateTime {
@@ -59,18 +58,16 @@ public class DateTime {
             values[index] = Integer.valueOf(dateSplit[index]);
         }
 
-
+        int year = values[0];
+        int month = values[1];
+        int day = values[2];
         int hour = values[3];
         int minute = values[4];
         int second = values[5];
 
-        Time prepTime = new Time();
-        prepTime.setToNow();
-        prepTime.hour = hour;
-        prepTime.minute = minute;
-        prepTime.second = second;
+        org.joda.time.DateTime dt = new org.joda.time.DateTime(year, month, day, hour, minute, second);
 
-        return prepTime.toMillis(true);
+        return dt.getMillis();
     }
 
     /**
@@ -132,12 +129,6 @@ public class DateTime {
         return hours + ":" + minutes + " " + amPm;
     }
 
-    public static String getFormattedDate() {
-
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        return df.format(new Date());
-    }
-
     public static String convertToTime24(String time) {
 
         String formattedDate = "error";
@@ -161,21 +152,36 @@ public class DateTime {
         return time.toMillis(true);
     }
 
-    /**
-     * @param timeToConvert
-     * @param dateToConvert will be null for now until i figure out the date issues.
+    /***
+     * returns proper sql timestamp. if justDate is true uses provided time with current date for timestamp.
+     * else returns current timestamp and date.
+     * @param justDate boolean true if time will be provided for timestamp.
+     * @param time 12 hour time will be injected into timestmap.
      * @return
      */
-    public static long convert12HrToTimeMillis(String timeToConvert, String dateToConvert) {
-        Time time = new Time();
-        time.setToNow();
+    public static String getCurrentTimestamp(boolean justDate, String time) {
 
-        String splitTime[] = convertToTime24(timeToConvert).split(":");
-        time.hour = Integer.valueOf(splitTime[0]);
-        time.minute = Integer.valueOf(splitTime[1]);
-        time.second = Integer.valueOf(splitTime[2]);
+        Calendar cal = Calendar.getInstance();
 
-        return time.toMillis(true);
+        Date now = cal.getTime();
+        Timestamp ts = new Timestamp(now.getTime());
+
+        String tsNoMill = ts.toString().split("\\.")[0];
+
+        return justDate ? tsNoMill.toString().split(" ")[0] + " " + convertToTime24(time) : tsNoMill.toString();
+    }
+
+    public static String getNextDayTimestamp(String time) {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, 1);
+        Date now = cal.getTime();
+        Timestamp ts = new Timestamp(now.getTime());
+
+        String tsNoMill = ts.toString().split("\\.")[0];
+
+        Log.d(TAG, "getNextDayTimestamp: " + tsNoMill.split(" ")[0] + " " + DateTime.convertToTime24(time));
+
+        return tsNoMill.split(" ")[0] + " " + DateTime.convertToTime24(time);
     }
 
 }

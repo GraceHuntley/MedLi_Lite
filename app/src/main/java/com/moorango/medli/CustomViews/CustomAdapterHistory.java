@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +37,7 @@ public class CustomAdapterHistory extends BaseAdapter {
     private final MedLiDataSource dbHelper;
     private final Fragment_History caller;
     private AlertDialog.Builder dialog;
+    final String TAG = "CustomAdapterHistory";
 
     public CustomAdapterHistory(Context context, List<MedLog> rowItem, Fragment_History caller) {
         this.context = context;
@@ -185,6 +187,7 @@ public class CustomAdapterHistory extends BaseAdapter {
                 message.setText(messageNote);
             }
             medName.setText(DataCheck.capitalizeTitles(dataItem.getName()));
+            Log.d(TAG, "LN190: " + dataItem.getTimeOnly());
             doseTime.setText(DateTime.convertToTime12(dataItem.getTimeOnly()));
             dose.setText(dataItem.getDose());
 

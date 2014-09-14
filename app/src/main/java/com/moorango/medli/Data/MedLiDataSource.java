@@ -18,9 +18,7 @@ import com.moorango.medli.Models.Medication;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Colin on 7/31/2014.
@@ -127,22 +125,6 @@ public class MedLiDataSource {
     private Medication cursorToRoutine(Cursor cursor, final Context context, final boolean makeAlarms) {
         final Medication medication = new Medication();
 
-
-        /*String test1 = "";
-        for (int index = 0; index < cursor.getColumnCount(); index++) {
-
-
-            switch(cursor.getType(index)) {
-                case Cursor.FIELD_TYPE_STRING:
-                    test1 += cursor.getColumnName(index) + " " + cursor.getString(index) + " ";
-                    break;
-                case Cursor.FIELD_TYPE_INTEGER:
-                    test1 += cursor.getColumnName(index) + " " + cursor.getInt(index) + " ";
-            }
-        } */
-
-        //Log.d(TAG, "cursorToRoutine: " + test1);
-
         medication.setMedName(cursor.getString(0));
         medication.setDoseMeasure(cursor.getFloat(1));
         medication.setDoseMeasureType(cursor.getString(2));
@@ -158,13 +140,12 @@ public class MedLiDataSource {
             medication.setNextDue(new Object() {
 
                 String setTime() {
-
+                    String split[] = medication.getDoseTimes().split(";");
                     if (medication.getDoseCount() > medication.getActualDoseCount()) {
-                        String split[] = medication.getDoseTimes().split(";");
 
-                        return split[medication.getActualDoseCount()];
+                        return DateTime.getCurrentTimestamp(true, split[medication.getActualDoseCount()]);
                     } else {
-                        return "COMPLETE";
+                        return DateTime.getNextDayTimestamp(split[0]);
                     }
                 }
             }.setTime());
@@ -177,7 +158,6 @@ public class MedLiDataSource {
             } else {
                 // TODO get last dose then see if it was recent.
                 String nextDose = getPrnNextDose(medication.getIdUnique(), medication.getDoseFrequency());
-                String splitTest[] = getPrnNextDose(medication.getIdUnique(), medication.getDoseFrequency()).split(" ");
 
                 medication.setNextDue(nextDose);
             }
@@ -219,7 +199,7 @@ public class MedLiDataSource {
                 String nextDoseHour = "" + (lastDoseHour + freq);
                 String minutes = "" + nextDose.split(" ")[1].split(":")[1];
 
-                nextDose = DateTime.convertToTime12(nextDoseHour + ":" + minutes + ":" + "00");
+                nextDose = DateTime.getCurrentTimestamp(true, DateTime.convertToTime12(nextDoseHour + ":" + minutes + ":" + "00"));
             } else {
                 nextDose = "PRN";
             }
@@ -371,7 +351,7 @@ public class MedLiDataSource {
         cv.put("ID_FK", medication.getIdUnique());
         cv.put("name", medication.getMedName());
         cv.put("dose", medication.getDoseMeasure() + " " + medication.getDoseMeasureType());
-        cv.put("timestamp", dt.getDate() + " " + DateTime.convertToTime24(time));
+        cv.put("timestamp", time);
         cv.put("missed", 1);
         cv.put("status", MedLog.SPACE_FILLER);
         cv.put("due_time", time);
@@ -388,7 +368,7 @@ public class MedLiDataSource {
         cv.put("ID_FK", medication.getIdUnique());
         cv.put("name", medication.getMedName());
         cv.put("dose", medication.getDoseMeasure() + " " + medication.getDoseMeasureType());
-        cv.put("timestamp", dt.getDate() + " " + DateTime.convertToTime24(medication.getNextDue()));
+        cv.put("timestamp", medication.getNextDue());
         cv.put("missed", 1);
         cv.put("status", MedLog.SKIPPED);
         cv.put("due_time", medication.getNextDue());
@@ -434,39 +414,6 @@ public class MedLiDataSource {
         }
     }
 
-    public Map<String, Boolean> getMedDosesByID(int uniqueID) {
-
-        Map<String, Boolean> map = new HashMap<String, Boolean>();
-
-        this.open();
-
-        String query = "SELECT "
-                + "dose_times as doses "
-                + "WHERE ID_UNIQUE=" + uniqueID
-                + " LIMIT 1";
-
-        Cursor cs = database.rawQuery(query, null);
-        if (cs.moveToFirst()) {
-            String doseTimes[] = cs.getString(0).split(";");
-            for (String time : doseTimes) {
-                Time now = new Time();
-                now.setToNow();
-                if (DateTime.convert12HrToTimeMillis(time, null) < (now.toMillis(true))) {
-                    map.put(time, false); // only add dose times that are passed.
-                }
-            }
-        }
-
-        return map;
-    }
-
-    public boolean checkIfMedDoseIDExists(int unique) {
-        this.open();
-
-        Cursor cs = database.rawQuery("SELECT ID_UNIQUE FROM med_logs WHERE ID_UNIQUE=" + unique, null);
-        return cs.getCount() > 0;
-    }
-
     private void insertPreference(String prefName, ContentValues cv) {
         this.open();
         Cursor cs = database.rawQuery("SELECT pref_name FROM prefs WHERE pref_name = '" + prefName + "'", null);
@@ -475,7 +422,6 @@ public class MedLiDataSource {
         } else {
             database.insert("prefs", "pref_name", cv);
         }
-
     }
 
     public boolean getPreferenceBool(String name) {
