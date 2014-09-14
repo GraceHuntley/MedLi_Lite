@@ -168,6 +168,8 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
             String dueWording = (dataItem.getNextDue().equalsIgnoreCase("prn") ? "Any Time" : DateTime.convertToTime12(dataItem.getNextDue().split(" ")[1]));
             nextDueTime.setText(!DataCheck.isToday(dataItem.getNextDue()) && !dataItem.getAdminType().equalsIgnoreCase("prn") ? "COMPLETE" : doseVerbage + dueWording);
 
+            convertView.findViewById(R.id.late_dose_image).setVisibility(View.GONE); // hack for test.
+
             if (DataCheck.isToday(dataItem.getNextDue()) &&
                     !dataItem.getNextDue().equalsIgnoreCase("prn") &&
                     !dataItem.getAdminType().equalsIgnoreCase("prn") &&

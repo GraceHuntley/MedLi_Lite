@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.util.Log;
 
 import com.moorango.medli.NotifyService;
 
@@ -33,7 +32,6 @@ public class AlarmHelpers {
 
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        Log.d(TAG, "setAlarm: " + DateTime.getUTCTimeMillis(time));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 

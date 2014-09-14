@@ -103,6 +103,7 @@
                 android:hint="@string/med_name_hint"
                 android:layout_weight="1"
                 android:singleLine="true"
+                android:imeOptions="actionNext"
                 android:textColor="#000000" />
 
             <TextView
@@ -122,6 +123,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="@string/dose_hint"
+
                     android:inputType="numberDecimal" />
 
                 <EditText

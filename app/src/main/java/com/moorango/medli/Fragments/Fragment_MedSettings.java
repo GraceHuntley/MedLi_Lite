@@ -797,8 +797,12 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
                     med_measure_spinner.setText(choices.get(id).getDoseMeasure());
                     med_measure_spinner.setError(null);
+                    doseFormEntry.requestFocus();
 
+                } else {
+                    med_dose.requestFocus();
                 }
+
                 adDoseChoices.dismiss();
 
             }

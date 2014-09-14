@@ -429,10 +429,7 @@ public class MedLiDataSource {
         this.open();
         Cursor cs = database.rawQuery("SELECT pref_bool FROM prefs WHERE pref_name = '" + name + "'", null);
 
-        if (cs.moveToFirst()) {
-            return cs.getInt(0) == 1;
-        }
-        return true;
+        return !cs.moveToFirst() || cs.getInt(0) == 1;
 
     }
 

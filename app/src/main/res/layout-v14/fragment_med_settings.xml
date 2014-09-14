@@ -110,6 +110,7 @@
                 android:layout_height="0dip"
                 android:hint="@string/med_name_hint"
                 android:inputType="textNoSuggestions"
+                android:imeOptions="actionNext"
                 android:layout_weight="1"
                 android:singleLine="true"
                 android:textColor="#000000" />

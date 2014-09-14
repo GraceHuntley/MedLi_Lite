@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -187,7 +186,7 @@ public class CustomAdapterHistory extends BaseAdapter {
                 message.setText(messageNote);
             }
             medName.setText(DataCheck.capitalizeTitles(dataItem.getName()));
-            Log.d(TAG, "LN190: " + dataItem.getTimeOnly());
+
             doseTime.setText(DateTime.convertToTime12(dataItem.getTimeOnly()));
             dose.setText(dataItem.getDose());
 

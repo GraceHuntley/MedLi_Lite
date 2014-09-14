@@ -168,7 +168,7 @@ public class DateTime {
 
         String tsNoMill = ts.toString().split("\\.")[0];
 
-        return justDate ? tsNoMill.toString().split(" ")[0] + " " + convertToTime24(time) : tsNoMill.toString();
+        return justDate ? tsNoMill.split(" ")[0] + " " + convertToTime24(time) : tsNoMill;
     }
 
     public static String getNextDayTimestamp(String time) {
@@ -178,8 +178,6 @@ public class DateTime {
         Timestamp ts = new Timestamp(now.getTime());
 
         String tsNoMill = ts.toString().split("\\.")[0];
-
-        Log.d(TAG, "getNextDayTimestamp: " + tsNoMill.split(" ")[0] + " " + DateTime.convertToTime24(time));
 
         return tsNoMill.split(" ")[0] + " " + DateTime.convertToTime24(time);
     }
