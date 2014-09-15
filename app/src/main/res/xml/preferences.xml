@@ -10,16 +10,26 @@
             android:summary="If checked device will vibrate twice when a medication is due."
             android:defaultValue="true" />
 
+        <CheckBoxPreference
+            android:key="sound_preference"
+            android:title="Sound alert?"
+            android:summary="If checked device will alert with a sound, some tablets will default to sound if vibrate not available."
+            android:defaultValue="true" />
+
+        <EditTextPreference
+            android:key="early_alarm_preference"
+            android:title="Early warning alarm?"
+            android:summary="Enter how many minutes before a medication is due that you would like the alarm to go off."
+            android:inputType="number"
+            android:defaultValue="0"
+            android:dialogTitle="test" />
+
     </PreferenceCategory>
 
     <!-- <PreferenceCategory
          android:title="@string/dialog_based_preferences">
 
-         <EditTextPreference
-             android:key="edittext_preference"
-             android:title="@string/title_edittext_preference"
-             android:summary="@string/summary_edittext_preference"
-             android:dialogTitle="@string/dialog_title_edittext_preference" />
+
 
          <ListPreference
              android:key="list_preference"

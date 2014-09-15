@@ -26,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -556,11 +557,42 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                         //checkDoseTimes(etList);
                         dataSource.submitNewMedication(prepareMedicationObject(), doUpdate);
                         hideKeyboard();
-                        mListener.onFragmentInteraction(1, null, 0);
-                    } else {
-                        //Toast.makeText(getActivity(), "You forgot to enter something", Toast.LENGTH_SHORT).show();
-                    }
 
+                        if (dataSource.getPreferenceBool("show_new_med_info")) {
+
+                            AlertDialog.Builder adB = new AlertDialog.Builder(getActivity());
+                            adB.setIcon(android.R.drawable.ic_dialog_info);
+                            adB.setTitle("New medication added");
+                            adB.setInverseBackgroundForced(true); // fixed bug in older versions of android.
+
+                            View view = getActivity().getLayoutInflater().inflate(R.layout.info_dialog, null);
+                            final CheckBox checkBox = (CheckBox) view.findViewById(R.id.no_show_checkbox);
+
+                            String home_welcome_info = acMedName.getText().toString() + " has been added.\n\n" +
+                                    "If this is a routine medication the next due will be set to the next available dose after now " +
+                                    " or complete if there are no doses left for the day after now. All reminders have been set and " +
+                                    "starting tomorrow the routine will start from the first dose.";
+                            TextView tv1 = (TextView) view.findViewById(R.id.main_text);
+                            tv1.setText(home_welcome_info);
+
+                            ((TextView) view.findViewById(R.id.dont_show_message)).setText(getResources().getString(R.string.do_not_show));
+
+                            adB.setView(view)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            if (checkBox.isChecked()) {
+                                                dataSource.addOrUpdatePreference("show_new_med_info", false);
+
+                                            }
+                                            mListener.onFragmentInteraction(1, null, 0);
+                                        }
+                                    }).show();
+                        } else {
+                            mListener.onFragmentInteraction(1, null, 0);
+                        }
+
+                    }
                 }
                 break;
             case R.id.plus_button:

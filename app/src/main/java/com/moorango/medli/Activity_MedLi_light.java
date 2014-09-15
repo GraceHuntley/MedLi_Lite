@@ -68,7 +68,7 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
         final MedLiDataSource dataSource = MedLiDataSource.getHelper(this);
         if (dataSource.getPreferenceBool("agree_to_disclaimer")) {
             AlertDialog.Builder adB = new AlertDialog.Builder(this);
-
+            adB.setInverseBackgroundForced(true); // fixed bug in older versions of android.
             View view = this.getLayoutInflater().inflate(R.layout.info_dialog, null);
             final CheckBox checkBox = (CheckBox) view.findViewById(R.id.no_show_checkbox);
             TextView tv1 = (TextView) view.findViewById(R.id.main_text);

@@ -153,11 +153,12 @@ public class DateTime {
         return time.toMillis(true);
     }
 
-    /***
+    /**
      * returns proper sql timestamp. if justDate is true uses provided time with current date for timestamp.
      * else returns current timestamp and date.
+     *
      * @param justDate boolean true if time will be provided for timestamp.
-     * @param time 12 hour time will be injected into timestmap.
+     * @param time     12 hour time will be injected into timestmap.
      * @return
      */
     public static String getCurrentTimestamp(boolean justDate, String time) {
@@ -166,6 +167,7 @@ public class DateTime {
 
         Date now = cal.getTime();
         Timestamp ts = new Timestamp(now.getTime());
+
 
         String tsNoMill = ts.toString().split("\\.")[0];
 

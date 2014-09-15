@@ -16,8 +16,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.moorango.medli.Data.MedLiDataSource;
-
 /**
  * Created by Colin on 9/8/2014.
  * Copyright 2014
@@ -39,10 +37,11 @@ public class NotifyService extends Service {
     public static final String INTENT_NOTIFY = "com.moorango.medli.INTENT_NOTIFY";
     public static final String INTENT_FROM_NOTIFICATION = "com.moorango.medli.INTENT_FROM_NOTIFICATION";
     public static final String MEDICATION_NAME = "med_name";
+    public static final String EARLY_ALARM = "early_alarm";
     private String medicationName;
     // The system notification manager
     private NotificationManager mNM;
-
+    private int earlyDose = 0;
     private final String TAG = "NotifyService";
 
     @Override
@@ -62,6 +61,7 @@ public class NotifyService extends Service {
             showNotification();
 
         }
+        earlyDose = intent.getIntExtra(EARLY_ALARM, 0);
 
         // We don't care if this service is stopped as we have already delivered our notification
         return START_NOT_STICKY;
@@ -82,7 +82,7 @@ public class NotifyService extends Service {
         // This is the 'title' of the notification
         CharSequence title = "Medication Reminder!!";
 
-        CharSequence text = "You are due for Medication(s)";
+        CharSequence text = "You are due for Medication(s) " + ((earlyDose > 0) ? "in " + earlyDose + " minute(s)" : "now.");
 
         Notification notification;
 
@@ -101,6 +101,9 @@ public class NotifyService extends Service {
         notify.setContentTitle(title)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentText(text);
+        if (prefs.getBoolean("sound_preference", true)) {
+            notify.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+        }
         if (prefs.getBoolean("vibrate_preference", true) && isVibrator) {
             notify.setVibrate(new long[]{100, 250, 100, 500});
         } else if (prefs.getBoolean("vibrate_preference", true) && !isVibrator) {
@@ -108,10 +111,19 @@ public class NotifyService extends Service {
             notify.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
 
         }
+
+        /***
+         * if user ignores alarm set new alarms in background.
+         */
+        Intent intent = new Intent(this, StartAlarms.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, intent, 0);
+
+        notify.setDeleteIntent(pendingIntent);
         notification = notify.build();
 
-        MedLiDataSource dataSource = MedLiDataSource.getHelper(this);
-        dataSource.getAllMeds(this, true);
+
+        /*MedLiDataSource dataSource = MedLiDataSource.getHelper(this);
+        dataSource.getAllMeds(this, true); */
 
         // The PendingIntent to launch our activity if the user selects this notification
         Intent backIntent = new Intent(this, Activity_MedLi_light.class);
