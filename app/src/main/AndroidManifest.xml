@@ -12,11 +12,11 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="com.example.gcm.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <permission
         android:name="android.permission.STATUS_BAR_SERVICE"
         android:protectionLevel="signature" />
-
     <permission
         android:name="com.example.gcm.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
@@ -27,7 +27,7 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.Medli">
         <activity
-            android:name=".Activity_MedLi_light"
+            android:name="com.moorango.medli.Activity_MedLi_light"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
@@ -38,10 +38,17 @@
         </activity>
 
         <service
-            android:name=".NotifyService"
+            android:name="com.moorango.medli.NotifyService"
             android:exported="false" />
 
+        <receiver
+            android:name="com.moorango.medli.StartAlarms"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+            </intent-filter>
 
+        </receiver>
     </application>
 
 </manifest>

@@ -1,7 +1,9 @@
 package com.moorango.medli;
 
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -34,11 +36,27 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
         if (savedInstanceState == null) {
 
             if (MedLiDataSource.getHelper(this).medListHasEntries()) {
+
+                ComponentName receiver = new ComponentName(this, StartAlarms.class);
+                PackageManager pm = this.getPackageManager();
+
+                pm.setComponentEnabledSetting(receiver,
+                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                        PackageManager.DONT_KILL_APP);
+
                 getSupportFragmentManager().beginTransaction()
                         .replace(android.R.id.content, new Fragment_Home(), "home")
                                 // .addToBackStack("home")
                         .commit();
             } else {
+
+                ComponentName receiver = new ComponentName(this, StartAlarms.class);
+                PackageManager pm = this.getPackageManager();
+
+                pm.setComponentEnabledSetting(receiver,
+                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                        PackageManager.DONT_KILL_APP);
+
                 getSupportFragmentManager().beginTransaction()
                         .replace(android.R.id.content, new Fragment_EmptyMedList(), "emptyList")
                                 //.addToBackStack("emptyList")
@@ -63,7 +81,7 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             if (checkBox.isChecked()) {
-                                dataSource.addOrUpdatePreference("agree_to_disclaimer", true);
+                                dataSource.addOrUpdatePreference("agree_to_disclaimer", false);
                                 dialogInterface.dismiss();
 
                             } else {
@@ -73,7 +91,6 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
                     });
             adB.show();
         }
-
 
 
     }

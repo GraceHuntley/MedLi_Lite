@@ -16,6 +16,8 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.moorango.medli.Data.MedLiDataSource;
+
 /**
  * Created by Colin on 9/8/2014.
  * Copyright 2014
@@ -79,13 +81,8 @@ public class NotifyService extends Service {
     private void showNotification() {
         // This is the 'title' of the notification
         CharSequence title = "Medication Reminder!!";
-        // This is the icon to use on the notification
-        int icon = R.drawable.ic_launcher;
-        // This is the scrolling text of the notification
 
-        CharSequence text = "You are due for " + medicationName;
-        // What time to show on the notification
-        long time = System.currentTimeMillis();
+        CharSequence text = "You are due for Medication(s)";
 
         Notification notification;
 
@@ -112,6 +109,9 @@ public class NotifyService extends Service {
 
         }
         notification = notify.build();
+
+        MedLiDataSource dataSource = MedLiDataSource.getHelper(this);
+        dataSource.getAllMeds(this, true);
 
         // The PendingIntent to launch our activity if the user selects this notification
         Intent backIntent = new Intent(this, Activity_MedLi_light.class);

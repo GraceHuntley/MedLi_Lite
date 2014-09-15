@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Fragments.Fragment_Home;
-import com.moorango.medli.Helpers.AlarmHelpers;
 import com.moorango.medli.Helpers.DataCheck;
 import com.moorango.medli.Helpers.DateTime;
 import com.moorango.medli.Models.Medication;
@@ -200,23 +199,15 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
 
     private void fillAndSetTimers(Medication dataItem) {
 
-        /***
-         * Fill in missed doses for a new medication.
-         */
 
-        if (dataItem.getStatus() == Medication.NEW) {
-            dataItem.setNextDue(DataCheck.findNextDoseNewMed(context, dataItem));
-
-        }
-
-        if (dataItem.getAdminType().equalsIgnoreCase("routine")) {
+        /*if (dataItem.getAdminType().equalsIgnoreCase("routine")) {
 
             if (dataItem.getNextDue().compareTo(DateTime.getCurrentTimestamp(false, null)) == 1) {
 
                 AlarmHelpers ah = new AlarmHelpers(context);
                 ah.setAlarm(dataItem.getNextDue(), dataItem.getMedName(), dataItem.getIdUnique());
             }
-        }
+        } */
     }
 
     private void isLate(boolean isLate) {

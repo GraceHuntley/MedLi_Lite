@@ -27,6 +27,7 @@ public class AlarmHelpers {
         Intent intent = new Intent(context, NotifyService.class);
         intent.putExtra(NotifyService.INTENT_NOTIFY, true);
         intent.putExtra(NotifyService.MEDICATION_NAME, name);
+        intent.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
 
         PendingIntent pendingIntent = PendingIntent.getService(context, uniqueID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 

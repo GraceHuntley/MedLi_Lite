@@ -10,6 +10,7 @@ import android.text.format.Time;
 import android.util.Log;
 
 import com.moorango.medli.Constants;
+import com.moorango.medli.Helpers.AlarmHelpers;
 import com.moorango.medli.Helpers.DataCheck;
 import com.moorango.medli.Helpers.DateTime;
 import com.moorango.medli.Models.MedLog;
@@ -38,14 +39,17 @@ public class MedLiDataSource {
     private SQLiteDatabase database;
     private final Helper_SQLiteHelper dbHelper;
     private static MedLiDataSource instance;
+    private Context context;
 
     public MedLiDataSource(Context context) {
         dbHelper = new Helper_SQLiteHelper(context);
+        this.context = context;
     }
 
     public static synchronized MedLiDataSource getHelper(Context context) {
         if (instance == null)
             instance = new MedLiDataSource(context);
+
 
         return instance;
     }
@@ -153,6 +157,14 @@ public class MedLiDataSource {
                     }
                 }
             }.setTime());
+
+
+            if (medication.getNextDue().compareTo(DateTime.getCurrentTimestamp(false, null)) == 1) {
+
+                AlarmHelpers ah = new AlarmHelpers(context);
+                ah.setAlarm(medication.getNextDue(), medication.getMedName(), medication.getIdUnique());
+            }
+
         } else {
 
             medication.setDoseFrequency(Integer.valueOf(cursor.getString(7)));
@@ -261,6 +273,8 @@ public class MedLiDataSource {
         } else {
             cv.put("status", medication.getAdminType().equalsIgnoreCase("routine") ? Medication.NEW : Medication.ACTIVE);
             cv.put("ID_UNIQUE", DataCheck.createUniqueID(medication.getMedName()));
+
+
         }
         cv.put("dose_count", medication.getDoseCount());
         //cv.put("fillDate", medication.getFillDate()); // will add this for next roll-out
@@ -279,6 +293,12 @@ public class MedLiDataSource {
 
             database.insert("medlist", "ID_UNIQUE", cv);
         }
+        if (cv.getAsInteger("status") == Medication.NEW) {
+            DataCheck.findNextDoseNewMed(context, getSingleMedByName(cv.getAsInteger("ID_UNIQUE")));
+            changeMedicationStatus(cv.getAsInteger("ID_UNIQUE"), Medication.ACTIVE);
+
+        }
+
     }
 
     @SuppressWarnings("UnusedReturnValue")
@@ -414,7 +434,7 @@ public class MedLiDataSource {
         this.open();
         Cursor cs = database.rawQuery("SELECT pref_name FROM prefs WHERE pref_name = '" + prefName + "'", null);
         if (cs.moveToFirst()) {
-            database.update("prefs", cv, "pref_name = " + prefName, null);
+            database.update("prefs", cv, "pref_name = '" + prefName + "'", null);
         } else {
             database.insert("prefs", "pref_name", cv);
         }
