@@ -1,11 +1,16 @@
 package com.moorango.medli;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.TextView;
 
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Fragments.Fragment_EmptyMedList;
@@ -42,8 +47,37 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
 
         }
 
+        final MedLiDataSource dataSource = MedLiDataSource.getHelper(this);
+        if (dataSource.getPreferenceBool("agree_to_disclaimer")) {
+            AlertDialog.Builder adB = new AlertDialog.Builder(this);
+
+            View view = this.getLayoutInflater().inflate(R.layout.info_dialog, null);
+            final CheckBox checkBox = (CheckBox) view.findViewById(R.id.no_show_checkbox);
+            TextView tv1 = (TextView) view.findViewById(R.id.main_text);
+            tv1.setText(getResources().getString(R.string.disclaimer));
+            ((TextView) view.findViewById(R.id.dont_show_message)).setText("I Agree");
+            adB.setView(view)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if (checkBox.isChecked()) {
+                                dataSource.addOrUpdatePreference("agree_to_disclaimer", true);
+                                dialogInterface.dismiss();
+
+                            } else {
+                                finish();
+                            }
+                        }
+                    });
+            adB.show();
+        }
+
+
 
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -71,4 +71,10 @@
 
     <!-- END Fragment_EmptyMedList -->
 
+    <string name="disclaimer">This application by no means acts as a medical device, nor does it provide or contribute to any form of medical treatment.
+        The information and functions provided by this application, although well tested, are not guaranteed accurate nor are they guaranteed
+        to be available. The purpose of MedLi is to help the user keep track of a prescribed regime, not by any means to replace, or ensure
+        adherence to a medical professionals prescribed treatment. Furthermore if there are any questions or concerns about your
+        prescribed treatment you should consult the prescribing physician.</string>
+
 </resources>
