@@ -119,7 +119,8 @@ public class Fragment_Home extends Fragment {
                 final int pos = position;
 
                 if (!adapter.getItem(pos).isSubHeading()) {
-                    if (adapter.getItem(pos).getNextDue().equalsIgnoreCase("COMPLETE") && !adapter.isChecked(pos)) {
+                    Medication med = adapter.getItem(pos);
+                    if ((med.getActualDoseCount() >= med.getDoseCount()) && !adapter.isChecked(pos)) {
 
                         AlertDialog.Builder adB = new AlertDialog.Builder(getActivity())
                                 .setTitle("Maximum Doses Reached")

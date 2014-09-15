@@ -15,6 +15,10 @@ import com.moorango.medli.Helpers.DateTime;
 import com.moorango.medli.Models.MedLog;
 import com.moorango.medli.Models.Medication;
 
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -188,26 +192,18 @@ public class MedLiDataSource {
         }
 
         if (nextDose == null) {
-            nextDose = "PRN";
+            nextDose = "NOW";
         } else {
-            int lastDoseHour = Integer.valueOf(nextDose.split(" ")[1].split(":")[0]);
-            int lastDosePlusHour = lastDoseHour + freq; // just for testing purposes.
 
-            int currentHour = Integer.valueOf(DateTime.getTime24().split(":")[0]);
+            DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+            org.joda.time.DateTime dt = dateStringFormat.parseDateTime(nextDose);
 
-            if ((lastDosePlusHour - currentHour) >= 0) {
-                String nextDoseHour = "" + (lastDoseHour + freq);
-                String minutes = "" + nextDose.split(" ")[1].split(":")[1];
+            return new Timestamp(dt.plusHours(freq).toDate().getTime()).toString();
 
-                nextDose = DateTime.getCurrentTimestamp(true, DateTime.convertToTime12(nextDoseHour + ":" + minutes + ":" + "00"));
-            } else {
-                nextDose = "PRN";
-            }
         }
 
         return nextDose;
     }
-
 
     public List<MedLog> getMedHistory() {
 

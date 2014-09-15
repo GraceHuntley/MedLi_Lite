@@ -169,22 +169,17 @@ public class Medication {
 
     public int compareNextDue(Medication med) {
 
-        if (!DataCheck.isToday(this.getNextDue())) {
+        if (this.getNextDue().equalsIgnoreCase("NOW")) {
+            return -1;
+        } else if (med.getNextDue().equalsIgnoreCase("NOW")) {
+            return 1;
+        } else if (!DataCheck.isToday(this.getNextDue())) {
             return 1;
 
         } else if (!DataCheck.isToday(med.getNextDue())) {
             return -1;
-        } else if (this.getNextDue().equalsIgnoreCase("MAXED DOSES!")) {
-            return 1;
 
-        } else if (med.getNextDue().equalsIgnoreCase("MAXED DOSES!")) {
-            return -1;
-        } else if (this.getNextDue().equalsIgnoreCase("PRN")) {
-            return 1;
-        } else if (med.getNextDue().equalsIgnoreCase("PRN")) {
-            return -1;
         } else {
-
             return this.getNextDue().compareTo(med.getNextDue());
         }
         //return 0;

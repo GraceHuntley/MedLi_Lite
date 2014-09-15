@@ -39,6 +39,14 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
     private final List<Medication> data;
     private final SparseBooleanArray sparseBooleanArray;
 
+    private final String PRN_DOSE_TEXT = "Earliest Dose: ";
+    private final String ROUTINE_DOSE_TEXT = "Next Due: ";
+
+    private ImageView skipButton, editMed, lateDoseStamp;
+    private CheckedTextView txtTitle;
+    private TextView headerText, nextDueTime;
+    private RelativeLayout boxWrapper;
+
     public HomeCustomAdapter(Context context,
                              List<Medication> rowItem, Fragment_Home caller) {
         super(context, R.layout.home_list_item, R.id.title, rowItem);
@@ -51,7 +59,6 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
             sparseBooleanArray.put(index, false);
         }
     }
-
 
     public SparseBooleanArray getCheckedItemPositions() {
 
@@ -112,89 +119,137 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
             convertView = mInflater.inflate(R.layout.home_list_item, null);
         }
 
-        final CheckedTextView txtTitle = (CheckedTextView) convertView.findViewById(R.id.title);
-        final TextView headerText = (TextView) convertView.findViewById(R.id.header_title);
-        final TextView nextDueTime = (TextView) convertView.findViewById(R.id.next_dose_time);
-        final ImageView skipButton = (ImageView) convertView.findViewById(R.id.skip_dose);
-
-        final ImageView editMed = (ImageView) convertView.findViewById(R.id.edit_med_button);
-        RelativeLayout boxWrapper = (RelativeLayout) convertView.findViewById(R.id.box_wrapper);
-
+        txtTitle = (CheckedTextView) convertView.findViewById(R.id.title);
+        headerText = (TextView) convertView.findViewById(R.id.header_title);
+        nextDueTime = (TextView) convertView.findViewById(R.id.next_dose_time);
+        skipButton = (ImageView) convertView.findViewById(R.id.skip_dose);
+        editMed = (ImageView) convertView.findViewById(R.id.edit_med_button);
+        lateDoseStamp = (ImageView) convertView.findViewById(R.id.late_dose_image);
+        boxWrapper = (RelativeLayout) convertView.findViewById(R.id.box_wrapper);
         final Medication dataItem = data.get(position);
 
-        txtTitle.setChecked(sparseBooleanArray.get(position));
-
         if (dataItem.isSubHeading()) {
-            headerText.setText(dataItem.getMedName());
-            txtTitle.setText(dataItem.getMedName());
-            txtTitle.setChecked(false);
-            txtTitle.setVisibility(View.INVISIBLE);
-            nextDueTime.setVisibility(View.GONE);
-            skipButton.setVisibility(View.GONE);
-            headerText.setVisibility(View.VISIBLE);
-            editMed.setVisibility(View.GONE);
 
-            boxWrapper.setBackgroundResource(R.drawable.list_bg);
-        } else {
-            txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName()) + " " + dataItem.getDoseForm());
+            prepSubHeading(dataItem);
+
+        } else if (dataItem.getAdminType().equalsIgnoreCase("ROUTINE")) {
+
+            fillAndSetTimers(dataItem); // this eventually will be moved. TODO
+
+            txtTitle.setVisibility(View.VISIBLE);
+            txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName() + " " + dataItem.getDoseForm()));
+            nextDueTime.setVisibility(View.VISIBLE);
+            prepEditMed(true, dataItem);
+
+            txtTitle.setChecked(sparseBooleanArray.get(position));
 
             if (txtTitle.isChecked()) {
 
-                boxWrapper.setBackgroundResource(android.R.color.holo_green_light);
+                boxWrapper.setBackgroundResource(R.color.green_selector);
             } else {
                 boxWrapper.setBackgroundResource(android.R.color.white);
             }
 
+            if (!DataCheck.isToday(dataItem.getNextDue())) {
 
-            /***
-             * Fill in missed doses for a new medication.
-             */
-
-            if (dataItem.getStatus() == Medication.NEW) {
-                dataItem.setNextDue(DataCheck.findNextDoseNewMed(context, dataItem));
-
-            }
-
-            if (dataItem.getAdminType().equalsIgnoreCase("routine")) {
-
-                if (dataItem.getNextDue().compareTo(DateTime.getCurrentTimestamp(false, null)) == 1) {
-
-                    AlarmHelpers ah = new AlarmHelpers(context);
-                    ah.setAlarm(dataItem.getNextDue(), dataItem.getMedName(), dataItem.getIdUnique());
-                }
-            }
-
-            String doseVerbage = (dataItem.getAdminType().equalsIgnoreCase("routine")) ? "Next Due: " : "Earliest dose: ";
-            String dueWording = (dataItem.getNextDue().equalsIgnoreCase("prn") ? "Any Time" : DateTime.convertToTime12(dataItem.getNextDue().split(" ")[1]));
-            nextDueTime.setText(!DataCheck.isToday(dataItem.getNextDue()) && !dataItem.getAdminType().equalsIgnoreCase("prn") ? "COMPLETE" : doseVerbage + dueWording);
-
-            convertView.findViewById(R.id.late_dose_image).setVisibility(View.GONE); // hack for test.
-
-            if (DataCheck.isToday(dataItem.getNextDue()) &&
-                    !dataItem.getNextDue().equalsIgnoreCase("prn") &&
-                    !dataItem.getAdminType().equalsIgnoreCase("prn") &&
-                    dataItem.getStatus() == Medication.ACTIVE) {
+                nextDueTime.setText("COMPLETE");
+                prepSkipButton(false, null);
+            } else {
+                nextDueTime.setText(ROUTINE_DOSE_TEXT + DateTime.convertToTime12(dataItem.getNextDue().split(" ")[1]));
+                prepSkipButton(true, dataItem);
 
                 if (DataCheck.isDoseLate(dataItem.getNextDue(), false)) {
-
-                    nextDueTime.setTextColor(context.getResources().getColor(R.color.red));
-                    convertView.findViewById(R.id.late_dose_image).setVisibility(View.VISIBLE);
-
+                    isLate(true);
                 } else {
-                    nextDueTime.setTextColor(context.getResources().getColor(android.R.color.black));
-                    convertView.findViewById(R.id.late_dose_image).setVisibility(View.GONE);
+                    isLate(false);
                 }
             }
 
+        } else {
+            isLate(false);
+            prepSkipButton(false, null);
             txtTitle.setVisibility(View.VISIBLE);
+            txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName() + " " + dataItem.getDoseForm()));
             nextDueTime.setVisibility(View.VISIBLE);
-            if (!DataCheck.isToday(dataItem.getNextDue()) || dataItem.getAdminType().equalsIgnoreCase("prn")) {
-                skipButton.setVisibility(View.GONE);
+            prepEditMed(true, dataItem);
+
+            txtTitle.setChecked(sparseBooleanArray.get(position));
+
+            if (txtTitle.isChecked()) {
+
+                boxWrapper.setBackgroundResource(R.color.green_selector);
             } else {
-                skipButton.setVisibility(View.VISIBLE);
+                boxWrapper.setBackgroundResource(android.R.color.white);
             }
+
+            if (dataItem.getDoseCount() > dataItem.getActualDoseCount()) {
+                String nextDue = dataItem.getNextDue();
+                nextDue = nextDue.equalsIgnoreCase("NOW") ? "NOW" : DataCheck.isToday(nextDue) ? DateTime.convertToTime12(nextDue.split(" ")[1]) : "Tomorrow at " + DateTime.convertToTime12(nextDue.split(" ")[1]);
+                nextDueTime.setText(PRN_DOSE_TEXT + nextDue);
+            } else {
+                //nextDueTime.setText(DateTime.getReadableDate(dataItem.getNextDue().split(" ")[0]) + " " + DateTime.convertToTime12(dataItem.getNextDue().split(" ")[1]));
+                nextDueTime.setText("MAX DOSES REACHED");
+            }
+
+        }
+
+
+        return convertView;
+
+    }
+
+    private void fillAndSetTimers(Medication dataItem) {
+
+        /***
+         * Fill in missed doses for a new medication.
+         */
+
+        if (dataItem.getStatus() == Medication.NEW) {
+            dataItem.setNextDue(DataCheck.findNextDoseNewMed(context, dataItem));
+
+        }
+
+        if (dataItem.getAdminType().equalsIgnoreCase("routine")) {
+
+            if (dataItem.getNextDue().compareTo(DateTime.getCurrentTimestamp(false, null)) == 1) {
+
+                AlarmHelpers ah = new AlarmHelpers(context);
+                ah.setAlarm(dataItem.getNextDue(), dataItem.getMedName(), dataItem.getIdUnique());
+            }
+        }
+    }
+
+    private void isLate(boolean isLate) {
+        if (isLate) {
+            nextDueTime.setTextColor(context.getResources().getColor(R.color.red));
+            lateDoseStamp.setVisibility(View.VISIBLE);
+        } else {
+            lateDoseStamp.setVisibility(View.GONE);
+            nextDueTime.setTextColor(context.getResources().getColor(android.R.color.black));
+        }
+    }
+
+    private void prepSubHeading(Medication dataItem) {
+
+        txtTitle.setVisibility(View.GONE);
+        nextDueTime.setVisibility(View.GONE);
+        prepSkipButton(false, null);
+        prepEditMed(false, null);
+        isLate(false);
+
+        headerText.setText(dataItem.getMedName());
+        headerText.setVisibility(View.VISIBLE);
+
+        boxWrapper.setBackgroundResource(R.drawable.list_bg);
+    }
+
+    private void prepEditMed(boolean showButton, Medication dataItem) {
+
+        if (showButton) {
             editMed.setVisibility(View.VISIBLE);
             headerText.setVisibility(View.GONE);
+
+            final Medication data = dataItem;
 
             editMed.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -208,10 +263,21 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
             editMed.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    caller.mListener.onFragmentInteraction(3, dataItem.getMedName(), dataItem.getIdUnique());
+                    caller.mListener.onFragmentInteraction(3, data.getMedName(), data.getIdUnique());
                     return true;
                 }
             });
+        } else {
+            editMed.setVisibility(View.GONE);
+        }
+
+    }
+
+    private void prepSkipButton(boolean showButton, Medication dataItem) {
+        if (showButton) {
+            skipButton.setVisibility(View.VISIBLE);
+
+            final Medication data = dataItem;
 
             skipButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -225,7 +291,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
             skipButton.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    MedLiDataSource.getHelper(context).submitSkippedDose(dataItem);
+                    MedLiDataSource.getHelper(context).submitSkippedDose(data);
                     caller.mListener.onFragmentInteraction(1, null, 0);
                     Toast toast = Toast.makeText(context, "Skipped Dose", Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.TOP, 0, 0);
@@ -233,11 +299,9 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                     return true;
                 }
             });
-
+        } else {
+            skipButton.setVisibility(View.GONE);
         }
-
-        return convertView;
-
     }
 
 }
