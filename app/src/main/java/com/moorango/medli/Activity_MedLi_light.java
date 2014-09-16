@@ -11,7 +11,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.moorango.medli.Data.MedLiDataSource;
@@ -70,23 +69,26 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
             AlertDialog.Builder adB = new AlertDialog.Builder(this);
             adB.setInverseBackgroundForced(true); // fixed bug in older versions of android.
             View view = this.getLayoutInflater().inflate(R.layout.info_dialog, null);
-            final CheckBox checkBox = (CheckBox) view.findViewById(R.id.no_show_checkbox);
+            (view.findViewById(R.id.no_show_checkbox)).setVisibility(View.GONE);
+            (view.findViewById(R.id.dont_show_message)).setVisibility(View.GONE);
             TextView tv1 = (TextView) view.findViewById(R.id.main_text);
             tv1.setText(getResources().getString(R.string.disclaimer));
             ((TextView) view.findViewById(R.id.dont_show_message)).setText("I Agree");
             adB.setView(view)
                     .setIcon(android.R.drawable.ic_dialog_alert)
-
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    .setNegativeButton("I Disagree", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            if (checkBox.isChecked()) {
-                                dataSource.addOrUpdatePreference("agree_to_disclaimer", false);
-                                dialogInterface.dismiss();
+                            finish();
+                        }
+                    })
+                    .setPositiveButton("I Agree", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
 
-                            } else {
-                                finish();
-                            }
+                            dataSource.addOrUpdatePreference("agree_to_disclaimer", false);
+                            dialogInterface.dismiss();
+
                         }
                     });
             adB.show();
