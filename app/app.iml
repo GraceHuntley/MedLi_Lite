@@ -95,6 +95,7 @@
     <orderEntry type="library" exported="" name="google-oauth-client-1.18.0-rc" level="project" />
     <orderEntry type="library" exported="" name="support-v4-19.1.0" level="project" />
     <orderEntry type="library" exported="" name="google-http-client-1.18.0-rc" level="project" />
+    <orderEntry type="library" exported="" name="robotium-solo-5.2.1" level="project" />
     <orderEntry type="library" exported="" name="joda-time-2.4" level="project" />
   </component>
 </module>

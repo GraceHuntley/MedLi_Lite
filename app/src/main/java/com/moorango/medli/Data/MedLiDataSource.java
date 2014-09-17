@@ -268,12 +268,11 @@ public class MedLiDataSource {
         if (doUpdate) {
             Time now = new Time();
             now.setToNow();
-
+            cv.put("status", Medication.ACTIVE);
             cv.put("last_modified", now.format("%Y-%m-%d %H:%M:%S"));
         } else {
             cv.put("status", medication.getAdminType().equalsIgnoreCase("routine") ? Medication.NEW : Medication.ACTIVE);
             cv.put("ID_UNIQUE", DataCheck.createUniqueID(medication.getMedName()));
-
 
         }
         cv.put("dose_count", medication.getDoseCount());
@@ -286,18 +285,23 @@ public class MedLiDataSource {
             cv.put("dose_frequency", medication.getDoseFrequency());
         }
         this.open();
+
+        boolean dbSuccess;
         if (doUpdate) {
 
-            database.update("medlist", cv, "ID_UNIQUE='" + medication.getIdUnique() + "'", null);
+            dbSuccess = database.update("medlist", cv, "ID_UNIQUE='" + medication.getIdUnique() + "'", null) > 0 ? true : false;
         } else {
 
-            database.insert("medlist", "ID_UNIQUE", cv);
+            dbSuccess = database.insert("medlist", "ID_UNIQUE", cv) >= 0 ? true : false;
         }
-        if (cv.getAsInteger("status") == Medication.NEW) {
-            DataCheck.findNextDoseNewMed(context, getSingleMedByName(cv.getAsInteger("ID_UNIQUE")));
-            changeMedicationStatus(cv.getAsInteger("ID_UNIQUE"), Medication.ACTIVE);
+
+        if (dbSuccess && cv.getAsInteger("status") == Medication.NEW) {
+            Medication med = getSingleMedByName(cv.getAsInteger("ID_UNIQUE"));
+            DataCheck.findNextDoseNewMed(context, med);
+            changeMedicationStatus(med.getIdUnique(), Medication.ACTIVE);
 
         }
+
 
     }
 

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="medli-endpoints-android">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/medli/build/libs/medli-endpoints-android.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

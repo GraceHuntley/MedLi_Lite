@@ -22,7 +22,7 @@
             android:summary="Enter how many minutes before a medication is due that you would like the alarm to go off."
             android:inputType="number"
             android:defaultValue="0"
-            android:dialogTitle="test" />
+            android:dialogTitle="Enter how many minutes before medication is due." />
 
     </PreferenceCategory>
 

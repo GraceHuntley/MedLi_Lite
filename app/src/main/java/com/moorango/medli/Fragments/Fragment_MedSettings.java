@@ -62,21 +62,17 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
     private final String TAG = "MedSettingsFragment.java";
     private final ArrayList<EditText> etList = new ArrayList<EditText>();
-    private EditText med_dose, doseFrequency, doseFormEntry, med_measure_spinner;
-    private EditText maxDoses;
-    private LinearLayout adminTimesList;
+    private EditText med_dose, doseFrequency, doseFormEntry, med_measure_spinner, maxDoses;
+    private LinearLayout adminTimesList, prnFreqBox;
     private Spinner med_type;
     private AutoCompleteTextView acMedName;
     private TextWatcher textWatcher;
-    private LinearLayout prnFreqBox;
-    private ScrollView secondaryForm;
     private ScrollView formWrapper;
     private int index = 0;
     private boolean isRoutine = false;
     private Button delete_med, dc_med, clear;
     private AlertDialog.Builder adb;
     private AlertDialog adDoseChoices;
-    private static boolean isRunning = false;
     private Helper_DrugData drugDataHelper;
     private MedLiDataSource dataSource;
     private OnFragmentInteractionListener mListener;
@@ -149,7 +145,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         prnFreqBox = (LinearLayout) getActivity().findViewById(R.id.prn_frequency_box);
 
         acMedName = (AutoCompleteTextView) getActivity().findViewById(R.id.ac_Med_name);
-        acMedName.setThreshold(3);
+        acMedName.setThreshold(2);
 
         doseFormEntry.addTextChangedListener(new TextWatcher() {
             @Override
@@ -223,10 +219,15 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                 @Override
                 public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
 
-                    if (!isRunning) { // only start new asynctask if one is no running already.
-                        isRunning = true;
+                    if (getSuggestions != null && getSuggestions.getStatus() != AsyncTask.Status.RUNNING) { // only start new asynctask if one is no running already.
+
                         getSuggestions = new GetSuggestions().setParName(Uri.encode(charSequence.toString()));
                         getSuggestions.execute();
+                    } else {
+                        if (getSuggestions != null) {
+                            getSuggestions.cancel(true);
+                        }
+                        getSuggestions = new GetSuggestions().setParName(Uri.encode(charSequence.toString()));
                     }
 
                     acMedName.setTextColor(Color.BLACK);
@@ -558,7 +559,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                         dataSource.submitNewMedication(prepareMedicationObject(), doUpdate);
                         hideKeyboard();
 
-                        if (dataSource.getPreferenceBool("show_new_med_info")) {
+                        if (dataSource.getPreferenceBool("show_new_med_info") && !doUpdate) {
 
                             AlertDialog.Builder adB = new AlertDialog.Builder(getActivity());
                             adB.setIcon(android.R.drawable.ic_dialog_info);
@@ -866,33 +867,36 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
             HttpGet httpGet = new HttpGet(apiDomain + apiCall + partName);
 
             try {
-                HttpResponse response = httpClient.execute(httpGet);
-                InputStream is = response.getEntity().getContent();
-                parser = Xml.newPullParser();
 
-                parser.setInput(is, null);
+                if (!isCancelled()) {
+                    HttpResponse response = httpClient.execute(httpGet);
+                    InputStream is = response.getEntity().getContent();
+                    parser = Xml.newPullParser();
 
-                eventType = parser.getEventType();
+                    parser.setInput(is, null);
 
-                String text = "";
+                    eventType = parser.getEventType();
 
-                while (eventType != XmlPullParser.END_DOCUMENT) {
+                    String text = "";
 
-                    switch (eventType) {
-                        case XmlPullParser.START_TAG:
-                            // do nothing.
-                            break;
-                        case XmlPullParser.TEXT:
-                            text = parser.getText();
-                            break;
-                        case XmlPullParser.END_TAG:
-                            if (parser.getName().equalsIgnoreCase("suggestion")) {
-                                list.add(text);
-                            }
-                            break;
+                    while (!isCancelled() && eventType != XmlPullParser.END_DOCUMENT) {
 
+                        switch (eventType) {
+                            case XmlPullParser.START_TAG:
+                                // do nothing.
+                                break;
+                            case XmlPullParser.TEXT:
+                                text = parser.getText();
+                                break;
+                            case XmlPullParser.END_TAG:
+                                if (parser.getName().equalsIgnoreCase("suggestion")) {
+                                    list.add(text);
+                                }
+                                break;
+
+                        }
+                        eventType = parser.next();
                     }
-                    eventType = parser.next();
                 }
 
             } catch (IOException ioe) {
@@ -910,7 +914,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                         android.R.layout.select_dialog_item, list);
 
                 acMedName.setAdapter(adapter);
-                isRunning = false;
+
             }
             super.onPostExecute(list);
         }

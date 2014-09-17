@@ -79,8 +79,11 @@ public class DataCheck {
             String doseTS = DateTime.getCurrentTimestamp(true, dose);
             if (isDoseLate(doseTS, true)) {
                 dataSource.submitMissedDose(medication, doseTS);
+                //dataSource.changeMedicationStatus(medication.getIdUnique(), Medication.ACTIVE);
+                Log.d(TAG, "late");
             } else {
-                dataSource.changeMedicationStatus(medication.getIdUnique(), Medication.ACTIVE);
+                //dataSource.changeMedicationStatus(medication.getIdUnique(), Medication.ACTIVE);
+                Log.d(TAG, "notLate");
                 return doseTS;
             }
             nextDose = doseTS;
