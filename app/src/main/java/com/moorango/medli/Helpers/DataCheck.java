@@ -139,6 +139,8 @@ public class DataCheck {
     public static boolean isDoseLate(String dueTime, boolean filler) {
         // TODO test whether admin time is late.
 
+        //  Log.d(TAG, "dueTime: " + dueTime);
+        //  Log.d(TAG, "currTime: " + DateTime.getCurrentTimestamp(false, null));
         return dueTime.compareTo(DateTime.getCurrentTimestamp(false, null)) < 0;
     }
 

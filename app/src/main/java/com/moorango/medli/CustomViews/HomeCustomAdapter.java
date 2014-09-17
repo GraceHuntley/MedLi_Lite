@@ -133,7 +133,6 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
 
         } else if (dataItem.getAdminType().equalsIgnoreCase("ROUTINE")) {
 
-            fillAndSetTimers(dataItem); // this eventually will be moved. TODO
 
             txtTitle.setVisibility(View.VISIBLE);
             txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName() + " " + dataItem.getDoseForm()));
@@ -152,6 +151,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
             if (!DataCheck.isToday(dataItem.getNextDue())) {
 
                 nextDueTime.setText("COMPLETE");
+                isLate(false);
                 prepSkipButton(false, null);
             } else {
                 nextDueTime.setText(ROUTINE_DOSE_TEXT + DateTime.convertToTime12(dataItem.getNextDue().split(" ")[1]));
@@ -183,7 +183,10 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
 
             if (dataItem.getDoseCount() > dataItem.getActualDoseCount()) {
                 String nextDue = dataItem.getNextDue();
-                nextDue = nextDue.equalsIgnoreCase("NOW") ? "NOW" : DataCheck.isToday(nextDue) ? DateTime.convertToTime12(nextDue.split(" ")[1]) : "Tomorrow at " + DateTime.convertToTime12(nextDue.split(" ")[1]);
+                nextDue = nextDue.equalsIgnoreCase("NOW") ? "NOW" : DataCheck.isToday(nextDue) ? DataCheck.isDoseLate(nextDue, false) ? "NOW" : DateTime.convertToTime12(nextDue.split(" ")[1]) : "Tomorrow at " + DateTime.convertToTime12(nextDue.split(" ")[1]);
+
+
+
                 nextDueTime.setText(PRN_DOSE_TEXT + nextDue);
             } else {
                 //nextDueTime.setText(DateTime.getReadableDate(dataItem.getNextDue().split(" ")[0]) + " " + DateTime.convertToTime12(dataItem.getNextDue().split(" ")[1]));
@@ -192,22 +195,8 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
 
         }
 
-
         return convertView;
 
-    }
-
-    private void fillAndSetTimers(Medication dataItem) {
-
-
-        /*if (dataItem.getAdminType().equalsIgnoreCase("routine")) {
-
-            if (dataItem.getNextDue().compareTo(DateTime.getCurrentTimestamp(false, null)) == 1) {
-
-                AlarmHelpers ah = new AlarmHelpers(context);
-                ah.setAlarm(dataItem.getNextDue(), dataItem.getMedName(), dataItem.getIdUnique());
-            }
-        } */
     }
 
     private void isLate(boolean isLate) {

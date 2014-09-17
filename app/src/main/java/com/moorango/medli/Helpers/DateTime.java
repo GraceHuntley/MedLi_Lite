@@ -182,6 +182,8 @@ public class DateTime {
 
         String tsNoMill = ts.toString().split("\\.")[0];
 
+        Log.d(TAG, tsNoMill.split(" ")[0] + " " + DateTime.convertToTime24(time));
+
         return tsNoMill.split(" ")[0] + " " + DateTime.convertToTime24(time);
     }
 

@@ -151,6 +151,8 @@ public class MedLiDataSource {
                     String split[] = medication.getDoseTimes().split(";");
                     if (medication.getDoseCount() > medication.getActualDoseCount()) {
 
+                        Log.d(TAG, medication.getMedName());
+
                         return DateTime.getCurrentTimestamp(true, split[medication.getActualDoseCount()]);
                     } else {
                         return DateTime.getNextDayTimestamp(split[0]);
