@@ -82,7 +82,7 @@ public class NotifyService extends Service {
         // This is the 'title' of the notification
         CharSequence title = "Medication Reminder!!";
 
-        CharSequence text = "You are due for Medication(s) " + ((earlyDose > 0) ? "in " + earlyDose + " minute(s)" : "now.");
+        CharSequence text = "You are due for Medications " + ((earlyDose > 0) ? "in: " + earlyDose + " minute(s)" : "now.");
 
         Notification notification;
 
@@ -100,7 +100,10 @@ public class NotifyService extends Service {
         NotificationCompat.Builder notify = new NotificationCompat.Builder(this);
         notify.setContentTitle(title)
                 .setSmallIcon(R.drawable.ic_launcher)
-                .setContentText(text);
+                .setSubText(text)
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText(text));
+
         if (prefs.getBoolean("sound_preference", true)) {
             notify.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
         }
@@ -122,16 +125,12 @@ public class NotifyService extends Service {
         notification = notify.build();
 
 
-        /*MedLiDataSource dataSource = MedLiDataSource.getHelper(this);
-        dataSource.getAllMeds(this, true); */
-
         // The PendingIntent to launch our activity if the user selects this notification
         Intent backIntent = new Intent(this, Activity_MedLi_light.class);
         backIntent.putExtra(MEDICATION_NAME, medicationName);
         backIntent.putExtra(INTENT_FROM_NOTIFICATION, true);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, backIntent, 0);
-
 
         // Set the info for the views that show in the notification panel.
         notification.setLatestEventInfo(this, title, text, contentIntent);

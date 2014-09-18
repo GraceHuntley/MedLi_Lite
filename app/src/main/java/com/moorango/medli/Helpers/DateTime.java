@@ -59,7 +59,11 @@ public class DateTime {
          */
 
         String cleanDateTime = dateTime.split("\\.")[0];
-        String dateSplit[] = cleanDateTime.split("[-: ]");
+
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+        org.joda.time.DateTime due = formatter.parseDateTime(cleanDateTime);
+
+        /*String dateSplit[] = cleanDateTime.split("[-: ]");
         int values[] = new int[dateSplit.length];
 
         for (int index = 0; index < dateSplit.length; index++) {
@@ -73,10 +77,17 @@ public class DateTime {
         int minute = values[4];
         int second = values[5];
 
-        org.joda.time.DateTime dt = new org.joda.time.DateTime(year, month, day, hour, minute, second);
+        org.joda.time.DateTime dt = new org.joda.time.DateTime(year, month, day, hour, minute, second); */
 
-        return dt.getMillis();
+        return due.getMillis();
     }
+
+    public static long getNowInMillisec() {
+        Time time = new Time();
+        time.setToNow();
+        return time.toMillis(true);
+    }
+
 
     /**
      * From date string (SQL compatable time stamp) returns date only in presentable format.
@@ -154,11 +165,6 @@ public class DateTime {
 
     }
 
-    public static long getNowInMillisec() {
-        Time time = new Time();
-        time.setToNow();
-        return time.toMillis(true);
-    }
 
     /**
      * returns proper sql timestamp. if justDate is true uses provided time with current date for timestamp.

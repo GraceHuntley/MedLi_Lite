@@ -25,9 +25,9 @@ public class AlarmHelpers {
         this.context = context;
     }
 
-    public void setAlarm(String rawTime, String name, int uniqueID) {
+    public void setAlarm(int idUnique, String dueTime) {
 
-        long time = DateTime.getUTCTimeMillis(rawTime);
+        long time = DateTime.getUTCTimeMillis(dueTime);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int earlyAlarm = Integer.valueOf(prefs.getString("early_alarm_preference", "0"));
@@ -35,25 +35,23 @@ public class AlarmHelpers {
             time = time - (60 * 1000 * earlyAlarm);
         }
 
-        if (DateTime.getNowInMillisec() < time) {
+        if (DateTime.getNowInMillisec() <= time) {
             Intent intent = new Intent(context, NotifyService.class);
             intent.putExtra(NotifyService.INTENT_NOTIFY, true);
-            intent.putExtra(NotifyService.MEDICATION_NAME, name);
+
             intent.putExtra(NotifyService.EARLY_ALARM, earlyAlarm);
 
-
-            PendingIntent pendingIntent = PendingIntent.getService(context, uniqueID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getService(context, idUnique, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 
-                alarm.setWindow(AlarmManager.RTC_WAKEUP, time, 60 * 1000, pendingIntent);
+                alarm.setWindow(AlarmManager.RTC_WAKEUP, time, 10, pendingIntent);
             } else {
                 alarm.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
             }
-        }
+            }
 
     }
 

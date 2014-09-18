@@ -97,4 +97,10 @@ public class Activity_MedLi_lightTest extends AndroidTestCase implements Perform
         }
 
     }
+
+    public void testNowInMilliseconds() {
+        // Time t = new Time();
+        // t.setToNow();
+
+    }
 }

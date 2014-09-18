@@ -23,6 +23,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
@@ -87,19 +88,30 @@ public class MedLiDataSource {
     public List<Medication> getAllMeds(Context context, boolean makeAlarms) {
         List<Medication> routineList = new ArrayList<Medication>();
         List<Medication> prnList = new ArrayList<Medication>();
+        HashMap<String, String> map = new HashMap<String, String>();
+
         this.open(); // open db.
 
         Cursor cursor = database.rawQuery(Constants.GET_MEDLIST_ROUTINE, null);
 
         while (cursor.moveToNext()) {
             Medication medication = cursorToRoutine(cursor, context, makeAlarms);
+
+
             if (medication.getAdminType().equalsIgnoreCase("routine")) {
                 routineList.add(medication);
+
+                AlarmHelpers ah = new AlarmHelpers(context);
+                ah.setAlarm(medication.getIdUnique(), medication.getNextDue());
+
+
             } else {
                 prnList.add(medication);
             }
 
         }
+
+
         Collections.sort(routineList, new Comparator<Medication>() {
             @Override
             public int compare(Medication lhs, Medication rhs) {
@@ -158,13 +170,6 @@ public class MedLiDataSource {
                     }
                 }
             }.setTime());
-
-
-            if (medication.getNextDue().compareTo(DateTime.getCurrentTimestamp(false, null)) == 1) {
-
-                AlarmHelpers ah = new AlarmHelpers(context);
-                ah.setAlarm(medication.getNextDue(), medication.getMedName(), medication.getIdUnique());
-            }
 
         } else {
 
@@ -425,7 +430,12 @@ public class MedLiDataSource {
 
         database.update("medlist", cv, "ID_UNIQUE=" + idUnique, null);
         if (newStatus == Medication.DELETED) {
+            AlarmHelpers ah = new AlarmHelpers(context);
+            ah.clearAlarm(idUnique);
             database.delete("med_logs", "ID_FK = " + idUnique, null);
+        } else if (newStatus == Medication.DISCONTINUED) {
+            AlarmHelpers ah = new AlarmHelpers(context);
+            ah.clearAlarm(idUnique);
         }
     }
 

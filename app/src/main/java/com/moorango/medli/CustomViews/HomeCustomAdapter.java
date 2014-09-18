@@ -236,7 +236,8 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                     Log.d(TAG, dataSource.getPrnNextDose(medication.getIdUnique(), medication.getDoseFrequency()));
 
                     AlarmHelpers ah = new AlarmHelpers(context);
-                    ah.setAlarm(dataSource.getPrnNextDose(medication.getIdUnique(), medication.getDoseFrequency()), medication.getMedName(), medication.getIdUnique());
+
+                    ah.setAlarm(medication.getIdUnique(), dataSource.getPrnNextDose(medication.getIdUnique(), medication.getDoseFrequency()));
 
                     caller.mListener.onFragmentInteraction(1, null, 0);
                     Toast.makeText(getContext(), "Medication submitted and alarm has been set for the next dose.", Toast.LENGTH_LONG);
