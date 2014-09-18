@@ -178,8 +178,6 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
             nextDueTime.setVisibility(View.VISIBLE);
             prepEditMed(true, dataItem);
 
-            //MedLiDataSource.getHelper(context).getLastSixPRNDoses(dataItem.getIdUnique(), dataItem.getDoseCount(), dataItem.getDoseFrequency());
-
             txtTitle.setChecked(sparseBooleanArray.get(position));
 
             if (txtTitle.isChecked()) {
@@ -189,24 +187,17 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                 boxWrapper.setBackgroundResource(android.R.color.white);
             }
 
-            /*if (dataItem.getDoseCount() > dataItem.getActualDoseCount()) {
-
-                showPrnDoseAlarm(true, dataItem);
-                String nextDue = dataItem.getNextDue();
-                nextDue = nextDue.equalsIgnoreCase("NOW") ? "NOW" : DataCheck.isToday(nextDue) ? DataCheck.isDoseLate(nextDue, false) ? "NOW" : DateTime.convertToTime12(nextDue.split(" ")[1]) : "Tomorrow at " + DateTime.convertToTime12(nextDue.split(" ")[1]);
-
-                nextDueTime.setText(PRN_DOSE_TEXT + nextDue);
-            } else {
-
-                nextDueTime.setText("MAX DOSES REACHED");
-            } */
-
             if (dataItem.getNextDue().compareTo(DateTime.getCurrentTimestamp(false, null)) < 0) {
                 nextDueTime.setText("NOW");
                 showPrnDoseAlarm(true, dataItem);
             } else {
-                String time = dataItem.getNextDue().split(" ")[1];
-                nextDueTime.setText(PRN_DOSE_TEXT + (DataCheck.isToday(dataItem.getNextDue()) ? dataItem.getNextDue() : "Tommorow at " + DateTime.convertToTime12(time)));
+                try {
+                    String time = dataItem.getNextDue().split(" ")[1];
+                    nextDueTime.setText(PRN_DOSE_TEXT + (DataCheck.isToday(dataItem.getNextDue()) ? DateTime.convertToTime12(time) : "Tommorow at " + DateTime.convertToTime12(time)));
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    Log.d(TAG, e.toString());
+                    //nextDueTime.setText(dataItem.getNextDue());
+                }
             }
 
         }

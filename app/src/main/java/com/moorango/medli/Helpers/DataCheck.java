@@ -13,6 +13,9 @@ import com.moorango.medli.Models.MedLog;
 import com.moorango.medli.Models.Medication;
 import com.moorango.medli.R;
 
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.Random;
 
 /**
@@ -93,12 +96,18 @@ public class DataCheck {
         return (nextDose != null && !isDoseLate(nextDose, false)) ? nextDose : "COMPLETE";
     }
 
+    /**
+     * Returns a semi-unique id .
+     * <p/>
+     * UNIT-TESTED
+     *
+     * @param medName
+     * @return
+     */
     public static int createUniqueID(String medName) {
-
 
         return (new Random().nextInt() + medName + DateTime.getNowInMillisec()).hashCode();
     }
-
 
     public static void clearForm(ViewGroup group) {
 
@@ -139,8 +148,6 @@ public class DataCheck {
     public static boolean isDoseLate(String dueTime, boolean filler) {
         // TODO test whether admin time is late.
 
-        //  Log.d(TAG, "dueTime: " + dueTime);
-        //  Log.d(TAG, "currTime: " + DateTime.getCurrentTimestamp(false, null));
         return dueTime.compareTo(DateTime.getCurrentTimestamp(false, null)) < 0;
     }
 
@@ -155,31 +162,29 @@ public class DataCheck {
      */
     public static int getDoseTimeFrame(String time, String due) {
         if (validateDateEntry(time) && validateDateEntry(due)) {
+
             if (!DataCheck.isToday(due)) {
                 return MedLog.EXTRA_DOSE;
-            }
-            try {
-                String nextDose24Hour[] = due.split(" ")[1].split(":");
-                String loggedDose24Hour[] = DateTime.convertToTime24(time).split(":");
+            } else {
 
-                int nextDoseHour = Integer.valueOf(nextDose24Hour[0]);
-                int nextDoseMinute = Integer.valueOf(nextDose24Hour[1]);
+                DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+                long curTimeMillis = formatter.parseDateTime(time).getMillis();
+                long dueTimeMillis = formatter.parseDateTime(due).getMillis();
 
-                int loggedDoseHour = Integer.valueOf(loggedDose24Hour[0]);
-                int loggedDoseMinute = Integer.valueOf(loggedDose24Hour[1]);
+                long timeWindowMillis = 20; // time frame window.
 
-                int nextDoseTotalMinutes = (nextDoseHour * 60) + nextDoseMinute;
-                int loggedDoseTotalMinutes = (loggedDoseHour * 60) + loggedDoseMinute;
+                int differenceMinutes = (int) ((curTimeMillis - dueTimeMillis) / (60 * 1000));
 
-                if ((nextDoseTotalMinutes - loggedDoseTotalMinutes) > 30) {
+                Log.d(TAG, "diffM: " + differenceMinutes);
+
+                if (differenceMinutes < 0 && Math.abs(differenceMinutes) >= timeWindowMillis) { // early
                     return MedLog.EARLY;
-                } else if ((loggedDoseTotalMinutes - nextDoseTotalMinutes) > 30) {
+                } else if (differenceMinutes > 0 && Math.abs(differenceMinutes) >= timeWindowMillis) { // late
                     return MedLog.LATE;
+                } else { // on-time.
+                    return MedLog.ON_TIME;
                 }
-            } catch (NumberFormatException nfe) {
-                Log.e(TAG + " getDoseTimeFrame", nfe.toString());
             }
-            return MedLog.ON_TIME;
         }
         return 400;
     }

@@ -10,6 +10,8 @@ import com.moorango.medli.Helpers.DateTime;
 import com.moorango.medli.Models.MedLog;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -69,16 +71,30 @@ public class Activity_MedLi_lightTest extends AndroidTestCase implements Perform
 
         String currentDateTime = DateTime.getCurrentTimestamp(true, "1:37 PM");
 
-        //String earlyDateTime = DateTime.getCurrentTimestamp(true, "12:50 PM");
+        String earlyDateTime = DateTime.getCurrentTimestamp(true, "1:59 PM");
         String onTimeDateTime = DateTime.getCurrentTimestamp(true, "1:30 PM");
-        String lateDateTime = DateTime.getCurrentTimestamp(true, "1:45 PM");
+        String lateDateTime = DateTime.getCurrentTimestamp(true, "1:10 PM");
 
         String invalidParam = "2014-8-17 01:45:00";
 
-        // assertEquals("earlyDateTime", MedLog.EARLY, DataCheck.getDoseTimeFrame(earlyDateTime, currentDateTime));
+        assertEquals("earlyDateTime", MedLog.EARLY, DataCheck.getDoseTimeFrame(currentDateTime, earlyDateTime));
         assertEquals("onTimeDateTime", MedLog.ON_TIME, DataCheck.getDoseTimeFrame(currentDateTime, onTimeDateTime));
         assertEquals("lateDateTime", MedLog.LATE, DataCheck.getDoseTimeFrame(currentDateTime, lateDateTime));
         assertEquals("invalidParam", 400, DataCheck.getDoseTimeFrame(currentDateTime, invalidParam));
+
+    }
+
+    public void testUniqueIdCreator() {
+
+        Set<Integer> lump = new HashSet<Integer>();
+
+
+        for (int index = 0; index < 100; index++) {
+
+            int id = DataCheck.createUniqueID("f");
+            assertTrue(!lump.contains(id));
+            lump.add(DataCheck.createUniqueID("f"));
+        }
 
     }
 }

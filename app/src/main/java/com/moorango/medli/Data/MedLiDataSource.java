@@ -169,15 +169,7 @@ public class MedLiDataSource {
         } else {
 
             medication.setDoseFrequency(Integer.valueOf(cursor.getString(7)));
-            /*if (getPrnDoseCount24Hours(medication.getIdUnique()) >= medication.getDoseCount()) { // all doses have been taken.
-                // TODO might make this show the next dose with date.
-                medication.setNextDue("COMPLETE");
-            } else {
-                // TODO get last dose then see if it was recent.
-                String nextDose = getPrnNextDose(medication.getIdUnique(), medication.getDoseFrequency());
 
-                medication.setNextDue(nextDose);
-            } */
             medication.setNextDue(getNextPrnDose(medication.getIdUnique(), medication.getDoseCount(), medication.getDoseFrequency()));
         }
 
@@ -346,12 +338,12 @@ public class MedLiDataSource {
             cv.put("manual_entry", 1);
             cv.put("timestamp", dt.getDate() + " " + DateTime.convertToTime24(manualTime));
 
-            cv.put("time_frame", DataCheck.getDoseTimeFrame(manualTime, medication.getNextDue()));
+            cv.put("time_frame", DataCheck.getDoseTimeFrame(DateTime.getCurrentTimestamp(true, manualTime), medication.getNextDue()));
         } else { // no manual entry.
             cv.put("timestamp", dt.getDate() + " " + DateTime.getTime24());
             if (medication.getAdminType().equalsIgnoreCase("routine")) {
 
-                cv.put("time_frame", DataCheck.getDoseTimeFrame(DateTime.getTime12(), medication.getNextDue()));
+                cv.put("time_frame", DataCheck.getDoseTimeFrame(DateTime.getCurrentTimestamp(false, null), medication.getNextDue()));
             } else {
                 cv.put("time_frame", MedLog.ON_TIME);
             }
@@ -489,6 +481,7 @@ public class MedLiDataSource {
             while (cs.moveToNext()) {
                 return DateTime.getIncrementedTimestamp(cs.getString(0), 0, freq, 0);
             }
+            return DateTime.getCurrentTimestamp(false, null);
 
         } else { //
             this.open();
@@ -519,10 +512,7 @@ public class MedLiDataSource {
             return firstIncrement;
 
         }
-        return "error";
-    }
-
-    public static void fillMissedDoses(Medication medication) {
 
     }
+
 }

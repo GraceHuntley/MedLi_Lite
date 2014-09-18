@@ -144,7 +144,11 @@ public class MedLog {
     }
 
     public String timeFrame() {
-        return TIME_FRAME_TEXT[timeFrame];
+        if (timeFrame < TIME_FRAME_TEXT.length) {
+            return TIME_FRAME_TEXT[timeFrame];
+        } else {
+            return "ERROR";
+        }
     }
 
     public boolean isWasMissed() {
