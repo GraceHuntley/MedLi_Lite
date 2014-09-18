@@ -80,7 +80,7 @@ public class Constants {
                     + "med_logs.admin_type as type " // 9
                     + "FROM med_logs "
                     + "WHERE status !=" + MedLog.DELETED
-                    //+ " AND status !=" + MedLog.SPACE_FILLER
+                    + " AND status !=" + MedLog.SPACE_FILLER
                     + " ORDER BY DATETIME(strftime('%s',timestamp), 'unixepoch', 'localtime') DESC ";
 
     public static String GET_SINGLE_MED_BY_ID(int id) {
