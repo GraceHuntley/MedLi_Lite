@@ -37,7 +37,9 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.moorango.medli.Activity_MedLi_light;
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Helper_DrugData;
 import com.moorango.medli.Helpers.AlarmHelpers;
@@ -109,6 +111,10 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         dataSource = MedLiDataSource.getHelper(getActivity());
         getActivity().setRequestedOrientation(
                 ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        ga = ((Activity_MedLi_light) getActivity()).getTracker(
+                Activity_MedLi_light.TrackerName.APP_TRACKER);
+
 
     }
 
@@ -562,6 +568,12 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
                         //checkDoseTimes(etList);
                         dataSource.submitNewMedication(prepareMedicationObject(), doUpdate);
+
+                        if (doUpdate) {
+                            ga.send(new HitBuilders.EventBuilder().setAction("NewMedAdded").build());
+                        } else {
+                            ga.send(new HitBuilders.EventBuilder().setAction("MedicationEdited").build());
+                        }
                         hideKeyboard();
 
                         if (dataSource.getPreferenceBool("show_new_med_info") && !doUpdate) {
@@ -589,6 +601,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                                         public void onClick(DialogInterface dialogInterface, int i) {
                                             if (checkBox.isChecked()) {
                                                 dataSource.addOrUpdatePreference("show_new_med_info", false);
+
 
                                             }
                                             mListener.onFragmentInteraction(1, null, 0);

@@ -23,7 +23,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
@@ -88,7 +87,6 @@ public class MedLiDataSource {
     public List<Medication> getAllMeds(Context context, boolean makeAlarms) {
         List<Medication> routineList = new ArrayList<Medication>();
         List<Medication> prnList = new ArrayList<Medication>();
-        HashMap<String, String> map = new HashMap<String, String>();
 
         this.open(); // open db.
 
@@ -209,7 +207,6 @@ public class MedLiDataSource {
             DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
             org.joda.time.DateTime dt = dateStringFormat.parseDateTime(nextDose);
 
-            Log.d(TAG, new Timestamp(dt.plusHours(freq).toDate().getTime()).toString());
             return new Timestamp(dt.plusHours(freq).toDate().getTime()).toString().split("\\.")[0];
 
         }
@@ -292,7 +289,7 @@ public class MedLiDataSource {
             dbSuccess = database.update("medlist", cv, "ID_UNIQUE='" + medication.getIdUnique() + "'", null) > 0 ? true : false;
         } else {
 
-            dbSuccess = database.insert("medlist", "ID_UNIQUE", cv) >= 0 ? true : false;
+            dbSuccess = database.insert("medlist", "ID_UNIQUE", cv) != -1 ? true : false;
         }
 
         if (dbSuccess && cv.getAsInteger("status") == Medication.NEW) {
@@ -321,7 +318,7 @@ public class MedLiDataSource {
         cv.put("missed", 0);
 
         if (medLog.getAdminType() == MedLog.ROUTINE) {
-            cv.put("time_frame", DataCheck.getDoseTimeFrame(DateTime.convertToTime12(medLog.getTimeOnly()), medLog.getDueTime()));
+            cv.put("time_frame", DataCheck.getDoseTimeFrame(medLog.getTimestamp(), medLog.getDueTime()));
         } else {
             cv.put("time_frame", MedLog.ON_TIME);
         }

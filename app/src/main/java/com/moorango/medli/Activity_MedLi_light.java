@@ -22,6 +22,8 @@ import com.moorango.medli.Fragments.Fragment_History;
 import com.moorango.medli.Fragments.Fragment_Home;
 import com.moorango.medli.Fragments.Fragment_MedSettings;
 
+import java.util.HashMap;
+
 
 public class Activity_MedLi_light extends ActionBarActivity implements Fragment_Home.OnFragmentInteractionListener, Fragment_MedSettings.OnFragmentInteractionListener,
         Fragment_History.OnFragmentInteractionListener, Fragment_EmptyMedList.OnFragmentInteractionListener {
@@ -30,6 +32,27 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
 
     Tracker ga;
 
+    public enum TrackerName {
+        APP_TRACKER, // Tracker used only in this app.
+        GLOBAL_TRACKER, // Tracker used by all the apps from a company. eg: roll-up tracking.
+        ECOMMERCE_TRACKER, // Tracker used by all ecommerce transactions from a company.
+    }
+
+    HashMap<TrackerName, Tracker> mTrackers = new HashMap<TrackerName, Tracker>();
+
+
+    public synchronized Tracker getTracker(TrackerName trackerId) {
+        if (!mTrackers.containsKey(trackerId)) {
+
+            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
+            Tracker t = analytics.newTracker("UA-54927508-1");
+            mTrackers.put(trackerId, t);
+
+        }
+        return mTrackers.get(trackerId);
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,8 +60,8 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
 
         ga = GoogleAnalytics.getInstance(this).newTracker("UA-54927508-1");
 
+        ga = getTracker(TrackerName.APP_TRACKER);
 
-        ga.send(new HitBuilders.EventBuilder().setAction("MainActivityLoaded").build());
 
         getSupportActionBar().setHomeButtonEnabled(true);
 
@@ -98,6 +121,7 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
 
                             dataSource.addOrUpdatePreference("agree_to_disclaimer", false);
                             dialogInterface.dismiss();
+                            ga.send(new HitBuilders.EventBuilder().setAction("AgreedToDisclaimer").build());
 
                         }
                     });

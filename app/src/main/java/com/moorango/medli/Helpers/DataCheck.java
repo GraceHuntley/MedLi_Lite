@@ -3,7 +3,6 @@ package com.moorango.medli.Helpers;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -82,11 +81,9 @@ public class DataCheck {
             String doseTS = DateTime.getCurrentTimestamp(true, dose);
             if (isDoseLate(doseTS, true)) {
                 dataSource.submitMissedDose(medication, doseTS);
-                //dataSource.changeMedicationStatus(medication.getIdUnique(), Medication.ACTIVE);
-                Log.d(TAG, "late");
+
             } else {
-                //dataSource.changeMedicationStatus(medication.getIdUnique(), Medication.ACTIVE);
-                Log.d(TAG, "notLate");
+
                 return doseTS;
             }
             nextDose = doseTS;
@@ -174,8 +171,6 @@ public class DataCheck {
                 long timeWindowMillis = 20; // time frame window.
 
                 int differenceMinutes = (int) ((curTimeMillis - dueTimeMillis) / (60 * 1000));
-
-                Log.d(TAG, "diffM: " + differenceMinutes);
 
                 if (differenceMinutes < 0 && Math.abs(differenceMinutes) >= timeWindowMillis) { // early
                     return MedLog.EARLY;

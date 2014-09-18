@@ -2,7 +2,9 @@ package com.moorango.medli.CustomViews;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
@@ -195,8 +197,8 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                     String time = dataItem.getNextDue().split(" ")[1];
                     nextDueTime.setText(PRN_DOSE_TEXT + (DataCheck.isToday(dataItem.getNextDue()) ? DateTime.convertToTime12(time) : "Tommorow at " + DateTime.convertToTime12(time)));
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    Log.d(TAG, e.toString());
-                    //nextDueTime.setText(dataItem.getNextDue());
+                    Log.e(TAG, e.toString());
+
                 }
             }
 
@@ -222,7 +224,23 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
             setPrnAlarm.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(context, "Long press to automatically submit dose and set alarm for the next available dose.", Toast.LENGTH_LONG).show();
+                    AlertDialog.Builder adB = new AlertDialog.Builder(getContext())
+                            .setTitle("Non-Routine Scheduler")
+                            .setMessage("This feature allows you to log a non-routine medication, no questions asked. " +
+                                    "It also sets an alarm for the next time you are able to take the medication. " +
+                                    "This alarm is a one time alarm that will only be reset again when you activate this. \n\n" +
+                                    "In order to activate it long press the icon\n\n" +
+                                    "You will only be able to use this feature when you have doses available to be taken.")
+                            .setIcon(android.R.drawable.ic_dialog_info)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.dismiss();
+                                }
+                            });
+                    adB.show();
+
+
                 }
             });
 

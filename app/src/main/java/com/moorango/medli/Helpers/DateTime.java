@@ -158,7 +158,7 @@ public class DateTime {
             SimpleDateFormat output = new SimpleDateFormat("HH:mm:ss");
             formattedDate = output.format(dt);
         } catch (ParseException p) {
-            Log.e(TAG, p.toString());
+            Log.e(TAG, "convertToTime24: " + p.toString());
         }
 
         return formattedDate;
@@ -175,6 +175,7 @@ public class DateTime {
      * @return
      */
     public static String getCurrentTimestamp(boolean justDate, String time) {
+
 
         Calendar cal = Calendar.getInstance();
 
@@ -194,8 +195,6 @@ public class DateTime {
         Timestamp ts = new Timestamp(now.getTime());
 
         String tsNoMill = ts.toString().split("\\.")[0];
-
-        Log.d(TAG, tsNoMill.split(" ")[0] + " " + DateTime.convertToTime24(time));
 
         return tsNoMill.split(" ")[0] + " " + DateTime.convertToTime24(time);
     }

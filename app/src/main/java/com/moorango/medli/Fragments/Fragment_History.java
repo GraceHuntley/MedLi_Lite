@@ -111,7 +111,13 @@ public class Fragment_History extends Fragment {
 
                 String formattedHour = String.format("%02d", timePicker.getCurrentHour());
                 String formattedMinute = String.format("%02d", timePicker.getCurrentMinute());
-                medLog.setTimestamp(medLog.getDateOnly() + " " + formattedHour + ":" + formattedMinute + ":" + "00");
+
+                String time24 = DateTime.convertToTime12(formattedHour + ":" + formattedMinute + ":" + "00");
+
+
+                medLog.setTimestamp(DateTime.getCurrentTimestamp(true, time24));
+
+                //medLog.setTimestamp(medLog.getDateOnly() + " " + formattedHour + ":" + formattedMinute + ":" + "00");
 
                 if (dbHelper.updateMedicationAdmin(medLog) > -1) {
                     mListener.onFragmentInteraction(4, null, 0);
