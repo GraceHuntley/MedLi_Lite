@@ -24,7 +24,6 @@ import com.moorango.medli.Fragments.Fragment_MedSettings;
 
 import java.util.HashMap;
 
-
 public class Activity_MedLi_light extends ActionBarActivity implements Fragment_Home.OnFragmentInteractionListener, Fragment_MedSettings.OnFragmentInteractionListener,
         Fragment_History.OnFragmentInteractionListener, Fragment_EmptyMedList.OnFragmentInteractionListener {
 
@@ -58,9 +57,11 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_med_li_light);
 
-        ga = GoogleAnalytics.getInstance(this).newTracker("UA-54927508-1");
+        //ga = GoogleAnalytics.getInstance(this).newTracker("UA-54927508-1");
 
         ga = getTracker(TrackerName.APP_TRACKER);
+
+        ga.send(new HitBuilders.EventBuilder().setAction("ActivityLoaded").build());
 
 
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -273,7 +274,8 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
                 break;
 
             case 5:
-
+                ga.send(new HitBuilders.EventBuilder().setAction(name).build());
+                break;
         }
 
     }
