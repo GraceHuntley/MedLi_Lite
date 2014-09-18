@@ -42,9 +42,6 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
     private final List<Medication> data;
     private final SparseBooleanArray sparseBooleanArray;
 
-    private final String PRN_DOSE_TEXT = "Earliest Dose: ";
-    private final String ROUTINE_DOSE_TEXT = "Next Due: ";
-
     private ImageView skipButton, editMed, lateDoseStamp, setPrnAlarm;
     private CheckedTextView txtTitle;
     private TextView headerText, nextDueTime;
@@ -102,8 +99,8 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
         notifyDataSetChanged();
     }
 
-    public boolean isChecked(int position) {
-        return sparseBooleanArray.get(position);
+    public boolean notChecked(int position) {
+        return !sparseBooleanArray.get(position);
     }
 
     @Override
@@ -161,10 +158,11 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                 isLate(false);
                 prepSkipButton(false, null);
             } else {
+                String ROUTINE_DOSE_TEXT = "Next Due: ";
                 nextDueTime.setText(ROUTINE_DOSE_TEXT + DateTime.convertToTime12(dataItem.getNextDue().split(" ")[1]));
                 prepSkipButton(true, dataItem);
 
-                if (DataCheck.isDoseLate(dataItem.getNextDue(), false)) {
+                if (DataCheck.isDoseLate(dataItem.getNextDue())) {
                     isLate(true);
                 } else {
                     isLate(false);
@@ -195,6 +193,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
             } else {
                 try {
                     String time = dataItem.getNextDue().split(" ")[1];
+                    String PRN_DOSE_TEXT = "Earliest Dose: ";
                     nextDueTime.setText(PRN_DOSE_TEXT + (DataCheck.isToday(dataItem.getNextDue()) ? DateTime.convertToTime12(time) : "Tommorow at " + DateTime.convertToTime12(time)));
                 } catch (ArrayIndexOutOfBoundsException e) {
                     Log.e(TAG, e.toString());
@@ -258,7 +257,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                     ah.setAlarm(medication.getIdUnique(), dataSource.getPrnNextDose(medication.getIdUnique(), medication.getDoseFrequency()));
 
                     caller.mListener.onFragmentInteraction(1, null, 0);
-                    Toast.makeText(getContext(), "Medication submitted and alarm has been set for the next dose.", Toast.LENGTH_LONG);
+                    Toast.makeText(getContext(), "Medication submitted and alarm has been set for the next dose.", Toast.LENGTH_LONG).show();
 
                     return true;
                 }

@@ -83,7 +83,6 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     private TextView medTypePrompt;
     private int errorCount = 0;
     private GetSuggestions getSuggestions;
-    private ArrayList<String> errorMessages;
     private Tracker ga;
 
 
@@ -447,7 +446,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     }
 
     private boolean checkFormData(ViewGroup view) {
-        errorMessages = new ArrayList<String>();
+        ArrayList<String> errorMessages = new ArrayList<String>();
         errorCount = 0;
         if (acMedName.getText().length() == 0) {
             acMedName.setError("This cannot be empty.");

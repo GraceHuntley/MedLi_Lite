@@ -34,8 +34,8 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
 
     public enum TrackerName {
         APP_TRACKER, // Tracker used only in this app.
-        GLOBAL_TRACKER, // Tracker used by all the apps from a company. eg: roll-up tracking.
-        ECOMMERCE_TRACKER, // Tracker used by all ecommerce transactions from a company.
+        // --Commented out by Inspection (9/18/2014 1:20 PM):GLOBAL_TRACKER, // Tracker used by all the apps from a company. eg: roll-up tracking.
+        // --Commented out by Inspection (9/18/2014 1:20 PM):ECOMMERCE_TRACKER, // Tracker used by all ecommerce transactions from a company.
     }
 
     HashMap<TrackerName, Tracker> mTrackers = new HashMap<TrackerName, Tracker>();

@@ -40,7 +40,7 @@ public class MedLiDataSource {
     private SQLiteDatabase database;
     private final Helper_SQLiteHelper dbHelper;
     private static MedLiDataSource instance;
-    private Context context;
+    private final Context context;
 
     public MedLiDataSource(Context context) {
         dbHelper = new Helper_SQLiteHelper(context);
@@ -93,7 +93,7 @@ public class MedLiDataSource {
         Cursor cursor = database.rawQuery(Constants.GET_MEDLIST_ROUTINE, null);
 
         while (cursor.moveToNext()) {
-            Medication medication = cursorToRoutine(cursor, context, makeAlarms);
+            Medication medication = cursorToRoutine(cursor);
 
 
             if (medication.getAdminType().equalsIgnoreCase("routine")) {
@@ -141,7 +141,7 @@ public class MedLiDataSource {
         return routineList;
     }
 
-    private Medication cursorToRoutine(Cursor cursor, final Context context, final boolean makeAlarms) {
+    private Medication cursorToRoutine(Cursor cursor) {
         final Medication medication = new Medication();
 
         medication.setMedName(cursor.getString(0));
@@ -286,10 +286,10 @@ public class MedLiDataSource {
         boolean dbSuccess;
         if (doUpdate) {
 
-            dbSuccess = database.update("medlist", cv, "ID_UNIQUE='" + medication.getIdUnique() + "'", null) > 0 ? true : false;
+            dbSuccess = database.update("medlist", cv, "ID_UNIQUE='" + medication.getIdUnique() + "'", null) > 0;
         } else {
 
-            dbSuccess = database.insert("medlist", "ID_UNIQUE", cv) != -1 ? true : false;
+            dbSuccess = database.insert("medlist", "ID_UNIQUE", cv) != -1;
         }
 
         if (dbSuccess && cv.getAsInteger("status") == Medication.NEW) {
@@ -485,7 +485,7 @@ public class MedLiDataSource {
         if (actualCount < maxCount) { // doses left in 24 hour span.
             this.open();
             Cursor cs = database.rawQuery(Constants.GET_LAST_PRN_DOSE(idForeign), null);
-            while (cs.moveToNext()) {
+            if (cs.moveToFirst()) {
                 return DateTime.getIncrementedTimestamp(cs.getString(0), 0, freq, 0);
             }
             return DateTime.getCurrentTimestamp(false, null);

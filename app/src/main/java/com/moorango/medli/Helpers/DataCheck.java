@@ -70,6 +70,7 @@ public class DataCheck {
      * @param medication Medication Object.
      * @return
      */
+    @SuppressWarnings("UnusedReturnValue")
     public static String findNextDoseNewMed(Context con, Medication medication) {
 
         MedLiDataSource dataSource = MedLiDataSource.getHelper(con);
@@ -79,7 +80,7 @@ public class DataCheck {
         String nextDose = null;
         for (String dose : availableDoses) {
             String doseTS = DateTime.getCurrentTimestamp(true, dose);
-            if (isDoseLate(doseTS, true)) {
+            if (isDoseLate(doseTS)) {
                 dataSource.submitMissedDose(medication, doseTS);
 
             } else {
@@ -90,7 +91,7 @@ public class DataCheck {
         }
         dataSource.changeMedicationStatus(medication.getIdUnique(), Medication.ACTIVE);
 
-        return (nextDose != null && !isDoseLate(nextDose, false)) ? nextDose : "COMPLETE";
+        return (nextDose != null && !isDoseLate(nextDose)) ? nextDose : "COMPLETE";
     }
 
     /**
@@ -142,7 +143,7 @@ public class DataCheck {
 
     }
 
-    public static boolean isDoseLate(String dueTime, boolean filler) {
+    public static boolean isDoseLate(String dueTime) {
         // TODO test whether admin time is late.
 
         return dueTime.compareTo(DateTime.getCurrentTimestamp(false, null)) < 0;

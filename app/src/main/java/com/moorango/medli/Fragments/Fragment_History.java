@@ -173,10 +173,7 @@ public class Fragment_History extends Fragment {
         mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
-                if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
 
-
-                }
             }
 
             @Override

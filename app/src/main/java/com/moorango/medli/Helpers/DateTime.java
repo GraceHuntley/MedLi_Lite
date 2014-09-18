@@ -33,13 +33,6 @@ public class DateTime {
         return sdFormat.format(cal.getTime());
     }
 
-    public static String getTime12() {
-        cal = Calendar.getInstance();
-        sdFormat = getSDFormat("hh:mm a");
-
-        return sdFormat.format(cal.getTime());
-    }
-
     public String getDate() {
         cal = Calendar.getInstance();
         sdFormat = getSDFormat("yyyy-MM-dd");
@@ -124,11 +117,11 @@ public class DateTime {
     public static String convertToTime12(String time) {
         String[] splitTime = time.split(":");
         int hours = Integer.parseInt(splitTime[0]);
-        boolean nextDay = false;
+
 
         if (hours > 24) { // then it is tommorow.
             hours = hours - 24;
-            nextDay = true;
+
         }
         String minutes = splitTime[1];
         String amPm;
@@ -224,9 +217,8 @@ public class DateTime {
 
 
             Timestamp ts = new Timestamp(dt.getMillis());
-            String cleaned = ts.toString().split("\\.")[0];
+            return ts.toString().split("\\.")[0];
 
-            return cleaned;
         } else {
             return "error";
         }

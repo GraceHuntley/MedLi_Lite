@@ -121,7 +121,7 @@ public class Fragment_Home extends Fragment {
 
                 if (!adapter.getItem(pos).isSubHeading()) {
                     Medication med = adapter.getItem(pos);
-                    if ((med.getActualDoseCount() >= med.getDoseCount()) && !adapter.isChecked(pos)) {
+                    if ((med.getActualDoseCount() >= med.getDoseCount()) && adapter.notChecked(pos)) {
 
                         AlertDialog.Builder adB = new AlertDialog.Builder(getActivity())
                                 .setTitle("Maximum Doses Reached")
@@ -136,7 +136,7 @@ public class Fragment_Home extends Fragment {
                                     }
                                 });
                         adB.show();
-                    } else if (med.getNextDue().compareTo(DateTime.getIncrementedTimestamp(DateTime.getCurrentTimestamp(false, null), 0, 0, 20)) > 0 && !adapter.isChecked(pos)) {
+                    } else if (med.getNextDue().compareTo(DateTime.getIncrementedTimestamp(DateTime.getCurrentTimestamp(false, null), 0, 0, 20)) > 0 && adapter.notChecked(pos)) {
 
                         AlertDialog.Builder adB = new AlertDialog.Builder(getActivity())
                                 .setTitle("Early Dose")
@@ -359,10 +359,10 @@ public class Fragment_Home extends Fragment {
 
     }
 
-    private Html.ImageGetter imgGetter = new Html.ImageGetter() {
+    private final Html.ImageGetter imgGetter = new Html.ImageGetter() {
 
         public Drawable getDrawable(String source) {
-            Drawable drawable = null;
+            Drawable drawable;
             if (imageNumber == 1) {
                 drawable = getResources().getDrawable(R.drawable.ic_action_view_as_list);
                 ++imageNumber;

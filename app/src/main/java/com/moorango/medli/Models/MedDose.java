@@ -31,6 +31,7 @@ public class MedDose {
 
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean findDoseDouble(String val[], int index) {
 
         if (index == 0) return true; // failsafe.

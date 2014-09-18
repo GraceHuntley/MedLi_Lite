@@ -16,7 +16,7 @@ public class MedLog {
      * Status Constants
      */
 
-    public static int DELETED = 0;
+    public static final int DELETED = 0;
     public static final int ACTIVE = 1;
     public static final int SKIPPED = 4;
     public static final int SPACE_FILLER = 5;
