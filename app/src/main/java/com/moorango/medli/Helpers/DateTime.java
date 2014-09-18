@@ -10,6 +10,9 @@ import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.util.Log;
 
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -51,8 +54,12 @@ public class DateTime {
      */
     public static long getUTCTimeMillis(String dateTime) {
 
+        /***
+         * fixer for period on end of timestamp. TEMP FIX TODO
+         */
 
-        String dateSplit[] = dateTime.split("[-: ]");
+        String cleanDateTime = dateTime.split("\\.")[0];
+        String dateSplit[] = cleanDateTime.split("[-: ]");
         int values[] = new int[dateSplit.length];
 
         for (int index = 0; index < dateSplit.length; index++) {
@@ -185,6 +192,67 @@ public class DateTime {
         Log.d(TAG, tsNoMill.split(" ")[0] + " " + DateTime.convertToTime24(time));
 
         return tsNoMill.split(" ")[0] + " " + DateTime.convertToTime24(time);
+    }
+
+    /**
+     * Helper to increment days hours or minutes of timestamp.
+     * <p/>
+     * UNIT-TESTED
+     *
+     * @param timestamp "yyyy-MM-dd HH:mm:ss"
+     * @param days      days to increment
+     * @param hours     hours to increment
+     * @param minutes   minutes to increment
+     * @return
+     */
+    public static String getIncrementedTimestamp(String timestamp, int days, int hours, int minutes) {
+
+        if (timestamp.matches("^(20[1-9][1-9])-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[0-9]|1[0-9]|2[0-4]):([0-5][0-9]):([0-5][0-9])")) {
+            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+            org.joda.time.DateTime dt = formatter.parseDateTime(timestamp);
+            if (days > 0)
+                dt = dt.plusDays(days);
+            if (hours > 0)
+                dt = dt.plusHours(hours);
+            if (minutes > 0)
+                dt = dt.plusMinutes(minutes);
+
+
+            Timestamp ts = new Timestamp(dt.getMillis());
+            String cleaned = ts.toString().split("\\.")[0];
+
+            return cleaned;
+        } else {
+            return "error";
+        }
+    }
+
+    public static String getTimeDifference(String dueTime) {
+        if (dueTime.matches("^(20[1-9][1-9])-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[0-9]|1[0-9]|2[0-4]):([0-5][0-9]):([0-5][0-9])")) {
+
+            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+            org.joda.time.DateTime due = formatter.parseDateTime(dueTime);
+            org.joda.time.DateTime currentTime = formatter.parseDateTime(getCurrentTimestamp(false, null));
+
+            long difference = due.toDate().getTime() - currentTime.toDate().getTime();
+
+            int hourDifference = (int) difference / (1000 * 60 * 60);
+            int minutesDifference = (int) (difference / (1000 * 60)) % 60;
+
+            String message = "You are early by ";
+
+            if (hourDifference > 0)
+                message += hourDifference + DataCheck.getNumberVerbage(hourDifference, " hour");
+            if (hourDifference > 0 && minutesDifference > 0)
+                message += " and ";
+            if (minutesDifference > 0)
+                message += minutesDifference + DataCheck.getNumberVerbage(minutesDifference, " minute");
+
+            return message;
+
+        }
+        return "error";
+
     }
 
 }

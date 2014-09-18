@@ -144,33 +144,44 @@ public class DataCheck {
         return dueTime.compareTo(DateTime.getCurrentTimestamp(false, null)) < 0;
     }
 
+    /**
+     * Get time frame of dosing ie. Late, early, or on-time.
+     * <p/>
+     * UNIT-TESTED
+     *
+     * @param time String yyyy-MM-dd HH:mm:ss
+     * @param due  String yyyy-MM-dd HH:mm:ss
+     * @return int 400 for error, or Constant value from MedLogs object.
+     */
     public static int getDoseTimeFrame(String time, String due) {
-
-        if (!DataCheck.isToday(due)) {
-            return MedLog.EXTRA_DOSE;
-        }
-        try {
-            String nextDose24Hour[] = due.split(" ")[1].split(":");
-            String loggedDose24Hour[] = DateTime.convertToTime24(time).split(":");
-
-            int nextDoseHour = Integer.valueOf(nextDose24Hour[0]);
-            int nextDoseMinute = Integer.valueOf(nextDose24Hour[1]);
-
-            int loggedDoseHour = Integer.valueOf(loggedDose24Hour[0]);
-            int loggedDoseMinute = Integer.valueOf(loggedDose24Hour[1]);
-
-            int nextDoseTotalMinutes = (nextDoseHour * 60) + nextDoseMinute;
-            int loggedDoseTotalMinutes = (loggedDoseHour * 60) + loggedDoseMinute;
-
-            if ((nextDoseTotalMinutes - loggedDoseTotalMinutes) > 30) {
-                return MedLog.EARLY;
-            } else if ((loggedDoseTotalMinutes - nextDoseTotalMinutes) > 30) {
-                return MedLog.LATE;
+        if (validateDateEntry(time) && validateDateEntry(due)) {
+            if (!DataCheck.isToday(due)) {
+                return MedLog.EXTRA_DOSE;
             }
-        } catch (NumberFormatException nfe) {
-            Log.e(TAG + " getDoseTimeFrame", nfe.toString());
+            try {
+                String nextDose24Hour[] = due.split(" ")[1].split(":");
+                String loggedDose24Hour[] = DateTime.convertToTime24(time).split(":");
+
+                int nextDoseHour = Integer.valueOf(nextDose24Hour[0]);
+                int nextDoseMinute = Integer.valueOf(nextDose24Hour[1]);
+
+                int loggedDoseHour = Integer.valueOf(loggedDose24Hour[0]);
+                int loggedDoseMinute = Integer.valueOf(loggedDose24Hour[1]);
+
+                int nextDoseTotalMinutes = (nextDoseHour * 60) + nextDoseMinute;
+                int loggedDoseTotalMinutes = (loggedDoseHour * 60) + loggedDoseMinute;
+
+                if ((nextDoseTotalMinutes - loggedDoseTotalMinutes) > 30) {
+                    return MedLog.EARLY;
+                } else if ((loggedDoseTotalMinutes - nextDoseTotalMinutes) > 30) {
+                    return MedLog.LATE;
+                }
+            } catch (NumberFormatException nfe) {
+                Log.e(TAG + " getDoseTimeFrame", nfe.toString());
+            }
+            return MedLog.ON_TIME;
         }
-        return MedLog.ON_TIME;
+        return 400;
     }
 
     /**
@@ -182,6 +193,22 @@ public class DataCheck {
      */
     public static boolean isToday(String nextDue) {
 
-        return nextDue.split(" ")[0].equals(DateTime.getCurrentTimestamp(false, null).split(" ")[0]);
+        return nextDue.split(" ")[0].compareTo(DateTime.getCurrentTimestamp(false, null).split(" ")[0]) == 0;
+    }
+
+    public static String getNumberVerbage(int number, String starter) {
+
+        switch (number) {
+            case 1:
+                return starter;
+            default:
+                return starter += "s";
+
+        }
+    }
+
+    public static boolean validateDateEntry(String date) {
+
+        return date.matches("^(20[1-9][1-9])-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[0-9]|1[0-9]|2[0-4]):([0-5][0-9]):([0-5][0-9])");
     }
 }

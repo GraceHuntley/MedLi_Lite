@@ -13,6 +13,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Fragments.Fragment_EmptyMedList;
 import com.moorango.medli.Fragments.Fragment_History;
@@ -25,10 +28,17 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
 
     private final String TAG = "Activity_MedLi_Light";
 
+    Tracker ga;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_med_li_light);
+
+        ga = GoogleAnalytics.getInstance(this).newTracker("UA-54927508-1");
+
+
+        ga.send(new HitBuilders.EventBuilder().setAction("MainActivityLoaded").build());
 
         getSupportActionBar().setHomeButtonEnabled(true);
 

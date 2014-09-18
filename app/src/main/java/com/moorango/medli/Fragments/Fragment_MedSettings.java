@@ -37,6 +37,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.Tracker;
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Helper_DrugData;
 import com.moorango.medli.Helpers.AlarmHelpers;
@@ -81,6 +82,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     private int errorCount = 0;
     private GetSuggestions getSuggestions;
     private ArrayList<String> errorMessages;
+    private Tracker ga;
 
 
     public Fragment_MedSettings() {
@@ -94,6 +96,8 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         args.putInt("unique_id", param3);
         args.putBoolean("edit", param2);
         fragment.setArguments(args);
+
+
         return fragment;
     }
 
@@ -403,6 +407,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     }
 
     private boolean isFormCompleted(ViewGroup group) {
+
 
         for (int i = 0, count = group.getChildCount(); i < count; ++i) {
             View view = group.getChildAt(i);

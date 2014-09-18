@@ -71,5 +71,17 @@
         android:layout_alignParentBottom="true"
         android:layout_height="wrap_content" />
 
+    <ImageView
+        android:id="@+id/prn_alarm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_action_add_alarm"
+        android:contentDescription="add_alarm"
+        android:visibility="gone"
+        android:padding="5dp"
+        android:clickable="true"
+        android:layout_toLeftOf="@id/edit_med_button"
+        android:layout_alignParentBottom="true" />
+
 
 </RelativeLayout>

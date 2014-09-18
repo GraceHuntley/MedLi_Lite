@@ -3,6 +3,7 @@ package com.moorango.medli.CustomViews;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Fragments.Fragment_Home;
+import com.moorango.medli.Helpers.AlarmHelpers;
 import com.moorango.medli.Helpers.DataCheck;
 import com.moorango.medli.Helpers.DateTime;
 import com.moorango.medli.Models.Medication;
@@ -41,7 +43,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
     private final String PRN_DOSE_TEXT = "Earliest Dose: ";
     private final String ROUTINE_DOSE_TEXT = "Next Due: ";
 
-    private ImageView skipButton, editMed, lateDoseStamp;
+    private ImageView skipButton, editMed, lateDoseStamp, setPrnAlarm;
     private CheckedTextView txtTitle;
     private TextView headerText, nextDueTime;
     private RelativeLayout boxWrapper;
@@ -125,12 +127,14 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
         editMed = (ImageView) convertView.findViewById(R.id.edit_med_button);
         lateDoseStamp = (ImageView) convertView.findViewById(R.id.late_dose_image);
         boxWrapper = (RelativeLayout) convertView.findViewById(R.id.box_wrapper);
+        setPrnAlarm = (ImageView) convertView.findViewById(R.id.prn_alarm);
         final Medication dataItem = data.get(position);
 
         if (dataItem.isSubHeading()) {
 
             prepSubHeading(dataItem);
 
+            showPrnDoseAlarm(false, dataItem);
         } else if (dataItem.getAdminType().equalsIgnoreCase("ROUTINE")) {
 
 
@@ -138,6 +142,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
             txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName() + " " + dataItem.getDoseForm()));
             nextDueTime.setVisibility(View.VISIBLE);
             prepEditMed(true, dataItem);
+            showPrnDoseAlarm(false, dataItem);
 
             txtTitle.setChecked(sparseBooleanArray.get(position));
 
@@ -167,10 +172,13 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
         } else {
             isLate(false);
             prepSkipButton(false, null);
+            showPrnDoseAlarm(false, dataItem);
             txtTitle.setVisibility(View.VISIBLE);
             txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName() + " " + dataItem.getDoseForm()));
             nextDueTime.setVisibility(View.VISIBLE);
             prepEditMed(true, dataItem);
+
+            //MedLiDataSource.getHelper(context).getLastSixPRNDoses(dataItem.getIdUnique(), dataItem.getDoseCount(), dataItem.getDoseFrequency());
 
             txtTitle.setChecked(sparseBooleanArray.get(position));
 
@@ -181,16 +189,24 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                 boxWrapper.setBackgroundResource(android.R.color.white);
             }
 
-            if (dataItem.getDoseCount() > dataItem.getActualDoseCount()) {
+            /*if (dataItem.getDoseCount() > dataItem.getActualDoseCount()) {
+
+                showPrnDoseAlarm(true, dataItem);
                 String nextDue = dataItem.getNextDue();
                 nextDue = nextDue.equalsIgnoreCase("NOW") ? "NOW" : DataCheck.isToday(nextDue) ? DataCheck.isDoseLate(nextDue, false) ? "NOW" : DateTime.convertToTime12(nextDue.split(" ")[1]) : "Tomorrow at " + DateTime.convertToTime12(nextDue.split(" ")[1]);
 
-
-
                 nextDueTime.setText(PRN_DOSE_TEXT + nextDue);
             } else {
-                //nextDueTime.setText(DateTime.getReadableDate(dataItem.getNextDue().split(" ")[0]) + " " + DateTime.convertToTime12(dataItem.getNextDue().split(" ")[1]));
+
                 nextDueTime.setText("MAX DOSES REACHED");
+            } */
+
+            if (dataItem.getNextDue().compareTo(DateTime.getCurrentTimestamp(false, null)) < 0) {
+                nextDueTime.setText("NOW");
+                showPrnDoseAlarm(true, dataItem);
+            } else {
+                String time = dataItem.getNextDue().split(" ")[1];
+                nextDueTime.setText(PRN_DOSE_TEXT + (DataCheck.isToday(dataItem.getNextDue()) ? dataItem.getNextDue() : "Tommorow at " + DateTime.convertToTime12(time)));
             }
 
         }
@@ -206,6 +222,39 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
         } else {
             lateDoseStamp.setVisibility(View.GONE);
             nextDueTime.setTextColor(context.getResources().getColor(android.R.color.black));
+        }
+    }
+
+    private void showPrnDoseAlarm(boolean value, final Medication medication) {
+        if (value) {
+            setPrnAlarm.setVisibility(View.VISIBLE);
+            setPrnAlarm.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(context, "Long press to automatically submit dose and set alarm for the next available dose.", Toast.LENGTH_LONG).show();
+                }
+            });
+
+            setPrnAlarm.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+
+                    MedLiDataSource dataSource = MedLiDataSource.getHelper(context);
+                    dataSource.submitMedicationAdmin(medication, null);
+
+                    Log.d(TAG, dataSource.getPrnNextDose(medication.getIdUnique(), medication.getDoseFrequency()));
+
+                    AlarmHelpers ah = new AlarmHelpers(context);
+                    ah.setAlarm(dataSource.getPrnNextDose(medication.getIdUnique(), medication.getDoseFrequency()), medication.getMedName(), medication.getIdUnique());
+
+                    caller.mListener.onFragmentInteraction(1, null, 0);
+                    Toast.makeText(getContext(), "Medication submitted and alarm has been set for the next dose.", Toast.LENGTH_LONG);
+
+                    return true;
+                }
+            });
+        } else {
+            setPrnAlarm.setVisibility(View.GONE);
         }
     }
 

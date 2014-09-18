@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Created by Colin on 7/31/2014.
@@ -151,8 +152,6 @@ public class MedLiDataSource {
                     String split[] = medication.getDoseTimes().split(";");
                     if (medication.getDoseCount() > medication.getActualDoseCount()) {
 
-                        Log.d(TAG, medication.getMedName());
-
                         return DateTime.getCurrentTimestamp(true, split[medication.getActualDoseCount()]);
                     } else {
                         return DateTime.getNextDayTimestamp(split[0]);
@@ -170,7 +169,7 @@ public class MedLiDataSource {
         } else {
 
             medication.setDoseFrequency(Integer.valueOf(cursor.getString(7)));
-            if (getPrnDoseCount24Hours(medication.getIdUnique()) >= medication.getDoseCount()) { // all doses have been taken.
+            /*if (getPrnDoseCount24Hours(medication.getIdUnique()) >= medication.getDoseCount()) { // all doses have been taken.
                 // TODO might make this show the next dose with date.
                 medication.setNextDue("COMPLETE");
             } else {
@@ -178,7 +177,8 @@ public class MedLiDataSource {
                 String nextDose = getPrnNextDose(medication.getIdUnique(), medication.getDoseFrequency());
 
                 medication.setNextDue(nextDose);
-            }
+            } */
+            medication.setNextDue(getNextPrnDose(medication.getIdUnique(), medication.getDoseCount(), medication.getDoseFrequency()));
         }
 
         return medication;
@@ -194,7 +194,7 @@ public class MedLiDataSource {
 
     }
 
-    private String getPrnNextDose(int fk, int freq) {
+    public String getPrnNextDose(int fk, int freq) {
 
         String nextDose = null;
 
@@ -212,7 +212,8 @@ public class MedLiDataSource {
             DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
             org.joda.time.DateTime dt = dateStringFormat.parseDateTime(nextDose);
 
-            return new Timestamp(dt.plusHours(freq).toDate().getTime()).toString();
+            Log.d(TAG, new Timestamp(dt.plusHours(freq).toDate().getTime()).toString());
+            return new Timestamp(dt.plusHours(freq).toDate().getTime()).toString().split("\\.")[0];
 
         }
 
@@ -476,5 +477,52 @@ public class MedLiDataSource {
         cv.put("pref_name", prefName);
         cv.put("pref_int", prefValue);
         insertPreference(prefName, cv);
+    }
+
+    public String getNextPrnDose(int idForeign, int maxCount, int freq) {
+
+        int actualCount = getPrnDoseCount24Hours(idForeign);
+
+        if (actualCount < maxCount) { // doses left in 24 hour span.
+            this.open();
+            Cursor cs = database.rawQuery(Constants.GET_LAST_PRN_DOSE(idForeign), null);
+            while (cs.moveToNext()) {
+                return DateTime.getIncrementedTimestamp(cs.getString(0), 0, freq, 0);
+            }
+
+        } else { //
+            this.open();
+            String query = "SELECT timestamp FROM med_logs WHERE ID_FK = '" + idForeign + "'" +
+                    " AND status = '" + MedLog.ACTIVE +
+                    "' ORDER BY timestamp DESC LIMIT " + maxCount;
+            Cursor cs = database.rawQuery(query, null);
+
+            Stack<String> stack = new Stack<String>();
+            while (cs.moveToNext()) {
+                stack.push(cs.getString(0));
+
+            }
+            String earliest = stack.pop();
+            String firstIncrement = DateTime.getIncrementedTimestamp(earliest, 0, 24, 0);
+
+            String mostRecent = "";
+
+            while (!stack.isEmpty()) {
+                mostRecent = stack.pop();
+            }
+            String recentIncremented = DateTime.getIncrementedTimestamp(mostRecent, 0, freq, 0);
+
+            while (firstIncrement.compareTo(recentIncremented) < 0) {
+
+                firstIncrement = DateTime.getIncrementedTimestamp(firstIncrement, 0, 1, 0);
+            }
+            return firstIncrement;
+
+        }
+        return "error";
+    }
+
+    public static void fillMissedDoses(Medication medication) {
+
     }
 }

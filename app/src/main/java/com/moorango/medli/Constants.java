@@ -66,6 +66,7 @@ public class Constants {
                     + " OR medlist.status = '" + Medication.NEW + "'"
                     + " GROUP BY medlist.ID_UNIQUE ORDER By medlist.name ASC";
 
+
     public static final String GET_TODAYS_MED_ADMIN_LOGS =
             "SELECT med_logs.ID_UNIQUE as id, " // 0
                     + "med_logs.name as name, " // 1

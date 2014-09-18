@@ -25,6 +25,7 @@ import com.moorango.medli.CustomViews.HomeCustomAdapter;
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Helpers.AlarmHelpers;
 import com.moorango.medli.Helpers.DataCheck;
+import com.moorango.medli.Helpers.DateTime;
 import com.moorango.medli.Models.Medication;
 import com.moorango.medli.NotifyService;
 import com.moorango.medli.R;
@@ -135,8 +136,25 @@ public class Fragment_Home extends Fragment {
                                     }
                                 });
                         adB.show();
+                    } else if (med.getNextDue().compareTo(DateTime.getIncrementedTimestamp(DateTime.getCurrentTimestamp(false, null), 0, 0, 20)) > 0 && !adapter.isChecked(pos)) {
+
+                        AlertDialog.Builder adB = new AlertDialog.Builder(getActivity())
+                                .setTitle("Early Dose")
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setMessage(DateTime.getTimeDifference(med.getNextDue())
+                                        + " for " + DataCheck.capitalizeTitles(med.getMedName())
+                                        + " If you would still like to proceed entering it press proceed, else press cancel.")
+                                .setNegativeButton("Cancel", null)
+                                .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        adapter.toggleChecked(pos);
+                                    }
+                                });
+                        adB.show();
                     } else {
                         adapter.toggleChecked(position);
+
                     }
                 }
 

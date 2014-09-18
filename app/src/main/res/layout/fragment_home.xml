@@ -41,6 +41,12 @@
 
         <TextView
             android:layout_width="wrap_content"
+            android:text="Legend: "
+            android:gravity="center"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:paddingLeft="10dp"
             android:layout_gravity="center"
