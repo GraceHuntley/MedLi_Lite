@@ -60,7 +60,7 @@ public class Fragment_Home extends Fragment {
                 ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         if (savedInstanceState != null) {
-            routineChoicesFromInstance = (SparseBooleanArray) savedInstanceState.getParcelable("routine_array");
+            //routineChoicesFromInstance = (SparseBooleanArray) savedInstanceState.getParcelable("routine_array");
 
         }
 

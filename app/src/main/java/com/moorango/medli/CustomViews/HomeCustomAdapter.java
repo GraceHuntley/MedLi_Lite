@@ -187,7 +187,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                 boxWrapper.setBackgroundResource(android.R.color.white);
             }
 
-            if (dataItem.getNextDue().compareTo(DateTime.getCurrentTimestamp(false, null)) < 0) {
+            if (dataItem.getNextDue().compareTo(DateTime.getCurrentTimestamp(false, null)) <= 0) {
                 nextDueTime.setText("NOW");
                 showPrnDoseAlarm(true, dataItem);
             } else {
