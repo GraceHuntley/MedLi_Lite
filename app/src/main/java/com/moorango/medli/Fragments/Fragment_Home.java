@@ -126,8 +126,8 @@ public class Fragment_Home extends Fragment {
                         AlertDialog.Builder adB = new AlertDialog.Builder(getActivity())
                                 .setTitle("Maximum Doses Reached")
                                 .setIcon(android.R.drawable.ic_dialog_alert)
-                                .setMessage("You have reached the maximum set dose count for this Medication. "
-                                        + "If you would still like to proceed entering it press proceed, else press cancel.")
+                                .setMessage("You have reached the maximum set dose count for " + DataCheck.capitalizeTitles(med.getMedName()) + ". "
+                                        + "Click Proceed if you still want to enter it. Otherwise, click Cancel.")
                                 .setNegativeButton("Cancel", null)
                                 .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
                                     @Override
@@ -142,8 +142,8 @@ public class Fragment_Home extends Fragment {
                                 .setTitle("Early Dose")
                                 .setIcon(android.R.drawable.ic_dialog_alert)
                                 .setMessage(DateTime.getTimeDifference(med.getNextDue())
-                                        + " for " + DataCheck.capitalizeTitles(med.getMedName())
-                                        + " If you would still like to proceed entering it press proceed, else press cancel.")
+                                        + " early for " + DataCheck.capitalizeTitles(med.getMedName())
+                                        + ". Click Proceed if you still want to enter it. Otherwise, click Cancel.")
                                 .setNegativeButton("Cancel", null)
                                 .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
                                     @Override

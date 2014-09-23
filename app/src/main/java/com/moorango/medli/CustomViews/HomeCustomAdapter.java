@@ -138,7 +138,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
 
 
             txtTitle.setVisibility(View.VISIBLE);
-            txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName() + " " + dataItem.getDoseForm()));
+            txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName()) + " " + dataItem.getDoseForm());
             nextDueTime.setVisibility(View.VISIBLE);
             prepEditMed(true, dataItem);
             showPrnDoseAlarm(false, dataItem);
@@ -174,7 +174,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
             prepSkipButton(false, null);
             showPrnDoseAlarm(false, dataItem);
             txtTitle.setVisibility(View.VISIBLE);
-            txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName() + " " + dataItem.getDoseForm()));
+            txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName()) + " " + dataItem.getDoseForm());
             nextDueTime.setVisibility(View.VISIBLE);
             prepEditMed(true, dataItem);
 

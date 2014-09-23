@@ -56,22 +56,6 @@ public class DateTime {
         DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
         org.joda.time.DateTime due = formatter.parseDateTime(cleanDateTime);
 
-        /*String dateSplit[] = cleanDateTime.split("[-: ]");
-        int values[] = new int[dateSplit.length];
-
-        for (int index = 0; index < dateSplit.length; index++) {
-            values[index] = Integer.valueOf(dateSplit[index]);
-        }
-
-        int year = values[0];
-        int month = values[1];
-        int day = values[2];
-        int hour = values[3];
-        int minute = values[4];
-        int second = values[5];
-
-        org.joda.time.DateTime dt = new org.joda.time.DateTime(year, month, day, hour, minute, second); */
-
         return due.getMillis();
     }
 
@@ -236,7 +220,7 @@ public class DateTime {
             int hourDifference = (int) difference / (1000 * 60 * 60);
             int minutesDifference = (int) (difference / (1000 * 60)) % 60;
 
-            String message = "You are early by ";
+            String message = "You are ";
 
             if (hourDifference > 0)
                 message += hourDifference + DataCheck.getNumberVerbage(hourDifference, " hour");
