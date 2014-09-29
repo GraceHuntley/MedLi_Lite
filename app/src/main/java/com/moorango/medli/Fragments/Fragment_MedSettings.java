@@ -192,6 +192,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                                                        if (isRoutine) { // setup form for routine medication.
                                                            medTypePrompt.setText("Setting up a Routine medication");
                                                            setTextChangeListener();
+                                                           maxDoses.setText("0");
                                                            prnFreqBox.setVisibility(View.GONE);
                                                            doseFrequency.setVisibility(View.GONE);
                                                        } else { // setup form for prn med.
