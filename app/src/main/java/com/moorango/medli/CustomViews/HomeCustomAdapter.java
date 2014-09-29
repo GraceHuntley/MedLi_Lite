@@ -162,13 +162,10 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
 
         } else { // PRN MED.
 
-            prepPRNDisplay(dataItem); // might not need to pass object TODO
-
+            prepPRNDisplay(dataItem);
             showPrnDoseAlarm(false, dataItem);
             prepEditMed(true, dataItem);
-
             txtTitle.setChecked(sparseBooleanArray.get(position));
-
             setSelected(txtTitle);
 
             if (dataItem.getNextDue().compareTo(DateTime.getCurrentTimestamp(false, null)) <= 0) {
@@ -176,19 +173,20 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                 showPrnDoseAlarm(true, dataItem);
             } else {
                 try {
-                    String time = dataItem.getNextDue().split(" ")[1];
-                    String PRN_DOSE_TEXT = "Earliest Dose: ";
-                    nextDueTime.setText(PRN_DOSE_TEXT + (DataCheck.isToday(dataItem.getNextDue()) ? DateTime.convertToTime12(time) : "Tommorow at " + DateTime.convertToTime12(time)));
+                    String timeSplit[] = dataItem.getNextDue().split(" ");
+                    //if (timeSplit.length > 1) {
+                        String time = dataItem.getNextDue().split(" ")[1];
+
+                        String PRN_DOSE_TEXT = "Earliest Dose: ";
+                        nextDueTime.setText(PRN_DOSE_TEXT + (DataCheck.isToday(dataItem.getNextDue()) ? DateTime.convertToTime12(time) : "Tomorrow at " + DateTime.convertToTime12(time)));
+                    //}
+
                 } catch (ArrayIndexOutOfBoundsException e) {
                     Log.e(TAG, e.toString());
-
                 }
             }
-
         }
-
         return convertView;
-
     }
 
     private void isLate(boolean isLate) {

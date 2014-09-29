@@ -51,7 +51,6 @@ public class MedLiDataSource {
         if (instance == null)
             instance = new MedLiDataSource(context);
 
-
         return instance;
     }
 
@@ -95,20 +94,16 @@ public class MedLiDataSource {
         while (cursor.moveToNext()) {
             Medication medication = cursorToRoutine(cursor);
 
-
             if (medication.getAdminType().equalsIgnoreCase("routine")) {
                 routineList.add(medication);
 
                 AlarmHelpers ah = new AlarmHelpers(context);
                 ah.setAlarm(medication.getIdUnique(), medication.getNextDue());
 
-
             } else {
                 prnList.add(medication);
             }
-
         }
-
 
         Collections.sort(routineList, new Comparator<Medication>() {
             @Override
@@ -136,7 +131,6 @@ public class MedLiDataSource {
             routineList.add(med);
         }
         cursor.close();
-
 
         return routineList;
     }
@@ -500,7 +494,6 @@ public class MedLiDataSource {
             Stack<String> stack = new Stack<String>();
             while (cs.moveToNext()) {
                 stack.push(cs.getString(0));
-
             }
             String earliest = stack.pop();
             String firstIncrement = DateTime.getIncrementedTimestamp(earliest, 0, 24, 0);
@@ -509,6 +502,10 @@ public class MedLiDataSource {
 
             while (!stack.isEmpty()) {
                 mostRecent = stack.pop();
+            }
+            if (maxCount == 1 ) {
+
+                return DateTime.getIncrementedTimestamp(firstIncrement, 1, 0, 0);
             }
             String recentIncremented = DateTime.getIncrementedTimestamp(mostRecent, 0, freq, 0);
 
