@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.moorango.medli.Constants;
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Fragments.Fragment_Home;
 import com.moorango.medli.Helpers.AlarmHelpers;
@@ -133,29 +134,19 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
 
             prepSubHeading(dataItem);
 
-            showPrnDoseAlarm(false, dataItem);
         } else if (dataItem.getAdminType().equalsIgnoreCase("ROUTINE")) {
 
-
-            txtTitle.setVisibility(View.VISIBLE);
-            txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName()) + " " + dataItem.getDoseForm());
-            nextDueTime.setVisibility(View.VISIBLE);
-            prepEditMed(true, dataItem);
-            showPrnDoseAlarm(false, dataItem);
+            prepRoutineDisplay(dataItem);
 
             txtTitle.setChecked(sparseBooleanArray.get(position));
 
-            if (txtTitle.isChecked()) {
-
-                boxWrapper.setBackgroundResource(R.color.green_selector);
-            } else {
-                boxWrapper.setBackgroundResource(android.R.color.white);
-            }
+            setSelected(txtTitle);
 
             if (!DataCheck.isToday(dataItem.getNextDue())) {
 
-                nextDueTime.setText("COMPLETE");
                 isLate(false);
+                nextDueTime.setText("COMPLETE");
+
                 prepSkipButton(false, null);
             } else {
                 String ROUTINE_DOSE_TEXT = "Next Due: ";
@@ -169,23 +160,16 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                 }
             }
 
-        } else {
-            isLate(false);
-            prepSkipButton(false, null);
+        } else { // PRN MED.
+
+            prepPRNDisplay(dataItem); // might not need to pass object TODO
+
             showPrnDoseAlarm(false, dataItem);
-            txtTitle.setVisibility(View.VISIBLE);
-            txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName()) + " " + dataItem.getDoseForm());
-            nextDueTime.setVisibility(View.VISIBLE);
             prepEditMed(true, dataItem);
 
             txtTitle.setChecked(sparseBooleanArray.get(position));
 
-            if (txtTitle.isChecked()) {
-
-                boxWrapper.setBackgroundResource(R.color.green_selector);
-            } else {
-                boxWrapper.setBackgroundResource(android.R.color.white);
-            }
+            setSelected(txtTitle);
 
             if (dataItem.getNextDue().compareTo(DateTime.getCurrentTimestamp(false, null)) <= 0) {
                 nextDueTime.setText("NOW");
@@ -217,6 +201,37 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
         }
     }
 
+    private void prepRoutineDisplay(Medication dataItem) {
+
+        txtTitle.setVisibility(View.VISIBLE);
+        txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName()) + " " + dataItem.getDoseForm());
+        nextDueTime.setVisibility(View.VISIBLE);
+        prepEditMed(true, dataItem);
+        showPrnDoseAlarm(false, dataItem);
+    }
+
+    private void prepPRNDisplay(Medication dataItem) {
+
+        isLate(false);
+        prepSkipButton(false, null);
+
+        txtTitle.setVisibility(View.VISIBLE);
+        txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName()) + " " + dataItem.getDoseForm());
+        nextDueTime.setVisibility(View.VISIBLE);
+
+    }
+
+    private void setSelected(CheckedTextView txtTitle) {
+
+        if (txtTitle.isChecked()) {
+
+            boxWrapper.setBackgroundResource(R.color.green_selector);
+        } else {
+            boxWrapper.setBackgroundResource(android.R.color.white);
+        }
+
+    }
+
     private void showPrnDoseAlarm(boolean value, final Medication medication) {
         if (value) {
             setPrnAlarm.setVisibility(View.VISIBLE);
@@ -225,11 +240,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                 public void onClick(View view) {
                     AlertDialog.Builder adB = new AlertDialog.Builder(getContext())
                             .setTitle("Non-Routine Scheduler")
-                            .setMessage("This feature allows you to log a non-routine medication, no questions asked. " +
-                                    "It also sets an alarm for the next time you are able to take the medication. " +
-                                    "This alarm is a one time alarm that will only be reset again when you activate this. \n\n" +
-                                    "In order to activate it long press the icon\n\n" +
-                                    "You will only be able to use this feature when you have doses available to be taken.")
+                            .setMessage(Constants.PRN_ALARM_MESSAGE)
                             .setIcon(android.R.drawable.ic_dialog_info)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
@@ -238,7 +249,6 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                                 }
                             });
                     adB.show();
-
 
                 }
             });
@@ -250,12 +260,9 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
                     MedLiDataSource dataSource = MedLiDataSource.getHelper(context);
                     dataSource.submitMedicationAdmin(medication, null);
 
-                    Log.d(TAG, dataSource.getPrnNextDose(medication.getIdUnique(), medication.getDoseFrequency()));
-
                     AlarmHelpers ah = new AlarmHelpers(context);
 
                     ah.setAlarm(medication.getIdUnique(), dataSource.getPrnNextDose(medication.getIdUnique(), medication.getDoseFrequency()));
-
 
                     caller.mListener.onFragmentInteraction(5, "setPRNAlarm", 0);
 
@@ -282,6 +289,8 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
         headerText.setVisibility(View.VISIBLE);
 
         boxWrapper.setBackgroundResource(R.drawable.list_bg);
+
+        showPrnDoseAlarm(false, dataItem);
     }
 
     private void prepEditMed(boolean showButton, Medication dataItem) {
@@ -344,5 +353,4 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
             skipButton.setVisibility(View.GONE);
         }
     }
-
 }

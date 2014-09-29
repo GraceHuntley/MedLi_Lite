@@ -126,7 +126,15 @@ public class Constants {
             "SELECT COUNT(ID_UNIQUE) FROM medlist "
                     + "WHERE status=" + Medication.ACTIVE
                     + " OR status=" + Medication.NEW;
+
+    public static final String PRN_ALARM_MESSAGE = "This feature allows you to log a non-routine medication, no questions asked. " +
+            "It also sets an alarm for the next time you are able to take the medication. " +
+            "This alarm is a one time alarm that will only be reset again when you activate this. \n\n" +
+            "In order to activate it long press the icon\n\n" +
+            "You will only be able to use this feature when you have doses available to be taken.";
 }
+
+
 
 
 
