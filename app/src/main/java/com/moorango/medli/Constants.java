@@ -32,6 +32,15 @@ public class Constants {
             "dose_frequency TEXT, " + // 11
             "last_modified TEXT)"; // 12
 
+    // TODO institute new db on update.
+    public static final String CREATE_MED_RT_DOSE_DB = "CREATE TABLE med_doses (" +
+            "ID_UNIQUE INTEGER PRIMARY KEY NOT NULL, " + // 0"
+            "KEY_FK INTEGER, " + // 1
+            "dose_time, " + // 2
+            "dose_dbl, " + // 3
+            "dose_measure, " + // 4
+            "status)";
+
     public static final String CREATE_MEDLOGS_DB = "CREATE TABLE med_logs (" +
             "ID_UNIQUE INTEGER PRIMARY KEY NOT NULL, " +
             "name TEXT NOT NULL, " +
