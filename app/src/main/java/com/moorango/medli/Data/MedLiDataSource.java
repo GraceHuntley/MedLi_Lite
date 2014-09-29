@@ -516,7 +516,21 @@ public class MedLiDataSource {
             return firstIncrement;
 
         }
-
     }
 
+    /**
+     * Function mainly for version 2 database migration. Adding new Table for med dose fractinos
+     * ROUTINE MEDS ONLY.
+     * @param medication
+     * @return
+     */
+    public boolean doesDoseSchemeExist(Medication medication) {
+
+        this.open();
+
+        String query = "SELECT COUNT(KEY_FK) FROM med_doses WHERE KEY_FK = " + medication.getIdUnique();
+
+
+        return false;
+    }
 }

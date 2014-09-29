@@ -14,6 +14,7 @@ import com.moorango.medli.Constants;
 @SuppressWarnings("WeakerAccess")
 public class Helper_SQLiteHelper extends SQLiteOpenHelper {
 
+    private static final String TAG = "Helper_SQLiteHelper";
     private static final String DATABASE_NAME = "medli.db";
     private static final int DATABASE_VERSION = 1;
 
@@ -31,10 +32,15 @@ public class Helper_SQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        Log.w(Helper_SQLiteHelper.class.getName(),
-                "Upgrading database from version " + oldVersion + " to "
-                        + newVersion + ", which will destroy all old data");
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DATABASE_NAME);
-        onCreate(sqLiteDatabase);
+        switch(newVersion) {
+            case 2:
+                Log.d(TAG, "Adding Med Dose table");
+                sqLiteDatabase.execSQL(Constants.CREATE_MED_RT_DOSE_DB);
+                break;
+            default:
+                throw new IllegalStateException(
+                        "onUpgrade() with unknown newVersion" + newVersion);
+        }
+       // onCreate(sqLiteDatabase);
     }
 }
