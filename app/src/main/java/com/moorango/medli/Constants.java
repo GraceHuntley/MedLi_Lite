@@ -38,7 +38,7 @@ public class Constants {
             "KEY_FK INTEGER, " + // 1
             "dose_time, " + // 2
             "dose_dbl, " + // 3
-            "dose_measure, " + // 4
+            "dose_form, " + // 4
             "status)";
 
     public static final String CREATE_MEDLOGS_DB = "CREATE TABLE med_logs (" +

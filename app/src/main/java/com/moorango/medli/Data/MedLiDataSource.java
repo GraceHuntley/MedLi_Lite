@@ -518,19 +518,44 @@ public class MedLiDataSource {
         }
     }
 
-    /**
-     * Function mainly for version 2 database migration. Adding new Table for med dose fractinos
-     * ROUTINE MEDS ONLY.
-     * @param medication
-     * @return
-     */
-    public boolean doesDoseSchemeExist(Medication medication) {
-
+    public void copyDoseTimesToNewTable() {
         this.open();
 
-        String query = "SELECT COUNT(KEY_FK) FROM med_doses WHERE KEY_FK = " + medication.getIdUnique();
+        String query = "SELECT ID_UNIQUE, name, dose_form, dose_times, dose_int, dose_measure_type FROM medlist WHERE admin_type = 'routine' AND STATUS = '" + Medication.ACTIVE;
+
+        Cursor cs = database.rawQuery(query, null);
+
+        while (cs.moveToNext()) { // iterate through medication's.
+
+            String splitTimes[] = cs.getString(3).split(";");
+
+            String doseForm;
+
+            String readyDoseForm[] = DataCheck.getDoseFormNewTable(cs.getString(2)).split(";");
+
+            double doseDouble = Double.parseDouble(readyDoseForm[0]);
+            // TODO might throw a try in here for good luck. But should be pretty sanitary without.
+            if (readyDoseForm.length > 1) {
+                doseForm = readyDoseForm[1];
+            } else {
+                doseForm = "";
+            }
+
+            for (String time:splitTimes) {
 
 
-        return false;
+                ContentValues cv = new ContentValues();
+
+                cv.put("ID_UNIQUE", DataCheck.createUniqueID(cs.getString(1)));
+                cv.put("KEY_FK", cs.getInt(0));
+                cv.put("dose_time", DateTime.convertToTime24(time));
+                cv.put("dose_dbl", doseDouble);
+                cv.put("dose_form", doseForm.length() > 0?doseForm:"EDIT_THIS");
+                cv.put("status", Medication.ACTIVE);
+
+                database.insert("med_doses", "KEY_FK", cv);
+
+            }
+        }
     }
 }

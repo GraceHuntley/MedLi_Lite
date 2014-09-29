@@ -16,7 +16,7 @@ public class Helper_SQLiteHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "Helper_SQLiteHelper";
     private static final String DATABASE_NAME = "medli.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public Helper_SQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -27,6 +27,7 @@ public class Helper_SQLiteHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(Constants.CREATE_MEDLIST_DB);
         sqLiteDatabase.execSQL(Constants.CREATE_MEDLOGS_DB);
         sqLiteDatabase.execSQL(Constants.CREATE_PREFERENCES_DB);
+        sqLiteDatabase.execSQL(Constants.CREATE_MED_RT_DOSE_DB);
 
     }
 

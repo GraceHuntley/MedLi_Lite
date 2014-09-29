@@ -212,4 +212,47 @@ public class DataCheck {
 
         return date.matches("^(20[1-9][1-9])-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[0-9]|1[0-9]|2[0-4]):([0-5][0-9]):([0-5][0-9])");
     }
+
+    /**
+     * Can take a beating. Checks for fractions/decimals followed by space then dose form. tab/drops/bazookas etc.
+     *
+     * TODO should probably unit test this baby once I fix unit testing.
+     *
+     * @param doseForm
+     * @return semi-colon delimited first double value of dose, second wording cleaned with double word separation maintained.
+     */
+    public static String getDoseFormNewTable(String doseForm) {
+
+        double finalMeasure = 1.0; // if all else we'll default to 1.0
+
+        String wordPart = doseForm.replaceAll("[1-9/.]", "").trim();
+        String numbers = doseForm.replaceAll("[a-zA-Z- ]", "");
+
+        if (numbers.contains("/")) { // It might be a fraction.
+
+            int indexOfFslash = numbers.indexOf("/");
+            int indexOfBase = indexOfFslash + 1;
+            int indexOfTop = indexOfFslash - 1;
+
+            // get last part of fraction.
+            double fractionBase = Integer.valueOf(numbers.substring(indexOfBase));
+            double fractionTop = Integer.valueOf(numbers.substring(indexOfTop, indexOfFslash));
+
+            // see if there is a leading multiplier.
+            String multiplier = numbers.substring(0, indexOfTop);
+
+            if (multiplier.length() > 0) {
+
+                double value = Integer.valueOf(multiplier);
+                finalMeasure = (value + (fractionTop / fractionBase));
+            }
+
+        } else {// not a fraction.
+
+            if (numbers.length() > 0) { // should be a number to work with.
+                finalMeasure = Double.parseDouble(numbers);
+            }
+        }
+        return finalMeasure + ";" + wordPart;
+    }
 }
