@@ -40,5 +40,6 @@ dependencies {
     //compile project(path: ':medli', configuration: 'android-endpoints')
     compile 'joda-time:joda-time:2.4'
     compile 'com.jayway.android.robotium:robotium-solo:5.2.1'
+    //noinspection GradleDependency
     compile 'com.google.android.gms:play-services:5.0.89'
 }

@@ -17,7 +17,7 @@ public class StartAlarms extends BroadcastReceiver {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             // Set the alarm here.
             MedLiDataSource dataSource = MedLiDataSource.getHelper(context);
-            dataSource.getAllMeds(context, true);
+            dataSource.getAllMeds(context);
         }
 
     }

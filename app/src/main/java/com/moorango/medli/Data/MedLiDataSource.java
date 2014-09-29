@@ -83,7 +83,7 @@ public class MedLiDataSource {
 
     }
 
-    public List<Medication> getAllMeds(Context context, boolean makeAlarms) {
+    public List<Medication> getAllMeds(Context context) {
         List<Medication> routineList = new ArrayList<Medication>();
         List<Medication> prnList = new ArrayList<Medication>();
 

@@ -44,7 +44,7 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:text="Legend: "
+            android:text="@string/legend_title"
             android:gravity="center"
             android:layout_height="match_parent" />
 
@@ -52,18 +52,20 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:paddingLeft="10dp"
+            android:paddingRight="0dp"
             android:layout_gravity="center"
             android:gravity="center"
             android:drawableLeft="@drawable/ic_action_edit"
-            android:text="Edit Medication" />
+            android:text="@string/edit_med_legend" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:paddingLeft="10dp"
+            android:paddingRight="0dp"
             android:gravity="center"
             android:layout_gravity="center"
-            android:text="Skip Dose"
+            android:text="@string/skip_med_legend"
             android:drawableLeft="@drawable/ic_action_next" />
 
     </LinearLayout>

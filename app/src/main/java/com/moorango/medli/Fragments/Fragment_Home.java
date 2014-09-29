@@ -391,11 +391,11 @@ public class Fragment_Home extends Fragment {
         @Override
         protected String doInBackground(Void... voids) {
             List<Medication> meds;
-            if (getActivity().getIntent().hasExtra(NotifyService.INTENT_FROM_NOTIFICATION)) {
-                meds = dataSource.getAllMeds(getActivity(), true);
-            } else {
-                meds = dataSource.getAllMeds(getActivity(), false);
-            }
+            //if (getActivity().getIntent().hasExtra(NotifyService.INTENT_FROM_NOTIFICATION)) {
+                meds = dataSource.getAllMeds(getActivity());
+            //} else {
+            //    meds = dataSource.getAllMeds(getActivity());
+            //}
 
             adapter = new HomeCustomAdapter(getActivity(), meds, fragmentHome);
 

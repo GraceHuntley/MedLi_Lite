@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class HomeCustomAdapter extends ArrayAdapter<Medication> {
 
-    @SuppressWarnings("UnusedAssignment")
+    @SuppressWarnings({"UnusedAssignment", "FieldCanBeLocal"})
     private final String TAG = "Home/HomeCustomAdapter";
     private final Fragment_Home caller;
     private final Context context;
@@ -174,12 +174,14 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
             } else {
                 try {
                     String timeSplit[] = dataItem.getNextDue().split(" ");
-                    //if (timeSplit.length > 1) {
-                        String time = dataItem.getNextDue().split(" ")[1];
+                    if (timeSplit.length > 1) {
+                        String time = timeSplit[1];
 
                         String PRN_DOSE_TEXT = "Earliest Dose: ";
                         nextDueTime.setText(PRN_DOSE_TEXT + (DataCheck.isToday(dataItem.getNextDue()) ? DateTime.convertToTime12(time) : "Tomorrow at " + DateTime.convertToTime12(time)));
-                    //}
+                    } else {
+                        nextDueTime.setText("MAXED DOSE");
+                    }
 
                 } catch (ArrayIndexOutOfBoundsException e) {
                     Log.e(TAG, e.toString());

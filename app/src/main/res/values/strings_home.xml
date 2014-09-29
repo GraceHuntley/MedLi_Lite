@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="legend_title">Legend: </string>
+    <string name="edit_med_legend">Edit Medication</string>
+    <string name="skip_med_legend">Skip Dose</string>
+
+    <!-- Home Listview Adapter Strings -->
+    <string name="skip_descriptor">skip_med</string>
+    <string name="alarm_descriptor">add_alarm</string>
+
+    <!-- Empty home Strings -->
+    <string name="pillbottle_descriptor">pill_bottle</string>
+
+</resources>

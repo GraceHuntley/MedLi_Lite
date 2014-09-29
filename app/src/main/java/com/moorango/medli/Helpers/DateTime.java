@@ -103,7 +103,7 @@ public class DateTime {
         int hours = Integer.parseInt(splitTime[0]);
 
 
-        if (hours > 24) { // then it is tommorow.
+        if (hours > 24) { // then it is tomorrow.
             hours = hours - 24;
 
         }
@@ -148,7 +148,7 @@ public class DateTime {
      * else returns current timestamp and date.
      *
      * @param justDate boolean true if time will be provided for timestamp.
-     * @param time     12 hour time will be injected into timestmap.
+     * @param time     12 hour time will be injected into timestamp.
      * @return
      */
     public static String getCurrentTimestamp(boolean justDate, String time) {

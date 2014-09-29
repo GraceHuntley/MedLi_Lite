@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/box_wrapper"
     android:layout_width="match_parent"
     android:background="#ffffff"
@@ -45,7 +46,8 @@
         android:layout_below="@+id/title"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:ignore="RelativeOverlap" />
 
     <ImageView
         android:id="@+id/edit_med_button"
@@ -63,25 +65,25 @@
         android:id="@+id/skip_dose"
         android:src="@drawable/ic_action_next"
         android:layout_width="wrap_content"
-        android:contentDescription="skip_med"
+        android:contentDescription="@string/skip_descriptor"
         android:padding="5dp"
         android:clickable="true"
-        android:text="Skip"
+        android:text="@string/skip_descriptor"
         android:layout_toLeftOf="@id/edit_med_button"
         android:layout_alignParentBottom="true"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        tools:ignore="RelativeOverlap" />
 
     <ImageView
         android:id="@+id/prn_alarm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_action_add_alarm"
-        android:contentDescription="add_alarm"
+        android:contentDescription="@string/alarm_descriptor"
         android:visibility="gone"
         android:padding="5dp"
         android:clickable="true"
         android:layout_toLeftOf="@id/edit_med_button"
         android:layout_alignParentBottom="true" />
-
 
 </RelativeLayout>

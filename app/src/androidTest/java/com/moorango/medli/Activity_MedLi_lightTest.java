@@ -17,8 +17,8 @@ import java.util.Set;
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
  */
+@SuppressWarnings("ALL")
 public class Activity_MedLi_lightTest extends AndroidTestCase implements PerformanceTestCase {
-
 
     public Activity_MedLi_lightTest() {
         super();
@@ -31,8 +31,6 @@ public class Activity_MedLi_lightTest extends AndroidTestCase implements Perform
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-
-
 
     }
 

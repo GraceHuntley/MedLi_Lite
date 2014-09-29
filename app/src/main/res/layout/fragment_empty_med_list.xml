@@ -3,12 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ffffff"
-    tools:context="com.moorango.medli.Fragments.Fragment_EmptyMedList">
+    tools:context="com.moorango.medli.Fragments.Fragment_EmptyMedList"
+    tools:ignore="Overdraw">
 
     <ImageView
         android:layout_width="match_parent"
         android:src="@drawable/pill_bg"
         android:layout_alignParentBottom="true"
+        android:contentDescription="@string/pillbottle_descriptor"
         android:layout_marginBottom="-50dp"
         android:layout_height="wrap_content" />
 
