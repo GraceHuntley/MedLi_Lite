@@ -84,6 +84,12 @@ public class MedLiDataSource {
     }
 
     public List<Medication> getAllMeds(Context context) {
+
+        // TODO need to check if copy list has been done yet.
+
+        copyDoseTimesToNewTable();
+
+
         List<Medication> routineList = new ArrayList<Medication>();
         List<Medication> prnList = new ArrayList<Medication>();
 
