@@ -51,7 +51,8 @@ public class DataCheck {
     }
 
     public static String capitalizeTitles(String toCapitalize) {
-        String splitString[] = toCapitalize.split(" ");
+
+        String splitString[] = toCapitalize.trim().split(" ");
         String readyForReturn = "";
 
         for (String titleWord : splitString) {
