@@ -87,7 +87,7 @@ public class MedLiDataSource {
 
         // TODO need to check if copy list has been done yet.
 
-        copyDoseTimesToNewTable();
+        // TODO will come back to htis after TDD is repaired. copyDoseTimesToNewTable();
 
 
         List<Medication> routineList = new ArrayList<Medication>();
