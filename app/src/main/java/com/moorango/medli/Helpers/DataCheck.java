@@ -62,7 +62,6 @@ public class DataCheck {
         return readyForReturn;
     }
 
-
     /**
      * Matches current hour to corresponding dose.
      *
