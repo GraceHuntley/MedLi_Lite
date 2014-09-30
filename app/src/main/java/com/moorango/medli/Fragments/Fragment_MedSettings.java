@@ -400,6 +400,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                     for (index = 0; index < etList.size(); index++) {
                         compiled += etList.get(index).getText().toString() + ";";
                     }
+
                     compiled = compiled.substring(0, compiled.length() - 1); // remove trailing semi-colon
                     return compiled;
                 }
