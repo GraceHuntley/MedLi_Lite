@@ -216,7 +216,7 @@ public class DataCheck {
     /**
      * Can take a beating. Checks for fractions/decimals followed by space then dose form. tab/drops/bazookas etc.
      *
-     * TODO should probably unit test this baby once I fix unit testing.
+     * UNIT-TESTED
      *
      * @param doseForm
      * @return semi-colon delimited first double value of dose, second wording cleaned with double word separation maintained.

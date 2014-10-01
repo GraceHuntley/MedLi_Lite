@@ -86,7 +86,6 @@ public class Activity_MedLi_lightTest extends AndroidTestCase implements Perform
 
         Set<Integer> lump = new HashSet<Integer>();
 
-
         for (int index = 0; index < 100; index++) {
 
             int id = DataCheck.createUniqueID("f");
@@ -96,9 +95,14 @@ public class Activity_MedLi_lightTest extends AndroidTestCase implements Perform
 
     }
 
-    public void testNowInMilliseconds() {
-        // Time t = new Time();
-        // t.setToNow();
+    public void testDoseFormParser() {
+        // TODO will test the parser for doseForm within DataCheck here.
 
+        String toCheck[] = {"21/2grams", "21/2 grams", "2 1/2 grams", "2.5 grams", "2.5grams"};
+
+        for (String check:toCheck) {
+            assertEquals("validateParsingDoseFormParser", "2.5;grams", DataCheck.getDoseFormNewTable(check));
+
+        }
     }
 }
