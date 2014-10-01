@@ -40,7 +40,7 @@ import android.widget.Toast;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.moorango.medli.Activity_MedLi_light;
-import com.moorango.medli.CustomViews.TimeDoseView;
+import com.moorango.medli.CustomViews.TimeDoseList;
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Helper_DrugData;
 import com.moorango.medli.Helpers.AlarmHelpers;
@@ -61,6 +61,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class Fragment_MedSettings extends Fragment implements View.OnClickListener {
 
@@ -85,7 +86,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     private int errorCount = 0;
     private GetSuggestions getSuggestions;
     private Tracker ga;
-    private TimeDoseView tdv;
+    private TimeDoseList tdv;
 
 
     public Fragment_MedSettings() {
@@ -134,7 +135,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         medTypePrompt = (TextView) view.findViewById(R.id.med_type_label);
         formWrapper = (ScrollView) view.findViewById(R.id.scrollview_wrapper);
         clear = (Button) view.findViewById(R.id.clear_btn);
-        tdv = (TimeDoseView) view.findViewById(R.id.time_dose_view);
+        tdv = (TimeDoseList) view.findViewById(R.id.time_dose_view);
 
         return view;
     }
@@ -559,7 +560,10 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_add_med:
-
+                List list =  tdv.getDoseData();
+                for (int i = 0; i < list.size(); i++) {
+                    Log.d(TAG, list.get(i).toString());
+                }
                 String selection = med_type.getSelectedItem().toString().toLowerCase();
                 boolean doUpdate = false;
                 if (getArguments() != null && getArguments().getBoolean("edit")) {
