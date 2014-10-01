@@ -55,7 +55,7 @@ public class Helper_SQLiteHelper extends SQLiteOpenHelper {
     public void copyDoseTimesToNewTable(SQLiteDatabase database) {
         //this.open();
 
-        String query = "SELECT ID_UNIQUE, name, dose_form, dose_times, dose_int, dose_measure_type FROM medlist WHERE admin_type = 'routine' AND STATUS = '" + Medication.ACTIVE;
+        String query = "SELECT ID_UNIQUE, name, dose_form, dose_times, dose_int, dose_measure_type FROM medlist WHERE admin_type = 'routine' AND STATUS = '" + Medication.ACTIVE + "'";
 
         Cursor cs = database.rawQuery(query, null);
 
@@ -76,7 +76,6 @@ public class Helper_SQLiteHelper extends SQLiteOpenHelper {
             }
 
             for (String time : splitTimes) {
-
 
                 ContentValues cv = new ContentValues();
 
