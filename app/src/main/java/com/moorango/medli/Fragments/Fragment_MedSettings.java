@@ -40,6 +40,7 @@ import android.widget.Toast;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.moorango.medli.Activity_MedLi_light;
+import com.moorango.medli.CustomViews.TimeDoseView;
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Helper_DrugData;
 import com.moorango.medli.Helpers.AlarmHelpers;
@@ -84,6 +85,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     private int errorCount = 0;
     private GetSuggestions getSuggestions;
     private Tracker ga;
+    private TimeDoseView tdv;
 
 
     public Fragment_MedSettings() {
@@ -132,6 +134,8 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         medTypePrompt = (TextView) view.findViewById(R.id.med_type_label);
         formWrapper = (ScrollView) view.findViewById(R.id.scrollview_wrapper);
         clear = (Button) view.findViewById(R.id.clear_btn);
+        tdv = (TimeDoseView) view.findViewById(R.id.time_dose_view);
+
         return view;
     }
 
@@ -354,6 +358,9 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
             @Override
             public void afterTextChanged(Editable editable) {
+
+                tdv.setDoseCount(Integer.valueOf(editable.toString().trim()));
+
 
                 try {
                     if (Integer.valueOf(editable.toString()) < (adminTimesList.getChildCount() / 2)) {
