@@ -5,8 +5,10 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 
 import com.moorango.medli.R;
 
@@ -93,15 +95,59 @@ public class TimeDoseList extends LinearLayout {
         List<String> items = new ArrayList<String>();
         for (int i = 0; i < getChildCount(); i++) {
 
+            String data = "";
 
-                View v = getChildAt(i);
-                if (v instanceof EditText) {
-                    EditText et = (EditText) v;
+            ViewGroup v = (ViewGroup) getChildAt(i);
 
-                    items.add(et.getText().toString());
+            for (int j = 0; j < v.getChildCount(); j++) {
+
+                View view = v.getChildAt(j);
+
+                if ( view instanceof EditText) {
+                    EditText et = (EditText) view;
+                    data += et.getText().toString() + ";";
+                } else if (view instanceof Spinner) {
+                    Spinner sp = (Spinner) view;
+                    data += sp.getSelectedItem().toString() + ";";
                 }
+            }
 
+            if (data.length() > 0) {
+                data = data.trim().substring(0, data.trim().length() - 1);
+                items.add(data.substring(0, data.trim().length()));
+
+            }
         }
+
+        //recursiveLoopChildren(this);
         return items;
+    }
+
+    public void recursiveLoopChildren(ViewGroup parent) {
+        List<String> list = new ArrayList<String>();
+
+        String data = "";
+        for (int i = 0; i < parent.getChildCount(); i++) {
+            final View child = parent.getChildAt(i);
+            if (child instanceof ViewGroup) {
+                recursiveLoopChildren((ViewGroup) child);
+                // DO SOMETHING WITH VIEWGROUP, AFTER CHILDREN HAS BEEN LOOPED
+            } else {
+                if (child != null) {
+
+                    if (child instanceof EditText) {
+                        EditText et = (EditText) child;
+                        data += et.getText().toString() + ";";
+                    } else if (child instanceof Spinner) {
+                        Spinner sp = (Spinner) child;
+                        data += sp.getSelectedItem().toString() + ";";
+                    }
+                }
+            }
+        }
+        if (data.length() > 0) {
+            list.add(data);
+        }
+
     }
 }
