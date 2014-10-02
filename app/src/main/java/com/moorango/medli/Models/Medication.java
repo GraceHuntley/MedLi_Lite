@@ -2,6 +2,9 @@ package com.moorango.medli.Models;
 
 import com.moorango.medli.Helpers.DataCheck;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Colin on 7/31/2014.
  * Copyright 2014
@@ -35,6 +38,11 @@ public class Medication {
     private String nextDue; // next due time.
     private int actualDoseCount; // actual count of doses given today.
     private int doseFrequency; // prn only frequency meds can be taken in hours.
+    private List<String> doseInfo = new ArrayList<String>();
+
+    public void setDoseInfo(List<String> doseInfo) { this.doseInfo = doseInfo; }
+
+    public List<String> getDoseInfo() { return this.doseInfo; }
 
     public void setIdUnique(int id) {
         this.idUnique = id;

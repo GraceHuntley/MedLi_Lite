@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Models.MedLog;
@@ -15,6 +16,7 @@ import com.moorango.medli.R;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -254,5 +256,60 @@ public class DataCheck {
             }
         }
         return finalMeasure + ";" + wordPart;
+    }
+
+    public static boolean isFormCompleted(ViewGroup group, int errorCounts) {
+
+
+        for (int i = 0, count = group.getChildCount(); i < count; ++i) {
+            View view = group.getChildAt(i);
+            if (view instanceof EditText && view.getVisibility() == View.VISIBLE) {
+
+                if (view.getId() == R.id.admin_count_edittext) {
+                    if (Integer.valueOf(((EditText) view).getText().toString()) < 1) {
+                        ((EditText) view).setError("This cannot be empty");
+
+                        errorCounts++;
+                    }
+                } else if (view instanceof EditText && ((EditText) view).getText().length() == 0) {
+
+                    ((EditText) view).setError("This cannot be empty.");
+
+                    errorCounts++;
+                } else if (view instanceof EditText && ((EditText) view).getText().toString().matches("^.*[^a-zA-Z0-9 ./:-].*$")) {
+
+                    ((EditText) view).setError("Invalid Characters");
+                    errorCounts++;
+                }
+            }
+
+
+            if (view instanceof ViewGroup && (((ViewGroup) view).getChildCount() > 0))
+                isFormCompleted((ViewGroup) view, errorCounts);
+
+        }
+
+        return errorCounts <= 0;
+    }
+
+    public static boolean checkDoseTimes(ArrayList<EditText> etList) {
+
+        if (etList.size() == 1) {
+            return true;
+        }
+
+        int errors = 0;
+        for (int index = etList.size() - 1; index > 0; index--) {
+            String fDate = DateTime.convertToTime24(etList.get(index).getText().toString());
+            String sDate = DateTime.convertToTime24(etList.get(index - 1).getText().toString());
+
+            if (fDate.compareTo(sDate) <= 0) {
+                etList.get(index).setError("Invalid Time");
+                errors++;
+            }
+
+        }
+
+        return errors == 0;
     }
 }
