@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="med_measure_value">
+        <item>1</item>
+        <item>1/4</item>
+        <item>1/2</item>
+        <item>3/4</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </string-array>
+
+    <string-array name="med_measure_type">
+        <item>applicator</item>
+        <item>capsule</item>
+        <item>cc</item>
+        <item>coating</item>
+        <item>drop</item>
+        <item>gm</item>
+        <item>ml</item>
+        <item>supp.</item>
+        <item>tab</item>
+        <item>tbl</item>
+        <item>tsp</item>
+    </string-array>
+</resources>

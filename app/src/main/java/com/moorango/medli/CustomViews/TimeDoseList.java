@@ -2,10 +2,13 @@ package com.moorango.medli.CustomViews;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+
+import com.moorango.medli.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +21,10 @@ public class TimeDoseList extends LinearLayout {
 
     private int mDoseCount;
     private int mEditTextResId;
-    private int mBoxResId;
-    private int mLinearLayoutResId;
+    private static int itemCount;
+    private final String TAG = "TimeDoseList";
+
+    private ArrayList<View> itemBox = new ArrayList<View>();
 
     public TimeDoseList(Context context) {
         super(context);
@@ -34,80 +39,69 @@ public class TimeDoseList extends LinearLayout {
     public int getDoseCount() { return mDoseCount; }
 
     public void setDoseCount(int doseCount) {
-        if (doseCount != mDoseCount) {
 
+        if (doseCount != mDoseCount && doseCount < mDoseCount) { // removeView.
+            removeViewAt(getChildCount() - 1);
             mDoseCount = doseCount;
+        } else if (doseCount != mDoseCount) {
 
-            removeAllViews();
+            //removeAllViews();
 
-            for (int i = 0; i < mDoseCount; i++) {
-                //addView(createEditText());
-                addView(createLinearLayout());
+            for (int i = 0; i < (doseCount - mDoseCount); i++) {
+
+                addView(createEditText());
             }
+            mDoseCount = doseCount;
         }
     }
 
     private View createEditText() {
-        View v;
 
+        View v;
         if (mEditTextResId > 0) {
+            Log.d(TAG, "test");
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            v = inflater.inflate(mEditTextResId, this, true);
+            v = inflater.inflate(mEditTextResId, this, false);
+            //v = inflate(getContext(), R.layout.time_dose_list, this);
         } else {
-            EditText et = new EditText(getContext());
-            et.setHint("Time");
-            v = et;
-        }
-        return v;
-    }
 
-    private View createLinearLayout() {
-
-        View v;
-        if (mLinearLayoutResId > 0) {
-            LayoutInflater inflater = LayoutInflater.from(getContext());
-            v = inflater.inflate(mLinearLayoutResId, this, true);
-        } else {
             LinearLayout ll = new LinearLayout(getContext());
-            ll.setOrientation(HORIZONTAL);
+
             EditText et1 = new EditText(getContext());
-            et1.setHint("time");
+
             EditText et2 = new EditText(getContext());
-            et2.setHint("measure");
             EditText et3 = new EditText(getContext());
-            et3.setHint("unit");
             ll.addView(et1);
             ll.addView(et2);
             ll.addView(et3);
+
             v = ll;
         }
-
+        //itemBox.add(v);
         return v;
     }
 
-    public int getLinearLayoutResId() {
-        return mLinearLayoutResId;
+    public int getEditTextResId() {
+        return mEditTextResId;
     }
 
-    public void setLinearLayoutResId(int linearLayoutResId) {
-        mEditTextResId = linearLayoutResId;
+    public void setEditTextResId(int editTextResId) {
+        mEditTextResId = editTextResId;
     }
 
     public List<String> getDoseData() {
-        List<String> names = new ArrayList<String>();
+        List<String> items = new ArrayList<String>();
         for (int i = 0; i < getChildCount(); i++) {
-            View v = getChildAt(i);
-            if (v instanceof EditText) {
-                String data = "";
-                EditText et = (EditText) v;
-                data += et.getText().toString().trim() + ";";
-                if ((i % 3) == 0) {
-                    data = data.substring(0, data.length());
-                    names.add(data);
-                    data = "";
+
+
+                View v = getChildAt(i);
+                if (v instanceof EditText) {
+                    EditText et = (EditText) v;
+
+                    items.add(et.getText().toString());
                 }
-            }
+
         }
-        return names;
+        return items;
     }
 }

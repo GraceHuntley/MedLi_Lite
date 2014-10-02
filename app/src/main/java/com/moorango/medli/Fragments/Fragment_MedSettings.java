@@ -359,7 +359,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
             @Override
             public void afterTextChanged(Editable editable) {
-
+                tdv.setEditTextResId(R.layout.time_dose_list);
                 tdv.setDoseCount(Integer.valueOf(editable.toString().trim()));
 
 
