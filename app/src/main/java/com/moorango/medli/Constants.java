@@ -141,6 +141,23 @@ public class Constants {
             "This alarm is a one time alarm that will only be reset again when you activate this. \n\n" +
             "In order to activate it long press the icon\n\n" +
             "You will only be able to use this feature when you have doses available to be taken.";
+
+    public static final String NO_INTERNET_CONNECT = "Sorry there is no internet connection which means you will not get any dose suggestions for this medication. " +
+            "But that's ok. " +
+            "If the drug you are adding is for example Miralax crystals do as follows\n" +
+            "ex." +
+            "\nNumeric value: 1" +
+            "\nMeasure unit: tsp" +
+            "\nDose Form: 1 tsp\n" +
+            "Otherwise you can just wait till your online to add the new medication.";
+
+    public static final String NO_DOSE_SUGGESTIONS = "Sorry there are no dose suggestions available for this medication. " +
+            "But that's ok. " +
+            "If the drug you are adding is for example Miralax crystals do as follows\n" +
+            "ex." +
+            "\nNumeric value: 1" +
+            "\nMeasure unit: tsp" +
+            "\nDose Form: 1 tsp";
 }
 
 

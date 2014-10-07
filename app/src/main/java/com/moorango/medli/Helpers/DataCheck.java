@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -311,5 +312,39 @@ public class DataCheck {
         }
 
         return errors == 0;
+    }
+
+    public static boolean checkFormData(ViewGroup view, Context context) {
+        ArrayList<String> errorMessages = new ArrayList<String>();
+        int errorCount = 0;
+
+        AutoCompleteTextView acMedName = (AutoCompleteTextView) view.findViewById(R.id.ac_Med_name);
+
+        if (acMedName.getText().length() == 0) {
+            acMedName.setError("This cannot be empty.");
+            errorMessages.add("- The medication name cannot be empty\n");
+
+        } else if (acMedName.getText().toString().matches("^.*[^a-zA-Z0-9 -].*$")) {
+            acMedName.setError("Invalid Characters");
+            errorMessages.add("- You must use valid characters.");
+        }
+
+        if (!DataCheck.isFormCompleted(view, errorCount)) {
+            errorMessages.add("- All medication information should be filled\n");
+        }
+
+        if (errorMessages.size() == 0) {
+            //errorMessages.add("- Each dose time must be later then the previous one\n");
+        }
+
+        String toastMessage = "";
+        for (String error : errorMessages) {
+
+            toastMessage += error;
+        }
+        if (toastMessage.length() > 0) {
+            Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show();
+        }
+        return errorMessages.size() == 0;
     }
 }

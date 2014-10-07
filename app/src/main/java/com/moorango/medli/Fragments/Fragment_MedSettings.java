@@ -37,6 +37,7 @@ import android.widget.Toast;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.moorango.medli.Activity_MedLi_light;
+import com.moorango.medli.Constants;
 import com.moorango.medli.CustomViews.TimeDoseList;
 import com.moorango.medli.Data.MedLiDataSource;
 import com.moorango.medli.Helper_DrugData;
@@ -49,6 +50,7 @@ import com.moorango.medli.R;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -62,14 +64,12 @@ import java.util.List;
 public class Fragment_MedSettings extends Fragment implements View.OnClickListener {
 
     private final String TAG = "MedSettingsFragment.java";
-    private final ArrayList<EditText> etList = new ArrayList<EditText>();
     private EditText med_dose, doseFrequency, doseFormEntry, med_measure_spinner, maxDoses;
     private LinearLayout adminTimesList, prnFreqBox;
     private Spinner med_type;
     private AutoCompleteTextView acMedName;
     private TextWatcher textWatcher;
     private ScrollView formWrapper;
-    private int index = 0;
     private boolean isRoutine = false;
     private Button delete_med, dc_med, clear;
     private AlertDialog.Builder adb;
@@ -79,11 +79,9 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     private OnFragmentInteractionListener mListener;
     private AlertDialog.Builder dialog;
     private TextView medTypePrompt;
-    private int errorCount = 0;
     private GetSuggestions getSuggestions;
     private Tracker ga;
     private TimeDoseList tdv;
-
 
     public Fragment_MedSettings() {
         // Required empty public constructor
@@ -96,7 +94,6 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         args.putInt("unique_id", param3);
         args.putBoolean("edit", param2);
         fragment.setArguments(args);
-
 
         return fragment;
     }
@@ -112,7 +109,6 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
         ga = ((Activity_MedLi_light) getActivity()).getTracker(
                 Activity_MedLi_light.TrackerName.APP_TRACKER);
-
 
     }
 
@@ -151,9 +147,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         dc_med = (Button) getActivity().findViewById(R.id.dc_med);
         med_type = (Spinner) getActivity().findViewById(R.id.med_type_spinner);
         med_measure_spinner = (EditText) getActivity().findViewById(R.id.med_measure_input);
-        // adminTimesList = (LinearLayout) getActivity().findViewById(R.id.admin_times_add_box);
         prnFreqBox = (LinearLayout) getActivity().findViewById(R.id.prn_frequency_box);
-
         acMedName = (AutoCompleteTextView) getActivity().findViewById(R.id.ac_Med_name);
         acMedName.setThreshold(2);
 
@@ -180,13 +174,11 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
          * if routine boolean isRoutine set to true.
          * --> if true form will be setup for routine medication.
          */
-        med_type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-
-                                           {
+        med_type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                                @Override
                                                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                                                    DataCheck.clearFormErrors(formWrapper);
-                                                   errorCount = 0;
+
                                                    if (!adapterView.getSelectedItem().toString().equalsIgnoreCase("select")) {
                                                        formWrapper.setVisibility(View.VISIBLE);
                                                        isRoutine = (adapterView.getSelectedItem().toString().equalsIgnoreCase("routine"));
@@ -200,7 +192,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                                                            maxDoses.removeTextChangedListener(textWatcher);
                                                            medTypePrompt.setText("Setting up a Non-Routine medication");
                                                            adminTimesList.removeAllViews();
-                                                           etList.clear();
+
                                                            prnFreqBox.setVisibility(View.VISIBLE);
                                                            doseFrequency.setVisibility(View.VISIBLE);
                                                        }
@@ -269,13 +261,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                             dialog = new AlertDialog.Builder(getActivity())
                                     .setIcon(android.R.drawable.ic_dialog_alert)
                                     .setTitle("No dose suggestions")
-                                    .setMessage("Sorry there are no dose suggestions available for this medication. " +
-                                            "But that's ok. " +
-                                            "If the drug you are adding is for example Miralax crystals do as follows\n" +
-                                            "ex." +
-                                            "\nNumeric value: 1" +
-                                            "\nMeasure unit: tsp" +
-                                            "\nDose Form: 1 tsp")
+                                    .setMessage(Constants.NO_DOSE_SUGGESTIONS)
                                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -300,14 +286,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         } else {
             AlertDialog.Builder adB = new AlertDialog.Builder(getActivity());
             adB.setTitle("No Internet Connection")
-                    .setMessage("Sorry there is no internet connection which means you will not get any dose suggestions for this medication. " +
-                            "But that's ok. " +
-                            "If the drug you are adding is for example Miralax crystals do as follows\n" +
-                            "ex." +
-                            "\nNumeric value: 1" +
-                            "\nMeasure unit: tsp" +
-                            "\nDose Form: 1 tsp\n" +
-                            "Otherwise you can just wait till your online to add the new medication.")
+                    .setMessage(Constants.NO_INTERNET_CONNECT)
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -327,10 +306,6 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
             @Override
             public void onClick(View view) {
                 DataCheck.clearForm(formWrapper);
-                if (etList != null && adminTimesList != null) {
-                    etList.clear();
-                    adminTimesList.removeAllViews();
-                }
 
             }
         });
@@ -365,9 +340,8 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
     private Medication prepareMedicationObject() {
         Medication medication = new Medication();
-        String type = med_type.getSelectedItem().toString().toLowerCase().trim();
         medication.setMedName(acMedName.getText().toString().toLowerCase().trim());
-        medication.setAdminType(type);
+        medication.setAdminType(med_type.getSelectedItem().toString().toLowerCase().trim());
         medication.setDoseMeasure(Float.valueOf(med_dose.getText().toString().trim()));
         medication.setDoseMeasureType(med_measure_spinner.getText().toString().toLowerCase().trim());
         medication.setDoseForm(doseFormEntry.getText().toString());
@@ -377,11 +351,13 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
         medication.setStartDate(df.format(cal.getTime()));
 
+
+
         if (getArguments() != null && getArguments().getBoolean("edit")) {
             medication.setIdUnique(getArguments().getInt("unique_id"));
         }
 
-        if (type.equalsIgnoreCase("routine")) {
+        if (medication.getAdminType().equalsIgnoreCase("routine")) {
 
             medication.setDoseInfo(tdv.getDoseData());
 
@@ -399,38 +375,6 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         }
 
         return medication;
-    }
-
-    private boolean checkFormData(ViewGroup view) {
-        ArrayList<String> errorMessages = new ArrayList<String>();
-        errorCount = 0;
-        if (acMedName.getText().length() == 0) {
-            acMedName.setError("This cannot be empty.");
-            errorMessages.add("- The medication name cannot be empty\n");
-
-        } else if (acMedName.getText().toString().matches("^.*[^a-zA-Z0-9 -].*$")) {
-            acMedName.setError("Invalid Characters");
-            errorMessages.add("- You must use valid characters.");
-
-        }
-
-        if (!DataCheck.isFormCompleted(view, errorCount)) {
-            errorMessages.add("- All medication information should be filled\n");
-        }
-
-        if (errorMessages.size() == 0 && !DataCheck.checkDoseTimes(etList)) {
-            errorMessages.add("- Each dose time must be later then the previous one\n");
-        }
-
-        String toastMessage = "";
-        for (String error : errorMessages) {
-
-            toastMessage += error;
-        }
-        if (toastMessage.length() > 0) {
-            Toast.makeText(getActivity(), toastMessage, Toast.LENGTH_LONG).show();
-        }
-        return errorMessages.size() == 0;
     }
 
     /**
@@ -465,10 +409,6 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                     //etList.get(index).setText(splitTimes[etList.get(index).getId()]);
 
                 }
-                for (EditText anEtList : etList) {
-                    anEtList.setText(splitTimes[anEtList.getId()]);
-
-                }
             }
         } else {
             doseFrequency.setText(String.valueOf(medication.getDoseFrequency()));
@@ -500,8 +440,8 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                     Toast.makeText(getActivity(), "You have not selected a medication type", Toast.LENGTH_LONG).show();
 
                 } else {
-                    errorCount = 0;
-                    if (checkFormData(formWrapper)) {
+
+                    if (DataCheck.checkFormData(formWrapper, getActivity())) {
 
                         dataSource.submitNewMedication(prepareMedicationObject(), doUpdate);
 
@@ -514,39 +454,10 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
                         if (dataSource.getPreferenceBool("show_new_med_info") && !doUpdate) {
 
-                            AlertDialog.Builder adB = new AlertDialog.Builder(getActivity());
-                            adB.setIcon(android.R.drawable.ic_dialog_info);
-                            adB.setTitle("New medication added");
-                            adB.setInverseBackgroundForced(true); // fixed bug in older versions of android.
-
-                            View view = getActivity().getLayoutInflater().inflate(R.layout.info_dialog, null);
-                            final CheckBox checkBox = (CheckBox) view.findViewById(R.id.no_show_checkbox);
-
-                            String home_welcome_info = acMedName.getText().toString() + " has been added.\n\n" +
-                                    "If this is a routine medication the next due will be set to the next available dose after now " +
-                                    " or complete if there are no doses left for the day after now. All reminders have been set and " +
-                                    "starting tomorrow the routine will start from the first dose.";
-                            TextView tv1 = (TextView) view.findViewById(R.id.main_text);
-                            tv1.setText(home_welcome_info);
-
-                            ((TextView) view.findViewById(R.id.dont_show_message)).setText(getResources().getString(R.string.do_not_show));
-
-                            adB.setView(view)
-                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            if (checkBox.isChecked()) {
-                                                dataSource.addOrUpdatePreference("show_new_med_info", false);
-
-
-                                            }
-                                            mListener.onFragmentInteraction(1, null, 0);
-                                        }
-                                    }).show();
+                            showFirstMedMessage(); // dialog with directions.
                         } else {
                             mListener.onFragmentInteraction(1, null, 0);
                         }
-
                     }
                 }
                 break;
@@ -802,5 +713,36 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    private void showFirstMedMessage() {
+        AlertDialog.Builder adB = new AlertDialog.Builder(getActivity());
+        adB.setIcon(android.R.drawable.ic_dialog_info);
+        adB.setTitle("New medication added");
+        adB.setInverseBackgroundForced(true); // fixed bug in older versions of android.
+
+        View view = getActivity().getLayoutInflater().inflate(R.layout.info_dialog, null);
+        final CheckBox checkBox = (CheckBox) view.findViewById(R.id.no_show_checkbox);
+
+        String home_welcome_info = acMedName.getText().toString() + " has been added.\n\n" +
+                "If this is a routine medication the next due will be set to the next available dose after now " +
+                " or complete if there are no doses left for the day after now. All reminders have been set and " +
+                "starting tomorrow the routine will start from the first dose.";
+        TextView tv1 = (TextView) view.findViewById(R.id.main_text);
+        tv1.setText(home_welcome_info);
+
+        ((TextView) view.findViewById(R.id.dont_show_message)).setText(getResources().getString(R.string.do_not_show));
+
+        adB.setView(view)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (checkBox.isChecked()) {
+                            dataSource.addOrUpdatePreference("show_new_med_info", false);
+
+                        }
+                        mListener.onFragmentInteraction(1, null, 0);
+                    }
+                }).show();
     }
 }

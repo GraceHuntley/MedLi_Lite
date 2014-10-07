@@ -158,12 +158,12 @@ public class MedLiDataSource {
             medication.setNextDue(new Object() {
 
                 String setTime() {
-                    String split[] = medication.getDoseTimes().split(";");
+                    String split[] = medication.getDoseTimes().split(",");
                     if (medication.getDoseCount() > medication.getActualDoseCount()) {
 
-                        return DateTime.getCurrentTimestamp(true, split[medication.getActualDoseCount()]);
+                        return DateTime.getCurrentTimestamp(true, split[medication.getActualDoseCount()].split(";")[0]);
                     } else {
-                        return DateTime.getNextDayTimestamp(split[0]);
+                        return DateTime.getNextDayTimestamp(split[0].split(";")[0]);
                     }
                 }
             }.setTime());
@@ -272,11 +272,22 @@ public class MedLiDataSource {
 
         }
         cv.put("dose_count", medication.getDoseCount());
-        //cv.put("fillDate", medication.getFillDate()); // will add this for next roll-out
+
         cv.put("startDate", medication.getStartDate());
 
         if (medication.getAdminType().equalsIgnoreCase("routine")) {
-            cv.put("dose_times", medication.getDoseTimes());
+            //cv.put("dose_times", medication.getDoseTimes());
+
+            List meds = medication.getDoseInfo();
+
+            String compiled = "";
+
+            for (int i = 0; i < meds.size(); i++) {
+                compiled += meds.get(i).toString() + ",";
+            }
+            compiled = compiled.substring(0, compiled.length() - 1); // remove trailing semi-colon.
+
+            cv.put("dose_times", compiled);
         } else {
             cv.put("dose_frequency", medication.getDoseFrequency());
         }

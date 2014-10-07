@@ -39,6 +39,11 @@ public class Medication {
     private int actualDoseCount; // actual count of doses given today.
     private int doseFrequency; // prn only frequency meds can be taken in hours.
     private List<String> doseInfo = new ArrayList<String>();
+    private String nextDose;
+
+    public void setNextDose(String dose) { this.nextDose = dose; }
+
+    public String getNextDose() { return this.nextDose; }
 
     public void setDoseInfo(List<String> doseInfo) { this.doseInfo = doseInfo; }
 

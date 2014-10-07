@@ -204,6 +204,7 @@ public class HomeCustomAdapter extends ArrayAdapter<Medication> {
     private void prepRoutineDisplay(Medication dataItem) {
 
         txtTitle.setVisibility(View.VISIBLE);
+
         txtTitle.setText(DataCheck.capitalizeTitles(dataItem.getMedName()) + " " + dataItem.getDoseForm());
         nextDueTime.setVisibility(View.VISIBLE);
         prepEditMed(true, dataItem);
