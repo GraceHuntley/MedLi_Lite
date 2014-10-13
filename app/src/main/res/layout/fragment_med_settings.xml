@@ -96,7 +96,7 @@
                 android:text="@string/med_name_label"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <AutoCompleteTextView
+            <com.moorango.medli.CustomViews.AutoCompleteMedication
                 android:id="@+id/ac_Med_name"
                 android:layout_width="fill_parent"
                 android:layout_height="0dip"

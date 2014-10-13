@@ -6,29 +6,22 @@ import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.util.Xml;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -38,33 +31,23 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.moorango.medli.Activity_MedLi_light;
 import com.moorango.medli.Constants;
+import com.moorango.medli.CustomViews.AutoCompleteMedication;
 import com.moorango.medli.CustomViews.TimeDoseList;
 import com.moorango.medli.Data.MedLiDataSource;
-import com.moorango.medli.Helper_DrugData;
 import com.moorango.medli.Helpers.AlarmHelpers;
 import com.moorango.medli.Helpers.DataCheck;
-import com.moorango.medli.Models.MedDose;
 import com.moorango.medli.Models.Medication;
 import com.moorango.medli.R;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONObject;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 public class Fragment_MedSettings extends Fragment implements View.OnClickListener {
 
     private final String TAG = "MedSettingsFragment.java";
-    private EditText med_dose, doseFrequency, doseFormEntry, med_measure_spinner, maxDoses;
+    private EditText doseFrequency, maxDoses;
+    public EditText med_dose, med_measure_spinner, doseFormEntry;
     private LinearLayout adminTimesList, prnFreqBox;
     private Spinner med_type;
     private AutoCompleteTextView acMedName;
@@ -72,14 +55,11 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     private ScrollView formWrapper;
     private boolean isRoutine = false;
     private Button delete_med, dc_med, clear;
-    private AlertDialog.Builder adb;
-    private AlertDialog adDoseChoices;
-    private Helper_DrugData drugDataHelper;
     private MedLiDataSource dataSource;
     private OnFragmentInteractionListener mListener;
     private AlertDialog.Builder dialog;
     private TextView medTypePrompt;
-    private GetSuggestions getSuggestions;
+    //private GetSuggestions getSuggestions;
     private Tracker ga;
     private TimeDoseList tdv;
 
@@ -100,8 +80,6 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        drugDataHelper = new Helper_DrugData();
 
         dataSource = MedLiDataSource.getHelper(getActivity());
         getActivity().setRequestedOrientation(
@@ -213,76 +191,12 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         );
 
         if (DataCheck.isNetworkAvailable(getActivity())) {
-            acMedName.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+            /***
+             * TODO instantiate autocomplete object here.
+             *
+             */
+            //AutoCompleteMedication acm = new AutoCompleteMedication(this, getActivity());
 
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-
-                    if (getSuggestions != null && getSuggestions.getStatus() != AsyncTask.Status.RUNNING) { // only start new asynctask if one is no running already.
-
-                        getSuggestions = new GetSuggestions().setParName(Uri.encode(charSequence.toString()));
-                        getSuggestions.execute();
-                    } else {
-                        if (getSuggestions != null) {
-                            getSuggestions.cancel(true);
-                        }
-                        getSuggestions = new GetSuggestions().setParName(Uri.encode(charSequence.toString()));
-                    }
-
-                    acMedName.setTextColor(Color.BLACK);
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-
-                }
-            });
-
-            acMedName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                    try {
-                        ArrayList<MedDose> drugDosesArray = drugDataHelper.getDrugNUI(acMedName.getText().toString().toLowerCase().trim());
-                        if (drugDosesArray.size() > 1) {
-                            adb = new AlertDialog.Builder(getActivity());
-                            adb.setView(buildDoseChoicesForDialog(drugDosesArray));
-
-                            adDoseChoices = adb.create();
-                            adDoseChoices.show();
-
-                        } else {
-
-                            dialog = new AlertDialog.Builder(getActivity())
-                                    .setIcon(android.R.drawable.ic_dialog_alert)
-                                    .setTitle("No dose suggestions")
-                                    .setMessage(Constants.NO_DOSE_SUGGESTIONS)
-                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            dialogInterface.dismiss();
-                                        }
-                                    });
-                            dialog.show();
-
-                            med_dose.requestFocus();
-
-                        }
-
-                    } catch (XmlPullParserException xmp) {
-                        Log.e(TAG, xmp.toString());
-                    } catch (IOException io) {
-                        Log.e(TAG, io.toString());
-                    }
-                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Service.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(acMedName.getWindowToken(), 0);
-                }
-            });
         } else {
             AlertDialog.Builder adB = new AlertDialog.Builder(getActivity());
             adB.setTitle("No Internet Connection")
@@ -350,8 +264,6 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
         medication.setStartDate(df.format(cal.getTime()));
-
-
 
         if (getArguments() != null && getArguments().getBoolean("edit")) {
             medication.setIdUnique(getArguments().getInt("unique_id"));
@@ -540,129 +452,6 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         return builder;
     }
 
-    private ScrollView buildDoseChoicesForDialog(final ArrayList<MedDose> choices) {
-        ScrollView checkBox = new ScrollView(getActivity());
-        RadioGroup radioGroup = new RadioGroup(getActivity());
-        int objectCount = 0;
-        for (MedDose medObject : choices) {
-
-            RadioButton radioButton = new RadioButton(getActivity());
-            radioButton.setText(medObject.getGenericName() + " " + medObject.getDoseDouble() + " " + medObject.getDoseMeasure() + " " + medObject.getDoseType());
-            radioButton.setId(objectCount);
-            objectCount++;
-            radioGroup.setBackgroundColor(getResources().getColor(android.R.color.white));
-            radioGroup.addView(radioButton);
-        }
-
-        RadioButton radioButton = new RadioButton(getActivity());
-        radioButton.setText("Other");
-        radioButton.setId(choices.size() + 1);
-        radioGroup.setBackgroundColor(getResources().getColor(android.R.color.white));
-        radioGroup.addView(radioButton);
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                RadioButton checkedRadioButton = (RadioButton) radioGroup.findViewById(i);
-                int id = checkedRadioButton.getId();
-
-                if (!checkedRadioButton.getText().toString().equalsIgnoreCase("Other")) {
-
-                    med_dose.setText(String.valueOf(choices.get(id).getDoseDouble()));
-                    med_dose.setError(null);
-
-                    med_measure_spinner.setText(choices.get(id).getDoseMeasure());
-                    med_measure_spinner.setError(null);
-                    doseFormEntry.requestFocus();
-
-                } else {
-                    med_dose.requestFocus();
-                }
-
-                adDoseChoices.dismiss();
-
-            }
-        });
-        checkBox.addView(radioGroup);
-        return checkBox;
-
-    }
-
-    class GetSuggestions extends AsyncTask<Void, Void, ArrayList<String>> {
-
-        String partName;
-
-        public GetSuggestions setParName(String partName) {
-            this.partName = partName;
-            return this;
-        }
-
-        @Override
-        protected ArrayList<String> doInBackground(Void... unused) {
-
-            ArrayList<String> list = new ArrayList<String>();
-            int eventType;
-            XmlPullParser parser;
-
-            DefaultHttpClient httpClient = new DefaultHttpClient();
-            String apiDomain = "http://rxnav.nlm.nih.gov/REST/";
-            String apiCall = "spellingsuggestions?name=";
-            HttpGet httpGet = new HttpGet(apiDomain + apiCall + partName);
-
-            try {
-
-                if (!isCancelled()) {
-                    HttpResponse response = httpClient.execute(httpGet);
-                    InputStream is = response.getEntity().getContent();
-                    parser = Xml.newPullParser();
-
-                    parser.setInput(is, null);
-
-                    eventType = parser.getEventType();
-
-                    String text = "";
-
-                    while (!isCancelled() && eventType != XmlPullParser.END_DOCUMENT) {
-
-                        switch (eventType) {
-                            case XmlPullParser.START_TAG:
-                                // do nothing.
-                                break;
-                            case XmlPullParser.TEXT:
-                                text = parser.getText();
-                                break;
-                            case XmlPullParser.END_TAG:
-                                if (parser.getName().equalsIgnoreCase("suggestion")) {
-                                    list.add(text);
-                                }
-                                break;
-
-                        }
-                        eventType = parser.next();
-                    }
-                }
-
-            } catch (IOException ioe) {
-                Log.e(TAG, ioe.toString());
-            } catch (XmlPullParserException xmlp) {
-                Log.e(TAG, xmlp.toString());
-            }
-            return list;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<String> list) {
-            if (!isCancelled()) {
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                        android.R.layout.select_dialog_item, list);
-
-                acMedName.setAdapter(adapter);
-
-            }
-            super.onPostExecute(list);
-        }
-    }
-
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(int tag, String name, int id);
@@ -672,9 +461,12 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     public void onPause() {
         dataSource.close();
 
-        if (getSuggestions != null && getSuggestions.getStatus() == AsyncTask.Status.RUNNING) {
+        /***
+         * TODO clean up asynctask in autocompleteview eventually.
+         */
+        /*if (getSuggestions != null && getSuggestions.getStatus() == AsyncTask.Status.RUNNING) {
             getSuggestions.cancel(true);
-        }
+        } */
 
         InputMethodManager imm = (InputMethodManager)
                 getActivity().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
