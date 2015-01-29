@@ -88,7 +88,6 @@ public class CustomAdapterHistory extends BaseAdapter {
             convertView = mInflater.inflate(R.layout.history_list_item, null);
         }
 
-
         TextView medName = (TextView) convertView.findViewById(R.id.name);
         final TextView doseTime = (TextView) convertView.findViewById(R.id.dose_time);
         final TextView dose = (TextView) convertView.findViewById(R.id.dose);
@@ -178,6 +177,8 @@ public class CustomAdapterHistory extends BaseAdapter {
 
             editButton.setVisibility(View.GONE);
             delButton.setVisibility(View.GONE);
+            doseTime.setVisibility(View.GONE);
+            dose.setVisibility(View.GONE);
 
         } else {
 
@@ -187,6 +188,8 @@ public class CustomAdapterHistory extends BaseAdapter {
             }
             medName.setText(DataCheck.capitalizeTitles(dataItem.getName()));
 
+            doseTime.setVisibility(View.VISIBLE);
+            dose.setVisibility(View.VISIBLE);
             doseTime.setText(DateTime.convertToTime12(dataItem.getTimeOnly()));
             dose.setText(dataItem.getDose());
 

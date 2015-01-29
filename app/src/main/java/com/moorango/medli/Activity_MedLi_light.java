@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -22,6 +23,7 @@ import com.moorango.medli.Fragments.Fragment_History;
 import com.moorango.medli.Fragments.Fragment_Home;
 import com.moorango.medli.Fragments.Fragment_MedSettings;
 
+import io.fabric.sdk.android.Fabric;
 import java.util.HashMap;
 
 public class Activity_MedLi_light extends ActionBarActivity implements Fragment_Home.OnFragmentInteractionListener, Fragment_MedSettings.OnFragmentInteractionListener,
@@ -55,6 +57,7 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_med_li_light);
 
         //ga = GoogleAnalytics.getInstance(this).newTracker("UA-54927508-1");

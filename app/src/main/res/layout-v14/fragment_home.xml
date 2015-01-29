@@ -38,34 +38,47 @@
         android:layout_width="match_parent"
         android:orientation="horizontal"
         android:gravity="center"
+        android:weightSum="11"
         android:layout_alignParentTop="true"
         android:layout_height="wrap_content">
 
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="3"
             android:text="@string/legend_title"
             android:gravity="center"
+            style="@android:style/TextAppearance.Small"
+            android:lines="1"
+            android:ellipsize="marquee"
             android:layout_height="match_parent" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="4"
             android:layout_height="match_parent"
             android:paddingLeft="10dp"
             android:paddingRight="0dp"
+            android:ellipsize="marquee"
+            android:lines="1"
             android:layout_gravity="center"
+            style="@android:style/TextAppearance.Small"
             android:gravity="center"
             android:drawableLeft="@drawable/ic_action_edit"
             android:text="@string/edit_med_legend" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="4"
             android:layout_height="match_parent"
             android:paddingLeft="10dp"
             android:paddingRight="0dp"
+            android:ellipsize="marquee"
+            android:lines="1"
             android:gravity="center"
             android:layout_gravity="center"
             android:text="@string/skip_med_legend"
+            style="@android:style/TextAppearance.Small"
             android:drawableLeft="@drawable/ic_action_next" />
 
     </LinearLayout>

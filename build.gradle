@@ -11,7 +11,7 @@ buildscript {
          * Changed as per lint to remove the + will test before removing commented out area. TODO
          */
         //classpath 'com.android.tools.build:gradle:0.12.+'
-        classpath 'com.android.tools.build:gradle:0.12.2'
+        classpath 'com.android.tools.build:gradle:1.0.0-rc4'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.+'
 
         // NOTE: Do not place your application dependencies here; they belong

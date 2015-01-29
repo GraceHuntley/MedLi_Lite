@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="legend_title">Legend: </string>
-    <string name="edit_med_legend">Edit Medication</string>
+    <string name="edit_med_legend">Edit Med</string>
     <string name="skip_med_legend">Skip Dose</string>
 
     <!-- Home Listview Adapter Strings -->

@@ -53,14 +53,21 @@ public class DataCheck {
     public static String capitalizeTitles(String toCapitalize) {
 
         String splitString[] = toCapitalize.trim().split(" ");
-        String readyForReturn = "";
+        StringBuilder readyForReturn = new StringBuilder();
 
         for (String titleWord : splitString) {
-            readyForReturn += titleWord.substring(0, 1).toUpperCase() + titleWord.substring(1, titleWord.length()) + " ";
+            if (titleWord.length() > 0) {
+                readyForReturn.append(titleWord.substring(0, 1).toUpperCase())
+                        .append(titleWord.substring(1, titleWord.length()))
+                        .append(" ");
+            }
         }
-        readyForReturn = readyForReturn.substring(0, readyForReturn.length() - 1);
+        if (readyForReturn.toString().length() > 0) {
+            return readyForReturn.toString().substring(0, readyForReturn.length() - 1);
+        } else {
+            return "";
+        }
 
-        return readyForReturn;
     }
 
 
