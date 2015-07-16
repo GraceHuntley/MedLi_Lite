@@ -25,16 +25,25 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
         <activity
             android:name="com.moorango.medli.Activity_MedLi_light"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustPan">
+
+
+        </activity>
+
+        <activity
+            android:name=".OnboardingActivity"
+            android:label="MedLi"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
+
 
         <service
             android:name="com.moorango.medli.NotifyService"

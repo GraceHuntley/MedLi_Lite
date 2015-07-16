@@ -7,6 +7,21 @@ import java.security.MessageDigest;
  */
 public class AuthUtil {
 
+    private static AuthUtil instance;
+    private boolean isLoggedIn = false;
+
+    public static AuthUtil getInstance() {
+        if (instance == null) {
+            instance = new AuthUtil();
+        }
+
+        return instance;
+    }
+
+    public boolean isLoggedIn() {
+        return isLoggedIn;
+    }
+
     public static String encryptPassword(String password) {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
