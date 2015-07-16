@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -22,9 +23,14 @@ import com.moorango.medli.Fragments.Fragment_EmptyMedList;
 import com.moorango.medli.Fragments.Fragment_History;
 import com.moorango.medli.Fragments.Fragment_Home;
 import com.moorango.medli.Fragments.Fragment_MedSettings;
+import com.moorango.medli.lib.network.API;
+import com.moorango.medli.lib.network.RequestParams;
+import com.moorango.medli.lib.network.URL;
+import com.moorango.medli.utils.LogUtil;
+
+import java.util.HashMap;
 
 import io.fabric.sdk.android.Fabric;
-import java.util.HashMap;
 
 public class Activity_MedLi_light extends ActionBarActivity implements Fragment_Home.OnFragmentInteractionListener, Fragment_MedSettings.OnFragmentInteractionListener,
         Fragment_History.OnFragmentInteractionListener, Fragment_EmptyMedList.OnFragmentInteractionListener {
@@ -65,6 +71,8 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
         ga = getTracker(TrackerName.APP_TRACKER);
 
         ga.send(new HitBuilders.EventBuilder().setAction("ActivityLoaded").build());
+
+        new FetchDataTask().execute();
 
 
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -132,9 +140,28 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
             adB.show();
         }
 
-
     }
 
+    private class FetchDataTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... param) {
+
+            RequestParams params = new RequestParams();
+            params.put("email", "test@test.com");
+            params.put("password", "test1");
+            params.put("password_confirmation", "test1");
+            //params.put("encrypted_password", AuthUtil.encryptPassword("test"));
+
+            String registerResult = API.getInstance().post(URL.generateUnsecureURL("users"), params);
+            //String result = API.getInstance().get(URL.generateUnsecureURL("users/index"), params);
+            //String result = API.getInstance().post(URL.generateUnsecureURL("users/index"), params);
+            LogUtil.log(TAG, registerResult);
+            //LogUtil.log(TAG, result);
+
+            return null;
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -280,7 +307,5 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
                 ga.send(new HitBuilders.EventBuilder().setAction(name).build());
                 break;
         }
-
     }
-
 }
