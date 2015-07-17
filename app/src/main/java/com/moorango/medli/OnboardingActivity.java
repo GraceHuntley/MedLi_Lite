@@ -2,10 +2,13 @@ package com.moorango.medli;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 
 import com.moorango.medli.Fragments.WelcomeFragment;
+import com.moorango.medli.lib.eventbus.EventBus;
+import com.moorango.medli.lib.eventbus.events.FragmentSwitcher;
 import com.moorango.medli.utils.AuthUtil;
 
 /**
@@ -19,6 +22,8 @@ public class OnboardingActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_onboarding);
 
+        EventBus.getInstance().register(this);
+
         if (AuthUtil.getInstance().isLoggedIn()) {
             Intent intent = new Intent(this, Activity_MedLi_light.class);
             startActivity(intent);
@@ -31,7 +36,21 @@ public class OnboardingActivity extends FragmentActivity {
                     .commit();
 
         }
+    }
 
+    public void onEvent(FragmentSwitcher destination) {
+        Class<? extends Fragment> fragmentClass = destination.getFragment().getFragmentClass();
+        try {
+            Fragment fragment = fragmentClass.newInstance();
+
+            FragmentManager fm = getSupportFragmentManager();
+            fm.beginTransaction()
+                    .replace(R.id.container, fragment, fragment.getClass().getSimpleName())
+                    .addToBackStack(fragment.getClass().getSimpleName())
+                    .commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 }
