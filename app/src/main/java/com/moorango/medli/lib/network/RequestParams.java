@@ -75,6 +75,7 @@ public class RequestParams {
         }
     }
 
+
     /**
      * Constructs a new RequestParams instance and populate it with a single initial key/value string
      * param.
@@ -385,6 +386,18 @@ public class RequestParams {
         return lparams;
     }
 
+    protected JSONObject getParamsObject() {
+        JSONObject jsonObject = new JSONObject();
+        for (ConcurrentHashMap.Entry<String, String> entry : urlParams.entrySet()) {
+            try {
+                jsonObject.put(entry.getKey(), entry.getValue());
+            } catch (JSONException jse) {
+                jse.printStackTrace();
+            }
+        }
+        return jsonObject;
+    }
+
     private List<BasicNameValuePair> getParamsList(String key, Object value) {
         List<BasicNameValuePair> params = new LinkedList();
         if (value instanceof Map) {
@@ -429,6 +442,16 @@ public class RequestParams {
 
     public String getParamString() {
         return URLEncodedUtils.format(getParamsList(), contentEncoding).replaceAll("\\+", "%20");
+    }
+
+    public JSONObject wrapObject(String wrapper, JSONObject object) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(wrapper, object);
+        } catch (JSONException jse) {
+            jse.printStackTrace();
+        }
+        return jsonObject;
     }
 
     public String getBody() {

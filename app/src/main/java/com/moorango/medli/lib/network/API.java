@@ -9,17 +9,15 @@ import com.moorango.medli.utils.LogUtil;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ResponseBody;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -90,44 +88,33 @@ public class API {
     }
 
     public String post(URL url, RequestParams params) {
-        CommonUtil.checkNetworkStateAndWait(Application.getActivityContext());
-        if (CommonUtil.checkNetworkState()) {
-            try {
-                HttpPost request = new HttpPost(url.getURL());
 
-                //request.setHeader("User-Agent", CommonUtil.getDeviceInfo());
-                //if (AuthUtil.getInstance().isLoggedIn()) {
+        try {
 
-                //}
+            OkHttpClient okClient = new OkHttpClient();
+            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-                request.setHeader("Content-Type", "application/json");
+            RequestBody body = RequestBody.create(JSON, params.getBody());
+            LogUtil.log(TAG, params.getBody());
 
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("email", "test1@test.com");
-                jsonObject.put("password", "12345678");
-                jsonObject.put("password_confirmation", "12345678");
+            Request request = new Request.Builder()
+                    .url(url.getURL())
+                    .post(body)
+                    .build();
 
-                JSONObject readyObject = new JSONObject();
-                readyObject.put("user", jsonObject);
+            Response response = okClient.newCall(request).execute();
 
-                LogUtil.log(TAG, readyObject.toString());
+            //LogUtil.log(TAG, response.toString());
+            //LogUtil.log(TAG, response.message().toString());
+            //return response.body().string();
 
-                //request.setEntity(new UrlEncodedFormEntity(getParamsList(params)));
-                request.setEntity(new StringEntity(readyObject.toString()));
-
-
-                HttpResponse response = new DefaultHttpClient().execute(request);
-
-                //LogUtil.log(TAG, request.toString());
-
-                return cleanReturn(response);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            return cleanReturn(response);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        //}
         return null;
     }
-
 
     public String put(URL url, RequestParams params) {
         CommonUtil.checkNetworkStateAndWait(Application.getActivityContext());
@@ -196,16 +183,6 @@ public class API {
     private Response getResponse(Request originalRequest) {
         try {
 
-            //LogUtil.log(TAG, "secret: " + consumer.getTokenSecret() + " token: " + consumer.getToken());
-
-            /*if (AuthUtil.getInstance().isLoggedIn() && AuthUtil.getInstance().getToken() != null && AuthUtil.getInstance().getTokenSecret() != null) {
-                consumer.setTokenWithSecret(AuthUtil.getInstance().getToken(), AuthUtil.getInstance().getTokenSecret());
-                LogUtil.log(TAG, "logged_IN");
-            } else {
-                consumer.setTokenWithSecret(null, null);
-            } */
-            //httpRequest = (Request) consumer.sign(originalRequest).unwrap();
-
 
             LogUtil.log(TAG, originalRequest.url().toString());
             return client.newCall(httpRequest).execute();
@@ -221,17 +198,20 @@ public class API {
     private void checkSuccess(Response response) {
         if (response != null) {
             checkSuccess(response.code());
+            LogUtil.log(TAG, "response_code: " + response.code());
         }
     }
 
     private void checkSuccess(HttpResponse response) {
         if (response != null) {
             checkSuccess(response.getStatusLine().getStatusCode());
+
         }
     }
 
     private void checkSuccess(final int responseCode) {
         this.successfulRequest = ((responseCode == 200) || (responseCode == 201));
+        LogUtil.log(TAG, "success: " + successfulRequest);
         if (!successfulRequest) {
            /*  The following check for an acceptable 401 (Unauthorized) server response
             *  was implemented because:
@@ -278,10 +258,9 @@ public class API {
             body = response.body();
 
         }
-
-
         checkSuccess(response);
         return getBody(body);
+
     }
 
     private String cleanReturn(HttpResponse response) {
@@ -316,9 +295,10 @@ public class API {
     }
 
     private String getBody(ResponseBody body) {
-        System.gc();
+
         try {
             if (body != null) {
+
                 try {
                     return body.string();
                 } catch (IllegalCharsetNameException icne) {
@@ -326,6 +306,7 @@ public class API {
                     return null;
                 }
             } else {
+                LogUtil.log(TAG, "itsNull");
                 return null;
             }
         } catch (IOException e) {
@@ -334,14 +315,14 @@ public class API {
              */
             return null;
         } catch (UnsupportedCharsetException uce) {
-            /* Patch for Crashlytics (Pivotal:97317986) */
+
             uce.printStackTrace();
             return null;
         } catch (NullPointerException npE) {
             npE.printStackTrace();
             return null;
         } catch (ArrayIndexOutOfBoundsException aio) {
-            /* Patch for Crashlytics (Pivotal:98891762) */
+
             aio.printStackTrace();
             return null;
         }

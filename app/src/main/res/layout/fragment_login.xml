@@ -40,14 +40,18 @@
         android:padding="10dp">
 
         <EditText
+            android:id="@+id/email_entry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Email" />
+            android:hint="Email"
+            android:inputType="textEmailAddress" />
 
         <EditText
+            android:id="@+id/password_entry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Password" />
+            android:hint="Password"
+            android:inputType="textPassword" />
 
     </LinearLayout>
 

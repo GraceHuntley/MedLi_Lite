@@ -23,6 +23,9 @@ public class OnboardingActivity extends FragmentActivity {
         setContentView(R.layout.activity_onboarding);
 
         EventBus.getInstance().register(this);
+        if (!AuthUtil.getInstance().isLoggedIn() && AuthUtil.getInstance().canLogin()) {
+            AuthUtil.getInstance().login();
+        }
 
         if (AuthUtil.getInstance().isLoggedIn()) {
             Intent intent = new Intent(this, Activity_MedLi_light.class);

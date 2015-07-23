@@ -23,10 +23,6 @@ import com.moorango.medli.Fragments.Fragment_EmptyMedList;
 import com.moorango.medli.Fragments.Fragment_History;
 import com.moorango.medli.Fragments.Fragment_Home;
 import com.moorango.medli.Fragments.Fragment_MedSettings;
-import com.moorango.medli.lib.network.API;
-import com.moorango.medli.lib.network.RequestParams;
-import com.moorango.medli.lib.network.URL;
-import com.moorango.medli.utils.LogUtil;
 
 import java.util.HashMap;
 
@@ -147,18 +143,14 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
         @Override
         protected Void doInBackground(Void... param) {
 
-            RequestParams params = new RequestParams();
-            params.put("email", "test@test.com");
-            params.put("password", "test1");
-            params.put("password_confirmation", "test1");
-            //params.put("encrypted_password", AuthUtil.encryptPassword("test"));
+           /* RequestParams params = new RequestParams();
 
             String registerResult = API.getInstance().post(URL.generateUnsecureURL("users"), params);
             //String result = API.getInstance().get(URL.generateUnsecureURL("users/index"), params);
             //String result = API.getInstance().post(URL.generateUnsecureURL("users/index"), params);
             LogUtil.log(TAG, registerResult);
             //LogUtil.log(TAG, result);
-
+            */
             return null;
         }
     }
