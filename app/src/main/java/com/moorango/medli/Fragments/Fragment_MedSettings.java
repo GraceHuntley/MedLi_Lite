@@ -11,12 +11,10 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Time;
-import android.util.Log;
 import android.util.Xml;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +46,8 @@ import com.moorango.medli.Helpers.DateTime;
 import com.moorango.medli.Models.MedDose;
 import com.moorango.medli.Models.Medication;
 import com.moorango.medli.R;
+import com.moorango.medli.lib.Constants;
+import com.moorango.medli.utils.LogUtil;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -65,7 +65,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
     private final String TAG = "MedSettingsFragment.java";
     private final ArrayList<EditText> etList = new ArrayList<EditText>();
-    private EditText med_dose, doseFrequency, doseFormEntry, med_measure_spinner, maxDoses;
+    private EditText medDose, doseFrequency, doseFormEntry, med_measure_spinner, maxDoses;
     private LinearLayout adminTimesList, prnFreqBox;
     private Spinner med_type;
     private AutoCompleteTextView acMedName;
@@ -73,7 +73,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     private ScrollView formWrapper;
     private int index = 0;
     private boolean isRoutine = false;
-    private Button delete_med, dc_med, clear;
+    private Button deleteMed, dc_med, clear, addMedButton, minusButton, plusButton;
     private AlertDialog.Builder adb;
     private AlertDialog adDoseChoices;
     private Helper_DrugData drugDataHelper;
@@ -84,7 +84,6 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     private int errorCount = 0;
     private GetSuggestions getSuggestions;
     private Tracker ga;
-
 
     public Fragment_MedSettings() {
         // Required empty public constructor
@@ -97,7 +96,6 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         args.putInt("unique_id", param3);
         args.putBoolean("edit", param2);
         fragment.setArguments(args);
-
 
         return fragment;
     }
@@ -114,48 +112,76 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         ga = ((Activity_MedLi_light) getActivity()).getTracker(
                 Activity_MedLi_light.TrackerName.APP_TRACKER);
 
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
 
-        View view = inflater.inflate(R.layout.fragment_med_settings, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_med_settings, container, false);
 
-        doseFormEntry = (EditText) view.findViewById(R.id.dose_form_input);
-        doseFrequency = (EditText) view.findViewById(R.id.prn_frequency_input);
-        med_dose = (EditText) view.findViewById(R.id.med_dose_input);
-        maxDoses = (EditText) view.findViewById(R.id.admin_count_edittext);
-        adminTimesList = (LinearLayout) view.findViewById(R.id.admin_times_add_box);
-        medTypePrompt = (TextView) view.findViewById(R.id.med_type_label);
-        formWrapper = (ScrollView) view.findViewById(R.id.scrollview_wrapper);
-        clear = (Button) view.findViewById(R.id.clear_btn);
-        return view;
+        return setupViews(rootView);
+
+    }
+
+    private View setupViews(View rootView) {
+
+        doseFormEntry = (EditText) rootView.findViewById(R.id.dose_form_input);
+        doseFrequency = (EditText) rootView.findViewById(R.id.prn_frequency_input);
+        medDose = (EditText) rootView.findViewById(R.id.med_dose_input);
+        maxDoses = (EditText) rootView.findViewById(R.id.admin_count_edittext);
+        adminTimesList = (LinearLayout) rootView.findViewById(R.id.admin_times_add_box);
+        medTypePrompt = (TextView) rootView.findViewById(R.id.med_type_label);
+        formWrapper = (ScrollView) rootView.findViewById(R.id.scrollview_wrapper);
+        clear = (Button) rootView.findViewById(R.id.clear_btn);
+        deleteMed = (Button) rootView.findViewById(R.id.del_med);
+        dc_med = (Button) rootView.findViewById(R.id.dc_med);
+        med_type = (Spinner) rootView.findViewById(R.id.med_type_spinner);
+        med_measure_spinner = (EditText) rootView.findViewById(R.id.med_measure_input);
+        prnFreqBox = (LinearLayout) rootView.findViewById(R.id.prn_frequency_box);
+        acMedName = (AutoCompleteTextView) rootView.findViewById(R.id.ac_Med_name);
+
+
+        minusButton = (Button) rootView.findViewById(R.id.minus_button);
+        plusButton = (Button) rootView.findViewById(R.id.plus_button);
+        addMedButton = (Button) rootView.findViewById(R.id.btn_add_med);
+
+        acMedName.setThreshold(2);
+
+        setupListeners();
+
+        return rootView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
+        if (getArguments() != null && getArguments().getBoolean("edit")) {
 
-        delete_med = (Button) getActivity().findViewById(R.id.del_med);
-        //maxDoses = (TextView) getActivity().findViewById(R.id.admin_count_edittext);
-        getActivity().findViewById(R.id.minus_button).setOnClickListener(this);
-        getActivity().findViewById(R.id.plus_button).setOnClickListener(this);
-        getActivity().findViewById(R.id.btn_add_med).setOnClickListener(this);
-        dc_med = (Button) getActivity().findViewById(R.id.dc_med);
-        med_type = (Spinner) getActivity().findViewById(R.id.med_type_spinner);
-        med_measure_spinner = (EditText) getActivity().findViewById(R.id.med_measure_input);
-        // adminTimesList = (LinearLayout) getActivity().findViewById(R.id.admin_times_add_box);
-        prnFreqBox = (LinearLayout) getActivity().findViewById(R.id.prn_frequency_box);
+            populateForEdit(getArguments().getInt("unique_id"));
+        }
 
-        acMedName = (AutoCompleteTextView) getActivity().findViewById(R.id.ac_Med_name);
-        acMedName.setThreshold(2);
 
+    } // end onActivityCreated()
+
+    private void setupListeners() {
+
+        minusButton.setOnClickListener(this);
+        plusButton.setOnClickListener(this);
+        addMedButton.setOnClickListener(this);
+
+        clear.setOnClickListener(new View.OnClickListener() { // clears all entries on form.
+            @Override
+            public void onClick(View view) {
+                DataCheck.clearForm(formWrapper);
+                if (etList != null && adminTimesList != null) {
+                    etList.clear();
+                    adminTimesList.removeAllViews();
+                }
+
+            }
+        });
         doseFormEntry.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
@@ -179,43 +205,44 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
          * if routine boolean isRoutine set to true.
          * --> if true form will be setup for routine medication.
          */
-        med_type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        med_type.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener()
 
-                                           {
-                                               @Override
-                                               public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                                                   DataCheck.clearFormErrors(formWrapper);
-                                                   errorCount = 0;
-                                                   if (!adapterView.getSelectedItem().toString().equalsIgnoreCase("select")) {
-                                                       formWrapper.setVisibility(View.VISIBLE);
-                                                       isRoutine = (adapterView.getSelectedItem().toString().equalsIgnoreCase("routine"));
-                                                       if (isRoutine) { // setup form for routine medication.
-                                                           medTypePrompt.setText("Setting up a Routine medication");
-                                                           setTextChangeListener();
-                                                           maxDoses.setText("0");
-                                                           prnFreqBox.setVisibility(View.GONE);
-                                                           doseFrequency.setVisibility(View.GONE);
-                                                       } else { // setup form for prn med.
-                                                           maxDoses.removeTextChangedListener(textWatcher);
-                                                           medTypePrompt.setText("Setting up a Non-Routine medication");
-                                                           adminTimesList.removeAllViews();
-                                                           etList.clear();
-                                                           prnFreqBox.setVisibility(View.VISIBLE);
-                                                           doseFrequency.setVisibility(View.VISIBLE);
-                                                       }
-                                                   } else {
+                {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        DataCheck.clearFormErrors(formWrapper);
+                        errorCount = 0;
+                        if (!adapterView.getSelectedItem().toString().equalsIgnoreCase("select")) {
+                            formWrapper.setVisibility(View.VISIBLE);
+                            isRoutine = (adapterView.getSelectedItem().toString().equalsIgnoreCase("routine"));
+                            if (isRoutine) { // setup form for routine medication.
+                                medTypePrompt.setText("Setting up a Routine medication");
+                                setTextChangeListener();
+                                maxDoses.setText("0");
+                                prnFreqBox.setVisibility(View.GONE);
+                                doseFrequency.setVisibility(View.GONE);
+                            } else { // setup form for prn med.
+                                maxDoses.removeTextChangedListener(textWatcher);
+                                medTypePrompt.setText("Setting up a Non-Routine medication");
+                                adminTimesList.removeAllViews();
+                                etList.clear();
+                                prnFreqBox.setVisibility(View.VISIBLE);
+                                doseFrequency.setVisibility(View.VISIBLE);
+                            }
+                        } else {
 
-                                                       medTypePrompt.setText(getResources().getString(R.string.medtype_label));
-                                                       formWrapper.setVisibility(View.GONE);
-                                                       isRoutine = false;
-                                                   }
-                                               }
+                            medTypePrompt.setText(getResources().getString(R.string.medtype_label));
+                            formWrapper.setVisibility(View.GONE);
+                            isRoutine = false;
+                        }
+                    }
 
-                                               @Override
-                                               public void onNothingSelected(AdapterView<?> adapterView) {
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
 
-                                               }
-                                           }
+                    }
+                }
 
         );
 
@@ -228,10 +255,11 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
                 @Override
                 public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-
+                    LogUtil.log(TAG, "textChanged");
                     if (getSuggestions != null && getSuggestions.getStatus() != AsyncTask.Status.RUNNING) { // only start new asynctask if one is no running already.
 
                         getSuggestions = new GetSuggestions().setParName(Uri.encode(charSequence.toString()));
+
                         getSuggestions.execute();
                     } else {
                         if (getSuggestions != null) {
@@ -268,13 +296,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                             dialog = new AlertDialog.Builder(getActivity())
                                     .setIcon(android.R.drawable.ic_dialog_alert)
                                     .setTitle("No dose suggestions")
-                                    .setMessage("Sorry there are no dose suggestions available for this medication. " +
-                                            "But that's ok. " +
-                                            "If the drug you are adding is for example Miralax crystals do as follows\n" +
-                                            "ex." +
-                                            "\nNumeric value: 1" +
-                                            "\nMeasure unit: tsp" +
-                                            "\nDose Form: 1 tsp")
+                                    .setMessage(Constants.NO_DOSE_SUGGESTIONS)
                                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -283,14 +305,14 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                                     });
                             dialog.show();
 
-                            med_dose.requestFocus();
+                            medDose.requestFocus();
 
                         }
 
                     } catch (XmlPullParserException xmp) {
-                        Log.e(TAG, xmp.toString());
+                        xmp.printStackTrace();
                     } catch (IOException io) {
-                        Log.e(TAG, io.toString());
+                        io.printStackTrace();
                     }
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Service.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(acMedName.getWindowToken(), 0);
@@ -299,14 +321,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         } else {
             AlertDialog.Builder adB = new AlertDialog.Builder(getActivity());
             adB.setTitle("No Internet Connection")
-                    .setMessage("Sorry there is no internet connection which means you will not get any dose suggestions for this medication. " +
-                            "But that's ok. " +
-                            "If the drug you are adding is for example Miralax crystals do as follows\n" +
-                            "ex." +
-                            "\nNumeric value: 1" +
-                            "\nMeasure unit: tsp" +
-                            "\nDose Form: 1 tsp\n" +
-                            "Otherwise you can just wait till your online to add the new medication.")
+                    .setMessage(Constants.NO_NETWORK_CONNECT_NEW_MED)
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -316,25 +331,8 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
             adB.show();
 
         }
+    }
 
-        if (getArguments() != null && getArguments().getBoolean("edit")) {
-
-            populateForEdit(getArguments().getInt("unique_id"));
-        }
-
-        clear.setOnClickListener(new View.OnClickListener() { // clears all entries on form.
-            @Override
-            public void onClick(View view) {
-                DataCheck.clearForm(formWrapper);
-                if (etList != null && adminTimesList != null) {
-                    etList.clear();
-                    adminTimesList.removeAllViews();
-                }
-
-            }
-        });
-
-    } // end onActivityCreated()
 
     /**
      * TextChange Listener for  Dose count edittext.
@@ -364,9 +362,9 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                         createEditTexts(editable);
                     }
                 } catch (NumberFormatException nfe) {
-                    Log.e(TAG, nfe.toString());
+                    nfe.printStackTrace();
                 } catch (NullPointerException npe) {
-                    Log.e(TAG, npe.toString());
+                    npe.printStackTrace();
                 }
             }
         };
@@ -378,7 +376,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         String type = med_type.getSelectedItem().toString().toLowerCase().trim();
         medication.setMedName(acMedName.getText().toString().toLowerCase().trim());
         medication.setAdminType(type);
-        medication.setDoseMeasure(Float.valueOf(med_dose.getText().toString().trim()));
+        medication.setDoseMeasure(Float.valueOf(medDose.getText().toString().trim()));
         medication.setDoseMeasureType(med_measure_spinner.getText().toString().toLowerCase().trim());
         medication.setDoseForm(doseFormEntry.getText().toString());
         medication.setDoseCount(Integer.valueOf(maxDoses.getText().toString()));
@@ -520,7 +518,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         }
 
         acMedName.setText(medication.getMedName());
-        med_dose.setText(Float.toString(medication.getDoseMeasure()));
+        medDose.setText(Float.toString(medication.getDoseMeasure()));
         med_measure_spinner.setText(medication.getDoseMeasureType());
 
         if (medication.getAdminType().equalsIgnoreCase("routine")) {
@@ -543,7 +541,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         }
         doseFormEntry.setText(medication.getDoseForm());
         dc_med.setVisibility(View.VISIBLE);
-        delete_med.setVisibility(View.VISIBLE);
+        deleteMed.setVisibility(View.VISIBLE);
         clear.setVisibility(View.GONE);
         setEditButtonListeners(uniqueID); // turn on listeners for buttons.
     }
@@ -723,7 +721,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                                     //noinspection ConstantConditions
                                     imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
                                 } catch (NullPointerException npe) {
-                                    Log.e(TAG, npe.toString());
+                                    npe.printStackTrace();
                                 }
 
                             }
@@ -751,7 +749,7 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
     }
 
     private void setEditButtonListeners(final int idUnique) {
-        delete_med.setOnClickListener(new View.OnClickListener() {
+        deleteMed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -844,15 +842,15 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
 
                 if (!checkedRadioButton.getText().toString().equalsIgnoreCase("Other")) {
 
-                    med_dose.setText(String.valueOf(choices.get(id).getDoseDouble()));
-                    med_dose.setError(null);
+                    medDose.setText(String.valueOf(choices.get(id).getDoseDouble()));
+                    medDose.setError(null);
 
                     med_measure_spinner.setText(choices.get(id).getDoseMeasure());
                     med_measure_spinner.setError(null);
                     doseFormEntry.requestFocus();
 
                 } else {
-                    med_dose.requestFocus();
+                    medDose.requestFocus();
                 }
 
                 adDoseChoices.dismiss();
@@ -874,9 +872,9 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
         }
 
         @Override
-        protected ArrayList<String> doInBackground(Void... unused) {
+        protected ArrayList<String> doInBackground(Void... params) {
 
-            ArrayList<String> list = new ArrayList<String>();
+            ArrayList<String> list = new ArrayList<>();
             int eventType;
             XmlPullParser parser;
 
@@ -919,9 +917,9 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                 }
 
             } catch (IOException ioe) {
-                Log.e(TAG, ioe.toString());
+                ioe.printStackTrace();
             } catch (XmlPullParserException xmlp) {
-                Log.e(TAG, xmlp.toString());
+                xmlp.printStackTrace();
             }
             return list;
         }
@@ -932,11 +930,11 @@ public class Fragment_MedSettings extends Fragment implements View.OnClickListen
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
                         android.R.layout.select_dialog_item, list);
 
+                LogUtil.log(TAG, "onPostExecute");
                 acMedName.setAdapter(adapter);
 
             }
             super.onPostExecute(list);
         }
     }
-
 }

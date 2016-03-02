@@ -1,6 +1,7 @@
 package com.moorango.medli;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -23,14 +24,13 @@ public class OnboardingActivity extends FragmentActivity {
         setContentView(R.layout.activity_onboarding);
 
         EventBus.getInstance().register(this);
-        if (!AuthUtil.getInstance().isLoggedIn() && AuthUtil.getInstance().canLogin()) {
-            AuthUtil.getInstance().login();
-        }
-
+        
         if (AuthUtil.getInstance().isLoggedIn()) {
             Intent intent = new Intent(this, Activity_MedLi_light.class);
             startActivity(intent);
             this.finish();
+        } else if (!AuthUtil.getInstance().isLoggedIn() && AuthUtil.getInstance().canLogin()) {
+            new validateUserTask().execute();
         } else {
             FragmentManager fm = getSupportFragmentManager();
             fm.beginTransaction()
@@ -38,6 +38,27 @@ public class OnboardingActivity extends FragmentActivity {
                     .addToBackStack(WelcomeFragment.class.getSimpleName())
                     .commit();
 
+        }
+    }
+
+    class validateUserTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            AuthUtil.getInstance().login();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            if (AuthUtil.getInstance().isLoggedIn()) {
+                Intent intent = new Intent(OnboardingActivity.this, Activity_MedLi_light.class);
+                startActivity(intent);
+                OnboardingActivity.this.finish();
+            }
         }
     }
 
