@@ -13,7 +13,6 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 /**
@@ -97,44 +96,36 @@ public class NotifyService extends Service {
 
         }
 
-        NotificationCompat.Builder notify = new NotificationCompat.Builder(this);
-        notify.setContentTitle(title)
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setSubText(text)
-                .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(text));
-
-        if (prefs.getBoolean("sound_preference", true)) {
-            notify.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
-        }
-        if (prefs.getBoolean("vibrate_preference", true) && isVibrator) {
-            notify.setVibrate(new long[]{100, 250, 100, 500});
-        } else if (prefs.getBoolean("vibrate_preference", true) && !isVibrator) {
-
-            notify.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
-
-        }
-
         /***
          * if user ignores alarm set new alarms in background.
          */
         Intent intent = new Intent(this, StartAlarms.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, intent, 0);
 
-        notify.setDeleteIntent(pendingIntent);
-        notification = notify.build();
+        Notification.Builder builder = new Notification.Builder(this)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setStyle(new Notification.BigTextStyle().bigText(text))
+                .setSmallIcon(R.drawable.ic_launcher);
 
+        if (prefs.getBoolean("sound_preference", true)) {
+            builder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+        }
+        if (prefs.getBoolean("vibrate_preference", true) && isVibrator) {
+            builder.setVibrate(new long[]{100, 250, 100, 500});
+        } else if (prefs.getBoolean("vibrate_preference", true) && !isVibrator) {
+
+            builder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+
+        }
+        builder.setDeleteIntent(pendingIntent);
+        
+        notification = builder.build(); // available from API level 11 and onwards
 
         // The PendingIntent to launch our activity if the user selects this notification
         Intent backIntent = new Intent(this, Activity_MedLi_light.class);
         backIntent.putExtra(MEDICATION_NAME, medicationName);
         backIntent.putExtra(INTENT_FROM_NOTIFICATION, true);
-
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, backIntent, 0);
-
-        // Set the info for the views that show in the notification panel.
-        notification.setLatestEventInfo(this, title, text, contentIntent);
-
 
         // Clear the notification when it is pressed
         notification.flags |= Notification.FLAG_AUTO_CANCEL;

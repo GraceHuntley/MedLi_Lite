@@ -5,24 +5,28 @@
     <PreferenceCategory android:title="MedLi Settings">
 
         <CheckBoxPreference
+            android:defaultValue="true"
             android:key="vibrate_preference"
-            android:title="Vibrate alert?"
             android:summary="If checked device will vibrate twice when a medication is due."
-            android:defaultValue="true" />
+            android:title="Vibrate alert?" />
 
         <CheckBoxPreference
+            android:defaultValue="true"
             android:key="sound_preference"
-            android:title="Sound alert?"
             android:summary="If checked device will alert with a sound, some tablets will default to sound if vibrate not available."
-            android:defaultValue="true" />
+            android:title="Sound alert?" />
 
         <EditTextPreference
-            android:key="early_alarm_preference"
-            android:title="Early warning alarm?"
-            android:summary="Enter how many minutes before a medication is due that you would like the alarm to go off."
-            android:inputType="number"
             android:defaultValue="0"
-            android:dialogTitle="Enter how many minutes before medication is due." />
+            android:dialogTitle="Enter how many minutes before medication is due."
+            android:inputType="number"
+            android:key="early_alarm_preference"
+            android:summary="Enter how many minutes before a medication is due that you would like the alarm to go off."
+            android:title="Early warning alarm?" />
+
+        <Preference
+            android:key="log_out"
+            android:title="Sign Out" />
 
     </PreferenceCategory>
 

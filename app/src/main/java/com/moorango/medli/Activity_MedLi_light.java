@@ -3,6 +3,7 @@ package com.moorango.medli;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -22,9 +23,12 @@ import com.moorango.medli.Fragments.Fragment_EmptyMedList;
 import com.moorango.medli.Fragments.Fragment_History;
 import com.moorango.medli.Fragments.Fragment_Home;
 import com.moorango.medli.Fragments.Fragment_MedSettings;
+import com.moorango.medli.lib.eventbus.EventBus;
+import com.moorango.medli.lib.eventbus.events.RevertLifeCycleForSignOut;
+
+import java.util.HashMap;
 
 import io.fabric.sdk.android.Fabric;
-import java.util.HashMap;
 
 public class Activity_MedLi_light extends ActionBarActivity implements Fragment_Home.OnFragmentInteractionListener, Fragment_MedSettings.OnFragmentInteractionListener,
         Fragment_History.OnFragmentInteractionListener, Fragment_EmptyMedList.OnFragmentInteractionListener {
@@ -59,6 +63,8 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_med_li_light);
+
+        EventBus.getInstance().register(this);
 
         //ga = GoogleAnalytics.getInstance(this).newTracker("UA-54927508-1");
 
@@ -281,6 +287,14 @@ public class Activity_MedLi_light extends ActionBarActivity implements Fragment_
                 break;
         }
 
+    }
+
+    public void onEvent(RevertLifeCycleForSignOut event) {
+
+        Intent intent = new Intent(Application.getContext(), Onboarding.class);
+        startActivity(intent);
+
+        this.finish();
     }
 
 }

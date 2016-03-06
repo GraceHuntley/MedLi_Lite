@@ -15,21 +15,36 @@
         android:protectionLevel="signature" />
 
     <application
+        android:name=".Application"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Medli">
+        android:theme="@style/Theme.AppCompat.Light">
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
         <activity
-            android:name="com.moorango.medli.Activity_MedLi_light"
-            android:label="@string/app_name"
-            android:windowSoftInputMode="adjustPan">
+            android:name=".MedliSplash"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.moorango.medli.Activity_MedLi_light"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustPan">
+
+        </activity>
+
+        <activity
+            android:name=".Onboarding"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
         </activity>
 

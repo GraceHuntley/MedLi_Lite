@@ -10,6 +10,10 @@ import com.moorango.medli.Models.Medication;
 
 public class Constants {
 
+    public static final boolean PRODUCTION = false;
+
+    public static final String BASE_URL = "http://powerful-scrubland-91016.herokuapp.com/api/v1/";
+
     public static final String CREATE_PREFERENCES_DB = "CREATE TABLE prefs (" +
             "last_modified DATE DEFAULT (datetime('now','localtime')), " + // 0
             "pref_name TEXT PRIMARY KEY NOT NULL, " + // 1

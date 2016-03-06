@@ -1,9 +1,5 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.Base.AppCompat.Light">
-        <!-- Customize your theme here. -->
-    </style>
 
     <color name="red">#CC0000</color>
     <color name="green_selector">#98CB01</color>
